@@ -1,0 +1,5 @@
+moduleinfo.ini
+releases/
+build.sh
+composer.json
+composer.lock
