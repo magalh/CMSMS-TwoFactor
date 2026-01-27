@@ -31,3 +31,7 @@ $dest = cms_join_path(CMS_ROOT_PATH, $config['admin_dir'], 'twofactor.php');
 if (file_exists($source)) {
     copy($source, $dest);
 }
+
+// Track installation
+include_once(dirname(__FILE__) . '/lib/class.ModuleTracker.php');
+ModuleTracker::track('TwoFactor', 'install');

@@ -17,3 +17,7 @@ $twofactor_file = cms_join_path(CMS_ROOT_PATH, $config['admin_dir'], 'twofactor.
 if (file_exists($twofactor_file)) {
     @unlink($twofactor_file);
 }
+
+// Track installation
+include_once(dirname(__FILE__) . '/lib/class.ModuleTracker.php');
+ModuleTracker::track('TwoFactor', 'uninstall');
