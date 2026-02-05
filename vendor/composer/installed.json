@@ -85,6 +85,6 @@
             "install-path": "../robthree/twofactorauth"
         }
     ],
-    "dev": true,
+    "dev": false,
     "dev-package-names": []
 }

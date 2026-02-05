@@ -1,22 +1,22 @@
 <?php return array(
     'root' => array(
-        'pretty_version' => 'dev-master',
-        'version' => 'dev-master',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '3ed12d9f4e80682200fffeff45030d63115fb2a7',
+        'reference' => '586a877ad8bb45411d03e8ffb7099f4162d3c5f1',
         'name' => '__root__',
-        'dev' => true,
+        'dev' => false,
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => 'dev-master',
-            'version' => 'dev-master',
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '3ed12d9f4e80682200fffeff45030d63115fb2a7',
+            'reference' => '586a877ad8bb45411d03e8ffb7099f4162d3c5f1',
             'dev_requirement' => false,
         ),
         'robthree/twofactorauth' => array(
