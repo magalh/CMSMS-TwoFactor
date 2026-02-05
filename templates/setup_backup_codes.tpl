@@ -12,7 +12,6 @@
     {/foreach}
   </div>
   
-  <p><a class="pageback" href="{cms_action_url action='defaultadmin'}">&laquo; {$mod->Lang('back')}</a></p>
 {elseif $is_enabled}
   <p>{$mod->Lang('backup_codes_enabled_info')}</p>
   <p><strong>{$mod->Lang('codes_remaining')}:</strong> {count($codes)}</p>
@@ -25,7 +24,6 @@
     <input type="submit" name="{$actionid}cancel" value="{$mod->Lang('cancel')}" />
   </form>
   
-  <p><a class="pageback" href="{cms_action_url action='defaultadmin'}">&laquo; {$mod->Lang('back')}</a></p>
 {else}
   <p>{$mod->Lang('backup_codes_setup_info')}</p>
   
@@ -34,5 +32,4 @@
     <input type="submit" name="{$actionid}cancel" value="{$mod->Lang('cancel')}" />
   </form>
   
-  <p><a class="pageback" href="{cms_action_url action='defaultadmin'}">&laquo; {$mod->Lang('back')}</a></p>
 {/if}

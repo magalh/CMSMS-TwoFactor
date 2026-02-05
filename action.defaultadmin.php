@@ -3,23 +3,23 @@
 if( !defined('CMS_VERSION') ) exit;
 if( !$this->CheckPermission(TwoFactor::MANAGE_PERM) ) return;
 
-$uid = get_userid();
-
-// Handle set primary
-if (isset($params['set_primary'])) {
-    TwoFactorCore::set_primary_provider($uid, $params['set_primary']);
-    $this->SetMessage($this->Lang('primary_updated'));
+// Handle save
+if (isset($params['submit'])) {
+    set_site_preference('twofactor_twilio_api_key', trim($params['api_key']));
+    set_site_preference('twofactor_twilio_api_secret', trim($params['api_secret']));
+    set_site_preference('twofactor_twilio_service_sid', trim($params['service_sid']));
+    
+    $this->SetMessage($this->Lang('twilio_settings_saved'));
     $this->RedirectToAdminTab();
     return;
 }
 
-$providers = TwoFactorCore::get_providers();
-$enabled_providers = TwoFactorUserMeta::get_enabled_providers($uid);
-$primary_provider = TwoFactorUserMeta::get_primary_provider($uid);
+$api_key = get_site_preference('twofactor_twilio_api_key', '');
+$api_secret = get_site_preference('twofactor_twilio_api_secret', '');
+$service_sid = get_site_preference('twofactor_twilio_service_sid', '');
 
-$tpl = $smarty->CreateTemplate($this->GetTemplateResource('defaultadmin.tpl'), null, null, $smarty);
-$tpl->assign('providers', $providers);
-$tpl->assign('enabled_providers', $enabled_providers);
-$tpl->assign('primary_provider', $primary_provider);
-$tpl->assign('user_id', $uid);
-$tpl->display();
+$smarty->assign('api_key', $api_key);
+$smarty->assign('api_secret', $api_secret);
+$smarty->assign('service_sid', $service_sid);
+
+echo $this->ProcessTemplate('defaultadmin.tpl');

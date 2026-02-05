@@ -36,7 +36,3 @@
     </p>
   {form_end}
 {/if}
-
-<p class="pageback">
-  <a class="pageback" href="{cms_action_url action='defaultadmin'}">&laquo; {$mod->Lang('back')}</a>
-</p>

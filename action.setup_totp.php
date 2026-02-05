@@ -1,10 +1,10 @@
 <?php
 # See doc/LICENSE.txt for full license information.
 if (!defined('CMS_VERSION')) exit;
-if (!$this->CheckPermission(TwoFactor::MANAGE_PERM)) return;
+if (!$this->CheckPermission(TwoFactor::USE_PERM)) return;
 
 if (isset($params['cancel'])) {
-    $this->RedirectToAdminTab();
+    $this->RedirectToAdminTab('','','user_prefs');
     return;
 }
 
@@ -22,7 +22,7 @@ if (isset($params['verify'])) {
         TwoFactorCore::enable_provider_for_user($uid, 'TwoFactorProviderTOTP');
         
         $this->SetMessage($this->Lang('totp_enabled'));
-        $this->RedirectToAdminTab();
+        $this->RedirectToAdminTab('','','user_prefs');
         return;
     } else {
         $error = $this->Lang('invalid_code');
@@ -34,7 +34,7 @@ if (isset($params['reset'])) {
     $provider->delete_user_totp_key($uid);
     TwoFactorCore::disable_provider_for_user($uid, 'TwoFactorProviderTOTP');
     $this->SetMessage($this->Lang('totp_reset'));
-    $this->RedirectToAdminTab();
+    $this->RedirectToAdminTab('','','user_prefs');
     return;
 }
 

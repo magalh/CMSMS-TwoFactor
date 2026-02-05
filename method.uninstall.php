@@ -3,6 +3,7 @@
 if( !defined('CMS_VERSION') ) exit;
 
 $this->RemovePermission(TwoFactor::MANAGE_PERM);
+$this->RemovePermission(TwoFactor::USE_PERM);
 
 $db = $this->GetDb();
 $dict = NewDataDictionary($db);
@@ -21,3 +22,7 @@ if (file_exists($twofactor_file)) {
 // Track installation
 include_once(dirname(__FILE__) . '/lib/class.ModuleTracker.php');
 ModuleTracker::track('TwoFactor', 'uninstall');
+
+// Remove email verification template type
+$type = CmsLayoutTemplateType::load($this->GetName(), 'email_verification');
+if ($type) $type->delete();

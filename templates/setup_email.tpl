@@ -21,5 +21,3 @@
     <input type="submit" name="{$actionid}cancel" value="{$mod->Lang('cancel')}" />
   </form>
 {/if}
-
-<p><a class="pageback" href="{cms_action_url action='defaultadmin'}">&laquo; {$mod->Lang('back')}</a></p>

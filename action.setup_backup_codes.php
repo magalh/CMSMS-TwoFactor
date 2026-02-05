@@ -1,10 +1,10 @@
 <?php
 # See doc/LICENSE.txt for full license information.
 if (!defined('CMS_VERSION')) exit;
-if (!$this->CheckPermission(TwoFactor::MANAGE_PERM)) return;
+if (!$this->CheckPermission(TwoFactor::USE_PERM)) return;
 
 if (isset($params['cancel'])) {
-    $this->RedirectToAdminTab();
+    $this->RedirectToAdminTab('','','user_prefs');
     return;
 }
 
@@ -29,7 +29,7 @@ if (isset($params['disable'])) {
     TwoFactorCore::disable_provider_for_user($uid, 'TwoFactorProviderBackupCodes');
     TwoFactorUserMeta::delete($uid, 'backup_codes');
     $this->SetMessage($this->Lang('backup_codes_disabled'));
-    $this->RedirectToAdminTab();
+    $this->RedirectToAdminTab('','','user_prefs');
     return;
 }
 

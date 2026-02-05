@@ -64,6 +64,10 @@ class TwoFactorCore
 
     public static function is_user_using_two_factor($user_id)
     {
+        $primary = TwoFactorUserMeta::get_primary_provider($user_id);
+        if ($primary === 'disabled') {
+            return false;
+        }
         return self::get_primary_provider_for_user($user_id) !== null;
     }
 
@@ -87,5 +91,22 @@ class TwoFactorCore
     public static function set_primary_provider($user_id, $provider_key)
     {
         return TwoFactorUserMeta::set_primary_provider($user_id, $provider_key);
+    }
+
+    public static function get_template($params, $key, $typename)
+    {
+        if($key)
+        {
+        $tpl = \xt_param::get_string($params, $key);
+        if($tpl) { return $tpl; }
+        }
+        
+        $tpl = \CmsLayoutTemplate::load_dflt_by_type($typename);
+        
+        if($tpl) { return $tpl->get_name(); }
+        
+        \audit('', 'TwoFactor', 'No default template of type ' . $typename . ' found');
+        
+        return '';
     }
 }

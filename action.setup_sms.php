@@ -1,19 +1,15 @@
 <?php
 # See doc/LICENSE.txt for full license information.
 if (!defined('CMS_VERSION')) exit;
-if (!$this->CheckPermission(TwoFactor::MANAGE_PERM)) return;
+if (!$this->CheckPermission(TwoFactor::USE_PERM)) return;
 
 if (isset($params['cancel'])) {
-    $this->RedirectToAdminTab();
+    $this->RedirectToAdminTab('','','user_prefs');
     return;
 }
 
 $uid = get_userid();
 $provider = TwoFactorProviderSMS::get_instance();
-
-$verify_result = null;
-$verify_success = false;
-$error_message = '';
 
 function get_friendly_twilio_error($response) {
     $code = $response['code'] ?? 0;
@@ -33,7 +29,7 @@ function get_friendly_twilio_error($response) {
 if (isset($params['resend_code'])) {
     $pending = TwoFactorUserMeta::get($uid, 'sms_phone_pending');
     if ($pending) {
-        $api_key_sid = get_site_preference('twofactor_twilio_api_key_sid');
+        $api_key_sid = get_site_preference('twofactor_twilio_api_key');
         $api_secret = get_site_preference('twofactor_twilio_api_secret');
         $service_sid = get_site_preference('twofactor_twilio_service_sid');
         
@@ -58,12 +54,10 @@ if (isset($params['resend_code'])) {
             $response = json_decode($result, true);
             
             if ($http_code >= 200 && $http_code < 300) {
-                $verify_result = $response;
-                $verify_success = true;
+                $message = ['class' => 'pagemcontainer', 'text' => $this->Lang('verification_sent')];
             } else {
-                $verify_result = $response;
-                $verify_success = false;
                 $error_message = get_friendly_twilio_error($response);
+                $message = ['class' => 'pageerrorcontainer', 'text' => $error_message];
                 audit($uid, $this->GetName(), 'SMS resend verification failed: ' . $error_message);
             }
         }
@@ -81,7 +75,7 @@ if (isset($params['verify_code'])) {
     $pending = TwoFactorUserMeta::get($uid, 'sms_phone_pending');
     
     if ($code && $pending) {
-        $api_key_sid = get_site_preference('twofactor_twilio_api_key_sid');
+        $api_key_sid = get_site_preference('twofactor_twilio_api_key');
         $api_secret = get_site_preference('twofactor_twilio_api_secret');
         $service_sid = get_site_preference('twofactor_twilio_service_sid');
         
@@ -109,12 +103,11 @@ if (isset($params['verify_code'])) {
             TwoFactorUserMeta::delete($uid, 'sms_phone_pending');
             TwoFactorCore::enable_provider_for_user($uid, 'TwoFactorProviderSMS');
             $this->SetMessage($this->Lang('sms_enabled'));
-            $this->RedirectToAdminTab();
+            $this->RedirectToAdminTab('','','user_prefs');
             return;
         } else {
-            $verify_result = $response;
-            $verify_success = false;
             $error_message = get_friendly_twilio_error($response);
+            $message = ['class' => 'pageerrorcontainer', 'text' => $error_message];
             audit($uid, $this->GetName(), 'SMS verification failed: ' . $error_message);
         }
     }
@@ -124,7 +117,7 @@ if (isset($params['verify_code'])) {
 if (isset($params['send_verification'])) {
     $phone = trim($params['phone'] ?? '');
     if ($phone) {
-        $api_key_sid = get_site_preference('twofactor_twilio_api_key_sid');
+        $api_key_sid = get_site_preference('twofactor_twilio_api_key');
         $api_secret = get_site_preference('twofactor_twilio_api_secret');
         $service_sid = get_site_preference('twofactor_twilio_service_sid');
         
@@ -150,33 +143,23 @@ if (isset($params['send_verification'])) {
             
             if ($http_code >= 200 && $http_code < 300) {
                 TwoFactorUserMeta::update($uid, 'sms_phone_pending', $phone);
-                $verify_result = $response;
-                $verify_success = true;
+                $message = ['class' => 'pagemcontainer', 'text' => $this->Lang('verification_sent')];
             } else {
-                $verify_result = $response;
-                $verify_success = false;
                 $error_message = get_friendly_twilio_error($response);
+                $message = ['class' => 'pageerrorcontainer', 'text' => $error_message];
                 audit($uid, $this->GetName(), 'SMS send verification failed: ' . $error_message);
             }
         }
     }
 }
 
-// Handle save settings
-if (isset($params['save_settings'])) {
-    set_site_preference('twofactor_twilio_api_key_sid', trim($params['twilio_api_key_sid'] ?? ''));
-    set_site_preference('twofactor_twilio_api_secret', trim($params['twilio_api_secret'] ?? ''));
-    set_site_preference('twofactor_twilio_service_sid', trim($params['twilio_service_sid'] ?? ''));
-    
-    $this->SetMessage($this->Lang('twilio_settings_saved'));
-}
-
 // Handle disable
 if (isset($params['disable'])) {
     TwoFactorCore::disable_provider_for_user($uid, 'TwoFactorProviderSMS');
     TwoFactorUserMeta::delete($uid, 'sms_phone');
+    TwoFactorUserMeta::delete($uid, 'sms_phone_pending');
     $this->SetMessage($this->Lang('sms_disabled'));
-    $this->RedirectToAdminTab();
+    $this->RedirectToAdminTab('','','user_prefs');
     return;
 }
 
@@ -184,18 +167,15 @@ $phone = TwoFactorUserMeta::get($uid, 'sms_phone');
 $is_enabled = !empty($phone);
 $pending_phone = TwoFactorUserMeta::get($uid, 'sms_phone_pending');
 
-$twilio_api_key_sid = get_site_preference('twofactor_twilio_api_key_sid', '');
+$twilio_api_key = get_site_preference('twofactor_twilio_api_key', '');
 $twilio_api_secret = get_site_preference('twofactor_twilio_api_secret', '');
 $twilio_service_sid = get_site_preference('twofactor_twilio_service_sid', '');
+$twilio_configured = !empty($twilio_api_key) && !empty($twilio_api_secret) && !empty($twilio_service_sid);
 
 $tpl = $smarty->CreateTemplate($this->GetTemplateResource('setup_sms.tpl'), null, null, $smarty);
 $tpl->assign('phone', $phone);
 $tpl->assign('is_enabled', $is_enabled);
 $tpl->assign('pending_phone', $pending_phone);
-$tpl->assign('twilio_api_key_sid', $twilio_api_key_sid);
-$tpl->assign('twilio_api_secret', $twilio_api_secret);
-$tpl->assign('twilio_service_sid', $twilio_service_sid);
-$tpl->assign('verify_result', $verify_result);
-$tpl->assign('verify_success', $verify_success);
-$tpl->assign('error_message', $error_message);
+$tpl->assign('twilio_configured', $twilio_configured);
+$tpl->assign('message', $message ?? '');
 $tpl->display();

@@ -41,10 +41,23 @@ class TwoFactorProviderEmail extends TwoFactorProvider
         $user = UserOperations::get_instance()->LoadUserByID($user_id);
         $mod = cms_utils::get_module('TwoFactor');
         
+        $thetemplate = TwoFactorCore::get_template([], '', 'TwoFactor::email_verification');
+        if (!$thetemplate) {
+            error_log('TwoFactorProviderEmail: Email verification template not found.');
+            return false;
+        }
+        
+        $smarty = cmsms()->GetSmarty();
+        $tpl = $smarty->CreateTemplate($mod->GetTemplateResource($thetemplate), null, null, $smarty);
+        $tpl->assign('code', $code);
+        $tpl->assign('user', $user);
+        $body = $tpl->fetch();
+        
         $mailer = new cms_mailer();
         $mailer->AddAddress($user->email);
         $mailer->SetSubject($mod->Lang('email_subject'));
-        $mailer->SetBody($mod->Lang('email_body', $code));
+        $mailer->IsHTML(true);
+        $mailer->SetBody($body);
         
         return $mailer->Send();
     }

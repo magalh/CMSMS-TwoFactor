@@ -3,18 +3,18 @@
 class TwoFactor extends CMSModule
 {
     const MANAGE_PERM = 'manage_twofactor';
+    const USE_PERM = 'use_twofactor';
 
-    public function GetVersion() { return '1.0.0'; }
-    public function MinimumCMSVersion() {
-        return '2.1.6';
-    }
+    public function GetVersion() { return '1.1.3'; }
+    public function MinimumCMSVersion() {return '2.1.6';}
     public function GetFriendlyName() { return $this->Lang('friendlyname'); }
     public function GetAdminDescription() { return $this->Lang('admindescription'); }
     public function IsPluginModule() { return FALSE; }
     public function HasAdmin() { return TRUE; }
-    public function VisibleToAdminUser() { return $this->CheckPermission(self::MANAGE_PERM); }
+    public function VisibleToAdminUser() { return FALSE; }
     public function GetAuthor() { return 'Magal Hezi'; }
     public function GetAuthorEmail() { return 'magal@pixelsolutions.biz'; }
+    public function GetAdminSection() { return 'siteadmin'; }
 
     public function __construct()
     {
@@ -101,6 +101,50 @@ class TwoFactor extends CMSModule
         if (strpos($file, $base_dir) !== 0) return '';
         if (basename($file) !== 'changelog.inc') return '';
         return @file_get_contents($file);
+    }
+
+    public static function page_type_lang_callback($str)
+    {
+        $mod = cms_utils::get_module('TwoFactor');
+        if (is_object($mod)) return $mod->Lang('type_'.$str);
+    }
+
+    public static function reset_page_type_defaults(CmsLayoutTemplateType $type)
+    {
+        $mod = cms_utils::get_module('TwoFactor');
+        if ($type->get_originator() != $mod->GetName()) throw new CmsLogicException('Cannot reset contents for this template type');
+
+        if ($type->get_name() == 'email_verification') {
+            $fn = __DIR__.'/templates/orig_email_verification.tpl';
+            if (file_exists($fn)) return @file_get_contents($fn);
+        }
+    }
+
+    public function GetAdminMenuItems()
+    {
+        $out = [];
+        
+        if ($this->CheckPermission(self::MANAGE_PERM)) {
+            $obj = new CmsAdminMenuItem();
+            $obj->module = $this->GetName();
+            $obj->section = 'siteadmin';
+            $obj->title = 'Settings - TwoFactor';
+            $obj->action = 'defaultadmin';
+            $obj->url = $this->create_url('m1_', $obj->action);
+            $out[] = $obj;
+        }
+        
+        if ($this->CheckPermission(self::USE_PERM)) {
+            $obj = new CmsAdminMenuItem();
+            $obj->module = $this->GetName();
+            $obj->section = 'myprefs';
+            $obj->title = 'TwoFactor';
+            $obj->action = 'user_prefs';
+            $obj->url = $this->create_url('m1_', $obj->action);
+            $out[] = $obj;
+        }
+        
+        return $out;
     }
 
 

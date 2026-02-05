@@ -1,10 +1,10 @@
 <?php
 # See doc/LICENSE.txt for full license information.
 if (!defined('CMS_VERSION')) exit;
-if (!$this->CheckPermission(TwoFactor::MANAGE_PERM)) return;
+if (!$this->CheckPermission(TwoFactor::USE_PERM)) return;
 
 if (isset($params['cancel'])) {
-    $this->RedirectToAdminTab();
+    $this->RedirectToAdminTab('','','user_prefs');
     return;
 }
 
@@ -15,7 +15,7 @@ $provider = TwoFactorProviderEmail::get_instance();
 if (isset($params['enable'])) {
     TwoFactorCore::enable_provider_for_user($uid, 'TwoFactorProviderEmail');
     $this->SetMessage($this->Lang('email_enabled'));
-    $this->RedirectToAdminTab();
+    $this->RedirectToAdminTab('','','user_prefs');
     return;
 }
 
@@ -23,7 +23,7 @@ if (isset($params['enable'])) {
 if (isset($params['disable'])) {
     TwoFactorCore::disable_provider_for_user($uid, 'TwoFactorProviderEmail');
     $this->SetMessage($this->Lang('email_disabled'));
-    $this->RedirectToAdminTab();
+    $this->RedirectToAdminTab('','','user_prefs');
     return;
 }
 
