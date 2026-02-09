@@ -1,6 +1,7 @@
 <?php
 # See doc/LICENSE.txt for full license information.
 if( !defined('CMS_VERSION') ) exit;
+$this->SetCurrentTab('smssettings');
 
 // Handle save
 if (isset($params['submit'])) {
@@ -9,7 +10,7 @@ if (isset($params['submit'])) {
     set_site_preference('twofactor_twilio_service_sid', trim($params['service_sid']));
     
     $this->SetMessage($this->Lang('twilio_settings_saved'));
-    $this->RedirectToAdminTab();
+    $this->RedirectToAdminTab('smssettings');
     return;
 }
 

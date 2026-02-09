@@ -1,3 +1,16 @@
+<h3>Version 1.1.3</h3>
+<ul>
+  <li>Added dual permission system (manage_twofactor and use_twofactor)</li>
+  <li>Created separate admin interfaces: Site Admin settings and My Preferences</li>
+  <li>Centralized Twilio API configuration in site preferences</li>
+  <li>Added "Disabled" option to primary method dropdown</li>
+  <li>Excluded backup codes from primary method selection</li>
+  <li>Improved SMS setup with verified status display</li>
+  <li>Converted to standard CMSMS message system (SetMessage/SetError)</li>
+  <li>Added customizable HTML email template system</li>
+  <li>Created professional email verification template with responsive design</li>
+</ul>
+
 <h3>Version 1.0.0</h3>
 <ul>
   <li>Initial stable release</li>

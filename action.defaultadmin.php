@@ -4,11 +4,25 @@ if( !defined('CMS_VERSION') ) exit;
 if( !$this->CheckPermission(TwoFactor::MANAGE_PERM) ) return;
 
 $current_tab = isset($params['active_tab']) ? $params['active_tab'] : 'settings';
+$is_pro = TwoFactor::IsProEnabled();
+
+echo '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">';
+echo '<h3 style="margin:0;">' . $this->Lang('two_factor_settings') . '</h3>';
+echo '<a href="https://pixelsolutions.biz" target="_blank" rel="noopener noreferrer">';
+echo '<img src="https://pixelsolution.s3.eu-south-1.amazonaws.com/logos/LOGO_3_COLOR_300.png" alt="Pixel Solutions" style="height:40px;" />';
+echo '</a>';
+echo '</div>';
+
+if ($is_pro) {
+    echo '<div class="information" style="margin-bottom:20px;">';
+    echo '<p><strong>✓ TwoFactor Pro Active</strong> - All premium features are enabled.</p>';
+    echo '</div>';
+}
 
 echo $this->StartTabHeaders();
-echo $this->SetTabHeader('settings', $this->Lang('tab_settings'), $current_tab == 'settings');
-echo $this->SetTabHeader('premium', $this->Lang('tab_premium'), $current_tab == 'premium');
-echo $this->SetTabHeader('smscredit', $this->Lang('tab_smscredit'), $current_tab == 'smscredit');
+echo $this->SetTabHeader('settings', $this->Lang('tab_settings'));
+echo $this->SetTabHeader('premium', $this->Lang('tab_premium'));
+echo $this->SetTabHeader('smscredit', $this->Lang('tab_smscredit'));
 echo $this->EndTabHeaders();
 
 echo $this->StartTabContent();

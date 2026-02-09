@@ -5,7 +5,7 @@ class TwoFactor extends CMSModule
     const MANAGE_PERM = 'manage_twofactor';
     const USE_PERM = 'use_twofactor';
 
-    public function GetVersion() { return '1.1.3'; }
+    public function GetVersion() { return '1.2.0'; }
     public function MinimumCMSVersion() {return '2.1.6';}
     public function GetFriendlyName() { return $this->Lang('friendlyname'); }
     public function GetAdminDescription() { return $this->Lang('admindescription'); }
@@ -145,6 +145,58 @@ class TwoFactor extends CMSModule
         }
         
         return $out;
+    }
+
+    /**
+     * Check if Pro features are enabled with license validation
+     * @param bool $revalidate Force API revalidation (default: checks cache)
+     * @return bool
+     */
+    public static function IsProEnabled($revalidate = false)
+    {
+        $license_key = get_site_preference('twofactor_license_key', '');
+        
+        if (empty($license_key)) {
+            return false;
+        }
+        
+        // Check cache (valid for 24 hours)
+        $cache_time = get_site_preference('twofactor_license_verified', 0);
+        $cache_valid = (time() - $cache_time) < 86400;
+        
+        if (!$revalidate && $cache_valid) {
+            return get_site_preference('twofactor_pro_enabled', '0') == '1';
+        }
+        
+        // Revalidate with API
+        $api_url = 'https://pixelsolutions.local/api/validate-license?key=' . urlencode($license_key);
+        
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $api_url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($http_code === 200 && $response) {
+            $data = json_decode($response, true);
+            $is_valid = isset($data['valid']) && $data['valid'] === true;
+            
+            set_site_preference('twofactor_pro_enabled', $is_valid ? '1' : '0');
+            set_site_preference('twofactor_license_verified', time());
+            
+            return $is_valid;
+        }
+        
+        // On API failure, keep existing status if recently verified
+        if ($cache_valid) {
+            return get_site_preference('twofactor_pro_enabled', '0') == '1';
+        }
+        
+        return false;
     }
 
 

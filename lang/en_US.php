@@ -118,3 +118,23 @@ $lang['confirm_disable'] = 'Are you sure you want to disable backup codes?';
 $lang['backup_codes_disabled'] = 'Backup codes have been disabled.';
 $lang['backup_codes_setup_info'] = 'Generate backup codes to use as a fallback authentication method.';
 $lang['generate_codes'] = 'Generate Backup Codes';
+
+// Premium Tab
+$lang['premium_title'] = 'TwoFactor Pro';
+$lang['license_key'] = 'License Key';
+$lang['verify_license'] = 'Verify License';
+$lang['license_key_required'] = 'Please enter a license key.';
+$lang['license_activated'] = 'License activated successfully! TwoFactor Pro features are now enabled.';
+$lang['license_invalid'] = 'Invalid license key. Please check and try again.';
+$lang['license_verification_failed'] = 'Unable to verify license. Please check your connection and try again.';
+$lang['pro_activated'] = 'TwoFactor Pro Activated';
+$lang['pro_features_unlocked'] = 'All premium features are now unlocked.';
+$lang['pro_features_title'] = 'Pro Features';
+$lang['pro_feature_rate_limiting'] = 'Rate Limiting & Brute Force Protection';
+$lang['pro_feature_session_revalidation'] = 'Session Revalidation for Security Settings';
+$lang['pro_feature_trusted_devices'] = 'Trusted Devices (Remember for 30 days)';
+$lang['pro_feature_user_management'] = 'User Management Dashboard';
+$lang['pro_feature_enforce_2fa'] = 'Enforce 2FA for All Admin Users';
+$lang['pro_feature_audit_logs'] = 'Advanced Audit Logs with Export';
+$lang['pro_feature_email_notifications'] = 'Email Notifications for Suspicious Activity';
+$lang['get_pro_license'] = 'Get Pro License';
