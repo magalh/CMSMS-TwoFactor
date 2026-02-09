@@ -21,6 +21,28 @@ if (!isset($_SESSION['twofactor_user_id'])) {
 $uid = $_SESSION['twofactor_user_id'];
 $mod = \cms_utils::get_module('TwoFactor');
 
+// Check if device is trusted
+if (\TwoFactorTrustedDevice::is_trusted($uid)) {
+    $user = \UserOperations::get_instance()->LoadUserByID($uid);
+    if ($user) {
+        $rememberme = $_SESSION['twofactor_rememberme'] ?? 0;
+        $key = $login_ops->save_authentication($user);
+        
+        if ($rememberme) {
+            setcookie(CMS_USER_KEY, $key, time() + 2592000);
+        }
+        
+        unset($_SESSION['twofactor_user_id']);
+        unset($_SESSION['twofactor_rememberme']);
+        
+        audit($uid, 'Admin Username: ' . $user->username, 'Logged In (2FA - Trusted Device)');
+        
+        $config = \cms_utils::get_config();
+        redirect($config['admin_url'] . '/index.php');
+        exit;
+    }
+}
+
 // Handle provider switch
 if (isset($_GET['provider'])) {
     if ($_GET['provider']) {
@@ -82,6 +104,11 @@ if (isset($_POST['submit']) && $locked_seconds === false) {
         // Reset failed attempts on success
         if (\TwoFactor::IsProEnabled()) {
             \TwoFactorRateLimiter::reset_attempts($uid, $ip_address);
+        }
+        
+        // Trust device if requested
+        if (isset($_POST['trust_device']) && $_POST['trust_device'] == '1') {
+            \TwoFactorTrustedDevice::trust_device($uid);
         }
         
         $user = \UserOperations::get_instance()->LoadUserByID($uid);

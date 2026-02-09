@@ -5,7 +5,7 @@ class TwoFactor extends CMSModule
     const MANAGE_PERM = 'manage_twofactor';
     const USE_PERM = 'use_twofactor';
 
-    public function GetVersion() { return '1.2.1'; }
+    public function GetVersion() { return '1.2.2'; }
     public function MinimumCMSVersion() {return '2.1.6';}
     public function GetFriendlyName() { return $this->Lang('friendlyname'); }
     public function GetAdminDescription() { return $this->Lang('admindescription'); }

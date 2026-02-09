@@ -66,3 +66,24 @@ if( version_compare($oldversion,'1.2.1') < 0 ) {
     set_site_preference('twofactor_max_attempts_reset', '10');
     set_site_preference('twofactor_notify_admin', '1');
 }
+
+if( version_compare($oldversion,'1.2.2') < 0 ) {
+    // Add trusted devices table
+    $db = $this->GetDb();
+    $dict = NewDataDictionary($db);
+    
+    $flds = "
+        id I KEY AUTO,
+        user_id I NOTNULL,
+        device_token C(64) NOTNULL,
+        device_fingerprint C(64) NOTNULL,
+        device_name C(255),
+        ip_address C(45),
+        created_at I NOTNULL,
+        expires_at I NOTNULL
+    ";
+    $sqlarray = $dict->CreateTableSQL(CMS_DB_PREFIX.'mod_twofactor_trusted_devices', $flds);
+    $dict->ExecuteSQLArray($sqlarray);
+    
+    $db->Execute('CREATE INDEX idx_user_token ON '.CMS_DB_PREFIX.'mod_twofactor_trusted_devices (user_id, device_token)');
+}

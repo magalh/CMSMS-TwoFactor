@@ -164,3 +164,19 @@ $lang['rate_limiting_settings'] = 'Rate Limiting & Brute Force Protection';
 $lang['tab_templates'] = 'Templates';
 $lang['password_reset_email'] = 'Password Reset Email';
 $lang['admin_alert_email'] = 'Admin Alert Email';
+
+// Trusted Devices
+$lang['tab_methods'] = 'Methods';
+$lang['tab_trusted_devices'] = 'Trusted Devices';
+$lang['trusted_devices'] = 'Trusted Devices';
+$lang['device_name'] = 'Device';
+$lang['ip_address'] = 'IP Address';
+$lang['device_added'] = 'Added';
+$lang['device_expires'] = 'Expires';
+$lang['actions'] = 'Actions';
+$lang['revoke'] = 'Revoke';
+$lang['confirm_revoke_device'] = 'Are you sure you want to revoke this device?';
+$lang['device_revoked'] = 'Device has been revoked.';
+$lang['no_trusted_devices'] = 'You have no trusted devices.';
+$lang['trusted_devices_help'] = 'Trusted devices allow you to skip 2FA verification for 30 days. You can revoke access at any time.';
+$lang['remember_device'] = 'Remember this device for 30 days';

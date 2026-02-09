@@ -25,6 +25,11 @@
 						<fieldset>
 							<label for="authcode">Verification Code</label>
 							<input id="authcode" class="focus" placeholder="123456" name="authcode" type="text" inputmode="numeric" pattern="[0-9]*" size="15" value="" autocomplete="off" autofocus{if isset($locked_seconds) && $locked_seconds !== false} disabled{/if} />
+							<div style="margin: 10px 0;">
+								<label style="font-weight: normal; font-size: 13px;">
+									<input type="checkbox" name="trust_device" value="1"{if isset($locked_seconds) && $locked_seconds !== false} disabled{/if} /> Remember this device for 30 days
+								</label>
+							</div>
 							<input class="loginsubmit" name="submit" type="submit" value="Verify"{if isset($locked_seconds) && $locked_seconds !== false} disabled{/if} />
 						</fieldset>
 					</form>

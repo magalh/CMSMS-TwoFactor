@@ -36,6 +36,22 @@ $dict->ExecuteSQLArray($sqlarray);
 
 $db->Execute('CREATE INDEX idx_user_ip ON '.CMS_DB_PREFIX.'mod_twofactor_failed_attempts (user_id, ip_address)');
 
+// Trusted devices table
+$flds = "
+    id I KEY AUTO,
+    user_id I NOTNULL,
+    device_token C(64) NOTNULL,
+    device_fingerprint C(64) NOTNULL,
+    device_name C(255),
+    ip_address C(45),
+    created_at I NOTNULL,
+    expires_at I NOTNULL
+";
+$sqlarray = $dict->CreateTableSQL(CMS_DB_PREFIX.'mod_twofactor_trusted_devices', $flds);
+$dict->ExecuteSQLArray($sqlarray);
+
+$db->Execute('CREATE INDEX idx_user_token ON '.CMS_DB_PREFIX.'mod_twofactor_trusted_devices (user_id, device_token)');
+
 // Register event handlers
 \Events::CreateEvent('Core', 'LoginPost');
 $this->RegisterEvents();
