@@ -3,23 +3,26 @@
 if( !defined('CMS_VERSION') ) exit;
 if( !$this->CheckPermission(TwoFactor::MANAGE_PERM) ) return;
 
-// Handle save
-if (isset($params['submit'])) {
-    set_site_preference('twofactor_twilio_api_key', trim($params['api_key']));
-    set_site_preference('twofactor_twilio_api_secret', trim($params['api_secret']));
-    set_site_preference('twofactor_twilio_service_sid', trim($params['service_sid']));
-    
-    $this->SetMessage($this->Lang('twilio_settings_saved'));
-    $this->RedirectToAdminTab();
-    return;
-}
+$current_tab = isset($params['active_tab']) ? $params['active_tab'] : 'settings';
 
-$api_key = get_site_preference('twofactor_twilio_api_key', '');
-$api_secret = get_site_preference('twofactor_twilio_api_secret', '');
-$service_sid = get_site_preference('twofactor_twilio_service_sid', '');
+echo $this->StartTabHeaders();
+echo $this->SetTabHeader('settings', $this->Lang('tab_settings'), $current_tab == 'settings');
+echo $this->SetTabHeader('premium', $this->Lang('tab_premium'), $current_tab == 'premium');
+echo $this->SetTabHeader('smscredit', $this->Lang('tab_smscredit'), $current_tab == 'smscredit');
+echo $this->EndTabHeaders();
 
-$smarty->assign('api_key', $api_key);
-$smarty->assign('api_secret', $api_secret);
-$smarty->assign('service_sid', $service_sid);
+echo $this->StartTabContent();
 
-echo $this->ProcessTemplate('defaultadmin.tpl');
+echo $this->StartTab('settings', $params);
+include(__DIR__ . '/function.admin_settings.php');
+echo $this->EndTab();
+
+echo $this->StartTab('premium', $params);
+include(__DIR__ . '/function.admin_premium.php');
+echo $this->EndTab();
+
+echo $this->StartTab('smscredit', $params);
+include(__DIR__ . '/function.admin_smssettings.php');
+echo $this->EndTab();
+
+echo $this->EndTabContent();
