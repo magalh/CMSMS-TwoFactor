@@ -1,7 +1,15 @@
 <?php
 # See doc/LICENSE.txt for full license information.
 if( !defined('CMS_VERSION') ) exit;
-if( !$this->CheckPermission(TwoFactor::MANAGE_PERM) ) return;
+
+// Allow access if user has any admin permission
+if (!$this->CheckPermission(TwoFactor::MANAGE_PERM) && 
+    !$this->CheckPermission(TwoFactor::VIEW_USERS_PERM) &&
+    !$this->CheckPermission(TwoFactor::MANAGE_USERS_PERM) &&
+    !$this->CheckPermission(TwoFactor::MANAGE_TEMPLATES_PERM) &&
+    !$this->CheckPermission(TwoFactor::MANAGE_SMS_PERM)) {
+    return;
+}
 
 $current_tab = isset($params['active_tab']) ? $params['active_tab'] : 'settings';
 $is_pro = TwoFactor::IsProEnabled();
@@ -20,33 +28,53 @@ if ($is_pro) {
 }
 
 echo $this->StartTabHeaders();
-echo $this->SetTabHeader('settings', $this->Lang('tab_settings'));
-echo $this->SetTabHeader('templates', $this->Lang('tab_templates'));
-echo $this->SetTabHeader('user_management', $this->Lang('tab_user_management'));
-echo $this->SetTabHeader('premium', $this->Lang('tab_premium'));
-echo $this->SetTabHeader('smscredit', $this->Lang('tab_smscredit'));
+if ($is_pro && $this->CheckPermission(TwoFactor::MANAGE_PERM)) {
+    echo $this->SetTabHeader('settings', $this->Lang('tab_settings'));
+}
+if ($this->CheckPermission(TwoFactor::MANAGE_SMS_PERM)) {
+    echo $this->SetTabHeader('smscredit', $this->Lang('tab_smscredit'));
+}
+if ($is_pro && $this->CheckPermission(TwoFactor::MANAGE_TEMPLATES_PERM)) {
+    echo $this->SetTabHeader('templates', $this->Lang('tab_templates'));
+}
+if ($is_pro && $this->CheckPermission(TwoFactor::VIEW_USERS_PERM)) {
+    echo $this->SetTabHeader('user_management', $this->Lang('tab_user_management'));
+}
+if ($this->CheckPermission(TwoFactor::MANAGE_PERM)) {
+    echo $this->SetTabHeader('premium', $this->Lang('tab_premium'));
+}
 echo $this->EndTabHeaders();
 
 echo $this->StartTabContent();
 
-echo $this->StartTab('settings', $params);
-include(__DIR__ . '/function.admin_settings.php');
-echo $this->EndTab();
+if ($is_pro && $this->CheckPermission(TwoFactor::MANAGE_PERM)) {
+    echo $this->StartTab('settings', $params);
+    include(__DIR__ . '/function.admin_settings.php');
+    echo $this->EndTab();
+}
 
-echo $this->StartTab('templates', $params);
-include(__DIR__ . '/function.admin_templates.php');
-echo $this->EndTab();
+if ($this->CheckPermission(TwoFactor::MANAGE_SMS_PERM)) {
+    echo $this->StartTab('smscredit', $params);
+    include(__DIR__ . '/function.admin_smssettings.php');
+    echo $this->EndTab();
+}
 
-echo $this->StartTab('user_management', $params);
-include(__DIR__ . '/function.admin_user_management.php');
-echo $this->EndTab();
+if ($is_pro && $this->CheckPermission(TwoFactor::MANAGE_TEMPLATES_PERM)) {
+    echo $this->StartTab('templates', $params);
+    include(__DIR__ . '/function.admin_templates.php');
+    echo $this->EndTab();
+}
 
-echo $this->StartTab('premium', $params);
-include(__DIR__ . '/function.admin_premium.php');
-echo $this->EndTab();
+if ($is_pro && $this->CheckPermission(TwoFactor::VIEW_USERS_PERM)) {
+    echo $this->StartTab('user_management', $params);
+    include(__DIR__ . '/function.admin_user_management.php');
+    echo $this->EndTab();
+}
 
-echo $this->StartTab('smscredit', $params);
-include(__DIR__ . '/function.admin_smssettings.php');
-echo $this->EndTab();
+if ($this->CheckPermission(TwoFactor::MANAGE_PERM)) {
+    echo $this->StartTab('premium', $params);
+    include(__DIR__ . '/function.admin_premium.php');
+    echo $this->EndTab();
+}
 
 echo $this->EndTabContent();

@@ -4,8 +4,12 @@ class TwoFactor extends CMSModule
 {
     const MANAGE_PERM = 'manage_twofactor';
     const USE_PERM = 'use_twofactor';
+    const VIEW_USERS_PERM = 'view_twofactor_users';
+    const MANAGE_USERS_PERM = 'manage_twofactor_users';
+    const MANAGE_TEMPLATES_PERM = 'manage_twofactor_templates';
+    const MANAGE_SMS_PERM = 'manage_twofactor_sms';
 
-    public function GetVersion() { return '1.2.2'; }
+    public function GetVersion() { return '1.2.3'; }
     public function MinimumCMSVersion() {return '2.1.6';}
     public function GetFriendlyName() { return $this->Lang('friendlyname'); }
     public function GetAdminDescription() { return $this->Lang('admindescription'); }
@@ -149,7 +153,12 @@ class TwoFactor extends CMSModule
     {
         $out = [];
         
-        if ($this->CheckPermission(self::MANAGE_PERM)) {
+        // Show Settings menu if user has any admin permission
+        if ($this->CheckPermission(self::MANAGE_PERM) || 
+            $this->CheckPermission(self::VIEW_USERS_PERM) ||
+            $this->CheckPermission(self::MANAGE_USERS_PERM) ||
+            $this->CheckPermission(self::MANAGE_TEMPLATES_PERM) ||
+            $this->CheckPermission(self::MANAGE_SMS_PERM)) {
             $obj = new CmsAdminMenuItem();
             $obj->module = $this->GetName();
             $obj->section = 'siteadmin';
@@ -194,7 +203,9 @@ class TwoFactor extends CMSModule
         }
         
         // Revalidate with API
-        $api_url = 'https://pixelsolutions.local/api/validate-license?key=' . urlencode($license_key);
+        $config = cms_utils::get_config();
+        $site_url = $config['root_url'];
+        $api_url = 'https://pixelsolutions.local/api/validate-license?key=' . urlencode($license_key) . '&url=' . urlencode($site_url);
         
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $api_url);

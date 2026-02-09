@@ -2,6 +2,8 @@
 # See doc/LICENSE.txt for full license information.
 if (!defined('CMS_VERSION')) exit;
 
+$uid = get_userid(false);
+
 // Handle revoke device
 if (isset($params['revoke_device'])) {
     $device_id = (int)$params['revoke_device'];

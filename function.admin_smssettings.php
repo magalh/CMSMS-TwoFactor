@@ -3,6 +3,8 @@
 if( !defined('CMS_VERSION') ) exit;
 $this->SetCurrentTab('smssettings');
 
+if (!$this->CheckPermission(TwoFactor::MANAGE_SMS_PERM)) return;
+
 // Handle save
 if (isset($params['submit'])) {
     set_site_preference('twofactor_twilio_api_key', trim($params['api_key']));

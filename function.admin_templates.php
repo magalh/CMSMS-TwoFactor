@@ -3,6 +3,8 @@
 if( !defined('CMS_VERSION') ) exit;
 $this->SetCurrentTab('templates');
 
+if (!$this->CheckPermission(TwoFactor::MANAGE_TEMPLATES_PERM)) return;
+
 // Handle save
 if (isset($params['save_templates'])) {
     if (TwoFactor::IsProEnabled()) {

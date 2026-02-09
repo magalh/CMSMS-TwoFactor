@@ -50,10 +50,14 @@
             <td>{$user.trusted_devices}</td>
             <td>
                 {if $user.has_2fa}
-                    <a href="{cms_action_url action='defaultadmin' active_tab='user_management' disable_2fa_user=$user.id}" 
-                       onclick="return confirm('{$mod->Lang('confirm_disable_user_2fa')|replace:'%s':$user.username}');">
-                        {$mod->Lang('disable_2fa')}
-                    </a>
+                    {if $can_manage}
+                        <a href="{cms_action_url action='defaultadmin' active_tab='user_management' disable_2fa_user=$user.id}" 
+                           onclick="return confirm('{$mod->Lang('confirm_disable_user_2fa')|replace:'%s':$user.username}');">
+                            {$mod->Lang('disable_2fa')}
+                        </a>
+                    {else}
+                        <span style="color: #999;">View Only</span>
+                    {/if}
                 {else}
                     -
                 {/if}

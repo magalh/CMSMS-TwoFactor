@@ -2,6 +2,8 @@
 # See doc/LICENSE.txt for full license information.
 if (!defined('CMS_VERSION')) exit;
 
+$uid = get_userid(false);
+
 // Handle set primary
 if (isset($params['set_primary'])) {
     TwoFactorCore::set_primary_provider($uid, $params['set_primary']);

@@ -1,14 +1,16 @@
 <?php
-# See doc/LICENSE.txt for full license information.
 if( !defined('CMS_VERSION') ) exit;
 
 $this->CreatePermission(TwoFactor::MANAGE_PERM, 'Manage TwoFactor');
 $this->CreatePermission(TwoFactor::USE_PERM, 'Use TwoFactor');
+$this->CreatePermission(TwoFactor::VIEW_USERS_PERM, 'View TwoFactor Users');
+$this->CreatePermission(TwoFactor::MANAGE_USERS_PERM, 'Manage TwoFactor Users');
+$this->CreatePermission(TwoFactor::MANAGE_TEMPLATES_PERM, 'Manage TwoFactor Templates');
+$this->CreatePermission(TwoFactor::MANAGE_SMS_PERM, 'Manage TwoFactor SMS');
 
 $db = $this->GetDb();
 $dict = NewDataDictionary($db);
 
-// User meta table for storing provider-specific data
 $flds = "
     id I KEY AUTO,
     user_id I NOTNULL,
@@ -17,11 +19,8 @@ $flds = "
 ";
 $sqlarray = $dict->CreateTableSQL(CMS_DB_PREFIX.'mod_twofactor_usermeta', $flds);
 $dict->ExecuteSQLArray($sqlarray);
-
-// Create index for faster lookups
 $db->Execute('CREATE INDEX idx_user_key ON '.CMS_DB_PREFIX.'mod_twofactor_usermeta (user_id, meta_key)');
 
-// Failed attempts table for rate limiting
 $flds = "
     id I KEY AUTO,
     user_id I NOTNULL,
@@ -33,10 +32,8 @@ $flds = "
 ";
 $sqlarray = $dict->CreateTableSQL(CMS_DB_PREFIX.'mod_twofactor_failed_attempts', $flds);
 $dict->ExecuteSQLArray($sqlarray);
-
 $db->Execute('CREATE INDEX idx_user_ip ON '.CMS_DB_PREFIX.'mod_twofactor_failed_attempts (user_id, ip_address)');
 
-// Trusted devices table
 $flds = "
     id I KEY AUTO,
     user_id I NOTNULL,
@@ -49,14 +46,11 @@ $flds = "
 ";
 $sqlarray = $dict->CreateTableSQL(CMS_DB_PREFIX.'mod_twofactor_trusted_devices', $flds);
 $dict->ExecuteSQLArray($sqlarray);
-
 $db->Execute('CREATE INDEX idx_user_token ON '.CMS_DB_PREFIX.'mod_twofactor_trusted_devices (user_id, device_token)');
 
-// Register event handlers
 \Events::CreateEvent('Core', 'LoginPost');
 $this->RegisterEvents();
 
-// Copy twofactor.php to admin directory
 $config = cms_config::get_instance();
 $source = cms_join_path($this->GetModulePath(), 'admin_files', 'orig.twofactor.php');
 $dest = cms_join_path(CMS_ROOT_PATH, $config['admin_dir'], 'twofactor.php');
@@ -64,17 +58,14 @@ if (file_exists($source)) {
     copy($source, $dest);
 }
 
-// Track installation
 include_once(dirname(__FILE__) . '/lib/class.ModuleTracker.php');
-ModuleTracker::track('TwoFactor', 'install');
+ModuleTracker::track('TwoFactor Pro', 'install');
 
-// Set default Pro settings
 set_site_preference('twofactor_rate_limiting_enabled', '1');
 set_site_preference('twofactor_max_attempts_lockout', '5');
 set_site_preference('twofactor_max_attempts_reset', '10');
 set_site_preference('twofactor_notify_admin', '1');
 
-// Create email verification template type
 $email_type = new CmsLayoutTemplateType();
 $email_type->set_originator($this->GetName());
 $email_type->set_name('email_verification');

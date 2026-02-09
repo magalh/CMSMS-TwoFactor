@@ -2,6 +2,9 @@
 # See doc/LICENSE.txt for full license information.
 if (!defined('CMS_VERSION')) exit;
 
+if (!$this->CheckPermission(TwoFactor::VIEW_USERS_PERM) && 
+    !$this->CheckPermission(TwoFactor::MANAGE_USERS_PERM)) return;
+
 // Handle disable 2FA for user
 if (isset($params['disable_2fa_user'])) {
     $target_uid = (int)$params['disable_2fa_user'];
@@ -87,4 +90,5 @@ $tpl = $smarty->CreateTemplate($this->GetTemplateResource('admin_user_management
 $tpl->assign('users', $users_data);
 $tpl->assign('actionid', $id);
 $tpl->assign('mod', $this);
+$tpl->assign('can_manage', $this->CheckPermission(TwoFactor::MANAGE_USERS_PERM));
 $tpl->display();
