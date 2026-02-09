@@ -23,14 +23,33 @@
 					<form method="post" action="twofactor.php">
 						<fieldset>
 							<label for="authcode">Authentication Code</label>
-							<input id="authcode" class="focus" placeholder="123 456" name="authcode" type="text" inputmode="numeric" pattern="[0-9 ]*" size="15" value="" autocomplete="off" autofocus />
-							<input class="loginsubmit" name="submit" type="submit" value="Verify" />
+							<input id="authcode" class="focus" placeholder="123 456" name="authcode" type="text" inputmode="numeric" pattern="[0-9 ]*" size="15" value="" autocomplete="off" autofocus{if isset($locked_seconds) && $locked_seconds !== false} disabled{/if} />
+							<input class="loginsubmit" name="submit" type="submit" value="Verify"{if isset($locked_seconds) && $locked_seconds !== false} disabled{/if} />
 						</fieldset>
 					</form>
 					{if isset($error) && $error != ''}
-						<div class="message error">
+						<div class="message error" id="error-message">
 							{$error}
 						</div>
+					{/if}
+					{if isset($locked_seconds) && $locked_seconds !== false}
+						<script>
+						var countdown = {$locked_seconds};
+						var timer = setInterval(function() {
+							countdown--;
+							if (countdown <= 0) {
+								window.location.href = 'twofactor.php';
+							} else {
+								var minutes = Math.ceil(countdown / 60);
+								var seconds = countdown % 60;
+								if (countdown < 60) {
+									document.getElementById('error-message').innerHTML = 'Too many failed attempts. Please try again in ' + countdown + ' second' + (countdown > 1 ? 's' : '') + '.';
+								} else {
+									document.getElementById('error-message').innerHTML = 'Too many failed attempts. Please try again in ' + minutes + ' minute' + (minutes > 1 ? 's' : '') + '.';
+								}
+							}
+						}, 1000);
+						</script>
 					{/if}
 					{if $has_backup_codes && !$using_backup}
 						<p class="forgotpw">

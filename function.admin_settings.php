@@ -3,5 +3,32 @@
 if( !defined('CMS_VERSION') ) exit;
 $this->SetCurrentTab('settings');
 
-echo '<h3>'.$this->Lang('tab_settings').'</h3>';
-echo '<p>'.$this->Lang('settings_info').'</p>';
+// Handle save
+if (isset($params['save_settings'])) {
+    if (TwoFactor::IsProEnabled()) {
+        set_site_preference('twofactor_rate_limiting_enabled', isset($params['rate_limiting_enabled']) ? '1' : '0');
+        set_site_preference('twofactor_max_attempts_lockout', (int)$params['max_attempts_lockout']);
+        set_site_preference('twofactor_max_attempts_reset', (int)$params['max_attempts_reset']);
+        set_site_preference('twofactor_notify_admin', isset($params['notify_admin']) ? '1' : '0');
+        set_site_preference('twofactor_ip_blacklist', trim($params['ip_blacklist']));
+        $this->SetMessage($this->Lang('settings_saved'));
+    }
+    $this->RedirectToAdminTab('settings');
+    return;
+}
+
+$is_pro = TwoFactor::IsProEnabled();
+
+$tpl = $smarty->CreateTemplate($this->GetTemplateResource('admin_settings.tpl'), null, null, $smarty);
+
+$tpl->assign('is_pro', $is_pro);
+
+if ($is_pro) {
+    $tpl->assign('rate_limiting_enabled', get_site_preference('twofactor_rate_limiting_enabled', '1'));
+    $tpl->assign('max_attempts_lockout', get_site_preference('twofactor_max_attempts_lockout', '3'));
+    $tpl->assign('max_attempts_reset', get_site_preference('twofactor_max_attempts_reset', '6'));
+    $tpl->assign('notify_admin', get_site_preference('twofactor_notify_admin', '1'));
+    $tpl->assign('ip_blacklist', get_site_preference('twofactor_ip_blacklist', ''));
+}
+
+$tpl->display();

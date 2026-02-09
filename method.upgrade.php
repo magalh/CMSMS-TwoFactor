@@ -40,3 +40,29 @@ if( version_compare($oldversion,'1.1.3') < 0 ) {
         $tpl->set_type_dflt(TRUE);
         $tpl->save();
 }
+
+if( version_compare($oldversion,'1.2.1') < 0 ) {
+    // Add failed attempts table for rate limiting
+    $db = $this->GetDb();
+    $dict = NewDataDictionary($db);
+    
+    $flds = "
+        id I KEY AUTO,
+        user_id I NOTNULL,
+        ip_address C(45) NOTNULL,
+        attempt_count I DEFAULT 0,
+        first_attempt I,
+        last_attempt I,
+        locked_until I
+    ";
+    $sqlarray = $dict->CreateTableSQL(CMS_DB_PREFIX.'mod_twofactor_failed_attempts', $flds);
+    $dict->ExecuteSQLArray($sqlarray);
+    
+    $db->Execute('CREATE INDEX idx_user_ip ON '.CMS_DB_PREFIX.'mod_twofactor_failed_attempts (user_id, ip_address)');
+    
+    // Set default Pro settings
+    set_site_preference('twofactor_rate_limiting_enabled', '1');
+    set_site_preference('twofactor_max_attempts_lockout', '5');
+    set_site_preference('twofactor_max_attempts_reset', '10');
+    set_site_preference('twofactor_notify_admin', '1');
+}

@@ -33,7 +33,7 @@ class TwoFactorProviderEmail extends TwoFactorProvider
     public function generate_and_send_code($user_id)
     {
         $code = sprintf('%06d', mt_rand(0, 999999));
-        $expiry = time() + 600; // 10 minutes
+        $expiry = time() + 1800; // 30 minutes (increased from 10)
         
         TwoFactorUserMeta::update($user_id, 'email_code', $code);
         TwoFactorUserMeta::update($user_id, 'email_code_expiry', $expiry);
@@ -72,7 +72,8 @@ class TwoFactorProviderEmail extends TwoFactorProvider
             return false;
         }
         
-        if ($submitted_code === $stored_code) {
+        // Convert both to strings for comparison
+        if (strval($submitted_code) === strval($stored_code)) {
             TwoFactorUserMeta::delete($user_id, 'email_code');
             TwoFactorUserMeta::delete($user_id, 'email_code_expiry');
             return true;

@@ -32,6 +32,15 @@ if (isset($_GET['provider'])) {
     unset($_SESSION['twofactor_sms_sent']);
 }
 
+// Handle resend request
+if (isset($_GET['resend'])) {
+    unset($_SESSION['twofactor_email_sent']);
+    unset($_SESSION['twofactor_sms_sent']);
+    $config = \cms_utils::get_config();
+    redirect($config['admin_url'] . '/twofactor.php');
+    exit;
+}
+
 // Get provider (check for override first)
 if (isset($_SESSION['twofactor_override_provider'])) {
     $provider_key = $_SESSION['twofactor_override_provider'];
@@ -49,11 +58,32 @@ if (!$provider) {
 }
 
 $error = '';
+$locked_seconds = false;
+$ip_address = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
 
-if (isset($_POST['submit'])) {
+// Check for error from previous redirect
+if (isset($_SESSION['twofactor_error'])) {
+    $error = $_SESSION['twofactor_error'];
+    unset($_SESSION['twofactor_error']);
+}
+
+// Check rate limiting (Pro feature)
+if (\TwoFactor::IsProEnabled()) {
+    $locked_seconds = \TwoFactorRateLimiter::check_rate_limit($uid, $ip_address);
+    if ($locked_seconds !== false) {
+        $error = sprintf($mod->Lang('account_locked'), ceil($locked_seconds / 60));
+    }
+}
+
+if (isset($_POST['submit']) && $locked_seconds === false) {
     $result = $provider->validate_authentication($uid);
     
     if ($result) {
+        // Reset failed attempts on success
+        if (\TwoFactor::IsProEnabled()) {
+            \TwoFactorRateLimiter::reset_attempts($uid, $ip_address);
+        }
+        
         $user = \UserOperations::get_instance()->LoadUserByID($uid);
         if ($user) {
             $rememberme = $_SESSION['twofactor_rememberme'] ?? 0;
@@ -76,6 +106,18 @@ if (isset($_POST['submit'])) {
             exit;
         }
     }
+    
+    // Record failed attempt
+    if (\TwoFactor::IsProEnabled()) {
+        \TwoFactorRateLimiter::record_failed_attempt($uid, $ip_address);
+        // Store error in session for after redirect
+        $_SESSION['twofactor_error'] = $mod->Lang('invalid_code');
+        // Redirect to refresh lockout status
+        $config = \cms_utils::get_config();
+        redirect($config['admin_url'] . '/twofactor.php');
+        exit;
+    }
+    
     $error = $mod->Lang('invalid_code');
 }
 
@@ -121,4 +163,5 @@ $smarty->assign('config', $config);
 $smarty->assign('error', $error);
 $smarty->assign('has_backup_codes', $has_backup_codes);
 $smarty->assign('using_backup', $using_backup);
+$smarty->assign('locked_seconds', $locked_seconds);
 $smarty->display($template);

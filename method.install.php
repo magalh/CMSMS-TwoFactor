@@ -21,6 +21,21 @@ $dict->ExecuteSQLArray($sqlarray);
 // Create index for faster lookups
 $db->Execute('CREATE INDEX idx_user_key ON '.CMS_DB_PREFIX.'mod_twofactor_usermeta (user_id, meta_key)');
 
+// Failed attempts table for rate limiting
+$flds = "
+    id I KEY AUTO,
+    user_id I NOTNULL,
+    ip_address C(45) NOTNULL,
+    attempt_count I DEFAULT 0,
+    first_attempt I,
+    last_attempt I,
+    locked_until I
+";
+$sqlarray = $dict->CreateTableSQL(CMS_DB_PREFIX.'mod_twofactor_failed_attempts', $flds);
+$dict->ExecuteSQLArray($sqlarray);
+
+$db->Execute('CREATE INDEX idx_user_ip ON '.CMS_DB_PREFIX.'mod_twofactor_failed_attempts (user_id, ip_address)');
+
 // Register event handlers
 \Events::CreateEvent('Core', 'LoginPost');
 $this->RegisterEvents();
@@ -36,6 +51,12 @@ if (file_exists($source)) {
 // Track installation
 include_once(dirname(__FILE__) . '/lib/class.ModuleTracker.php');
 ModuleTracker::track('TwoFactor', 'install');
+
+// Set default Pro settings
+set_site_preference('twofactor_rate_limiting_enabled', '1');
+set_site_preference('twofactor_max_attempts_lockout', '5');
+set_site_preference('twofactor_max_attempts_reset', '10');
+set_site_preference('twofactor_notify_admin', '1');
 
 // Create email verification template type
 $email_type = new CmsLayoutTemplateType();
