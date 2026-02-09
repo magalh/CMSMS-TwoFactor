@@ -46,6 +46,32 @@ class TwoFactor extends CMSModule
     public function InitializeAdmin()
     {
         TwoFactorCore::register_providers();
+        
+        // Check if 2FA enforcement is active
+        $enforce_2fa = get_site_preference('twofactor_enforce_all', '0') == '1';
+        if (!$enforce_2fa) {
+            return;
+        }
+        
+        $uid = get_userid(false);
+        if (!$uid) {
+            return;
+        }
+        
+        // Check if user has 2FA enabled
+        if (TwoFactorCore::is_user_using_two_factor($uid)) {
+            return;
+        }
+        
+        // Allow access to TwoFactor module for setup
+        $current_module = isset($_REQUEST['mact']) ? explode(',', $_REQUEST['mact'])[0] : '';
+        if ($current_module == 'TwoFactor') {
+            return;
+        }
+        
+        // Redirect to setup page
+        $this->RedirectToAdminTab('',array('enforce' => '1'),'user_prefs');
+        exit;
     }
 
     public function RegisterEvents()
@@ -65,24 +91,23 @@ class TwoFactor extends CMSModule
         if (!isset($params['user'])) return;
         
         $uid = $params['user']->id;
-
-        if (!TwoFactorCore::is_user_using_two_factor($uid)) {
-            return;
+        $config = cms_utils::get_config();
+        
+        // Check if user has 2FA enabled
+        $has_2fa = TwoFactorCore::is_user_using_two_factor($uid);
+        
+        if ($has_2fa) {
+            // User has 2FA, proceed with verification
+            $_SESSION['twofactor_user_id'] = $uid;
+            $_SESSION['twofactor_rememberme'] = isset($_POST['loginremember']) ? 1 : 0;
+            
+            $url = $config['admin_url'] . '/twofactor.php';
+            redirect($url);
+            exit;
         }
         
-        // Store user info
-        $_SESSION['twofactor_user_id'] = $uid;
-        $_SESSION['twofactor_rememberme'] = isset($_POST['loginremember']) ? 1 : 0;
-        
-        // Get the session key that was just created
-        $key = $_SESSION[CMS_USER_KEY] ?? '';
-        
-        // Redirect to 2FA verification page
-        $config = cms_utils::get_config();
-        $url = $config['admin_url'] . '/twofactor.php';
-        error_log('TwoFactor InterceptLogin: Redirecting to ' . $url);
-        redirect($url);
-        exit;
+        // Let login complete normally
+        return;
     }
 
     public function GetHelp() {

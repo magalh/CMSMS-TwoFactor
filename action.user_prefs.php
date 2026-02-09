@@ -3,11 +3,13 @@
 if( !defined('CMS_VERSION') ) exit;
 if( !$this->CheckPermission(TwoFactor::USE_PERM) ) return;
 
-// Always use the currently logged-in user, never trust session variables
-$uid = get_userid(false);
-if (!$uid) {
-    echo '<p class="error">You must be logged in to access this page.</p>';
-    return;
+// Check if 2FA is being enforced
+$enforce_mode = isset($params['enforce']) && $params['enforce'] == '1';
+if ($enforce_mode) {
+    echo '<div class="warning" style="margin: 20px 0; padding: 15px; background: #fff3cd; border: 1px solid #ffc107;">';
+    echo '<h3 style="margin-top: 0;">' . $this->Lang('2fa_required') . '</h3>';
+    echo '<p>' . $this->Lang('2fa_required_message') . '</p>';
+    echo '</div>';
 }
 
 echo $this->StartTabHeaders();

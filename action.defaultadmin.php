@@ -6,7 +6,7 @@ if( !$this->CheckPermission(TwoFactor::MANAGE_PERM) ) return;
 $current_tab = isset($params['active_tab']) ? $params['active_tab'] : 'settings';
 $is_pro = TwoFactor::IsProEnabled();
 
-echo '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">';
+echo '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">';
 echo '<h3 style="margin:0;">' . $this->Lang('two_factor_settings') . '</h3>';
 echo '<a href="https://pixelsolutions.biz" target="_blank" rel="noopener noreferrer">';
 echo '<img src="https://pixelsolution.s3.eu-south-1.amazonaws.com/logos/LOGO_3_COLOR_300.png" alt="Pixel Solutions" style="height:40px;" />';

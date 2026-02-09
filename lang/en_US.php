@@ -183,6 +183,13 @@ $lang['legend_failed_attempts'] = 'Failed attempts: Red (5+), Orange (3-4), Blac
 $lang['legend_disable'] = 'Use "Disable 2FA" to unlock users or remove their 2FA settings';
 $lang['device_not_found'] = 'Device not found or does not belong to you.';
 
+// Enforce 2FA
+$lang['general_settings'] = 'General Settings';
+$lang['enforce_2fa_all'] = 'Enforce 2FA for All Admin Users';
+$lang['enforce_2fa_all_help'] = 'When enabled, all admin users will be required to enable 2FA before they can access the admin panel';
+$lang['2fa_required'] = '2FA Required';
+$lang['2fa_required_message'] = 'Your administrator has enabled mandatory two-factor authentication. You must enable at least one 2FA method below to continue using the admin panel.';
+
 // Trusted Devices
 $lang['tab_methods'] = 'Methods';
 $lang['tab_trusted_devices'] = 'Trusted Devices';

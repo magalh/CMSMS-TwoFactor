@@ -1,8 +1,20 @@
 <h3>{$mod->Lang('tab_settings')}</h3>
 
-{if $is_pro}
 {form_start}
   
+  <fieldset>
+    <legend>{$mod->Lang('general_settings')}</legend>
+    
+    <div class="pageoverflow">
+      <p class="pagetext">{$mod->Lang('enforce_2fa_all')}:</p>
+      <p class="pageinput">
+        <input type="checkbox" name="{$actionid}enforce_2fa_all" value="1"{if $enforce_2fa_all == '1'} checked{/if} />
+        {$mod->Lang('enforce_2fa_all_help')}
+      </p>
+    </div>
+  </fieldset>
+
+{if $is_pro}
   <fieldset>
     <legend>{$mod->Lang('rate_limiting_settings')}</legend>
     
@@ -53,9 +65,18 @@
       <input type="submit" name="{$actionid}save_settings" value="{$mod->Lang('save_settings')}" class="pagebutton" />
     </p>
   </div>
-{form_end}
 {else}
-<div class="warning">
+</fieldset>
+
+<div class="warning" style="margin-top:20px;">
   <p>{$mod->Lang('pro_required_settings')}</p>
 </div>
+
+<div class="pageoverflow" style="margin-top:20px;">
+  <p class="pagetext"></p>
+  <p class="pageinput">
+    <input type="submit" name="{$actionid}save_settings" value="{$mod->Lang('save_settings')}" class="pagebutton" />
+  </p>
+</div>
 {/if}
+{form_end}
