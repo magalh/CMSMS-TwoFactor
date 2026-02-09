@@ -3,7 +3,12 @@
 if( !defined('CMS_VERSION') ) exit;
 if( !$this->CheckPermission(TwoFactor::USE_PERM) ) return;
 
-$uid = get_userid();
+// Always use the currently logged-in user, never trust session variables
+$uid = get_userid(false);
+if (!$uid) {
+    echo '<p class="error">You must be logged in to access this page.</p>';
+    return;
+}
 
 echo $this->StartTabHeaders();
 echo $this->SetTabHeader('methods', $this->Lang('tab_methods'));

@@ -125,6 +125,7 @@ if (isset($_POST['submit']) && $locked_seconds === false) {
             unset($_SESSION['twofactor_email_sent']);
             unset($_SESSION['twofactor_sms_sent']);
             unset($_SESSION['twofactor_override_provider']);
+            unset($_SESSION['twofactor_error']);
             
             audit($uid, 'Admin Username: ' . $user->username, 'Logged In (2FA)');
             

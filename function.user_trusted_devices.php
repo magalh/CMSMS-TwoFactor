@@ -5,8 +5,19 @@ if (!defined('CMS_VERSION')) exit;
 // Handle revoke device
 if (isset($params['revoke_device'])) {
     $device_id = (int)$params['revoke_device'];
-    TwoFactorTrustedDevice::revoke_device($uid, $device_id);
-    $this->SetMessage($this->Lang('device_revoked'));
+    
+    // Verify device belongs to current user before revoking
+    $db = $this->GetDb();
+    $query = "SELECT user_id FROM " . CMS_DB_PREFIX . "mod_twofactor_trusted_devices WHERE id = ?";
+    $device_owner = $db->GetOne($query, array($device_id));
+    
+    if ($device_owner && $device_owner == $uid) {
+        TwoFactorTrustedDevice::revoke_device($uid, $device_id);
+        $this->SetMessage($this->Lang('device_revoked'));
+    } else {
+        $this->SetError($this->Lang('device_not_found'));
+    }
+    
     $this->RedirectToAdminTab('trusted_devices', '', 'user_prefs');
     return;
 }

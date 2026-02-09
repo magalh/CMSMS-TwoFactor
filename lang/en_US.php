@@ -165,6 +165,24 @@ $lang['tab_templates'] = 'Templates';
 $lang['password_reset_email'] = 'Password Reset Email';
 $lang['admin_alert_email'] = 'Admin Alert Email';
 
+// User Management
+$lang['tab_user_management'] = 'User Management';
+$lang['user_management'] = 'User Management Dashboard';
+$lang['user_management_help'] = 'View and manage 2FA settings for all users. You can disable 2FA for locked-out users.';
+$lang['username'] = 'Username';
+$lang['email'] = 'Email';
+$lang['2fa_status'] = '2FA Status';
+$lang['enabled_methods'] = 'Enabled Methods';
+$lang['failed_attempts'] = 'Failed Attempts';
+$lang['disable_2fa'] = 'Disable 2FA';
+$lang['confirm_disable_user_2fa'] = 'Are you sure you want to disable 2FA for user "%s"? This will remove all their 2FA settings, trusted devices, and reset failed attempts.';
+$lang['user_2fa_disabled'] = '2FA has been disabled for user: %s';
+$lang['legend'] = 'Legend';
+$lang['legend_locked'] = 'Red background = User is currently locked out';
+$lang['legend_failed_attempts'] = 'Failed attempts: Red (5+), Orange (3-4), Black (0-2)';
+$lang['legend_disable'] = 'Use "Disable 2FA" to unlock users or remove their 2FA settings';
+$lang['device_not_found'] = 'Device not found or does not belong to you.';
+
 // Trusted Devices
 $lang['tab_methods'] = 'Methods';
 $lang['tab_trusted_devices'] = 'Trusted Devices';

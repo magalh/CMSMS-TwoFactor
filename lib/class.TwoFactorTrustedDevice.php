@@ -66,7 +66,21 @@ class TwoFactorTrustedDevice {
         return $result !== false;
     }
     
-    public static function trust_device($user_id) {
+    public static function trust_device($user_id = null) {
+        // Always use the actual logged-in user if available
+        if ($user_id === null) {
+            $user_id = get_userid(false);
+        }
+        
+        // If still no user_id, we're in the 2FA flow, use session
+        if (!$user_id && isset($_SESSION['twofactor_user_id'])) {
+            $user_id = $_SESSION['twofactor_user_id'];
+        }
+        
+        if (!$user_id) {
+            return false;
+        }
+        
         $token = bin2hex(random_bytes(32));
         $fingerprint = self::get_device_fingerprint();
         $device_name = self::get_device_name();
@@ -80,6 +94,8 @@ class TwoFactorTrustedDevice {
         $db->Execute($query, array($user_id, $token, $fingerprint, $device_name, $ip_address, time(), $expires));
         
         setcookie('twofactor_device', $token, $expires, '/', '', true, true);
+        
+        return true;
     }
     
     public static function revoke_device($user_id, $device_id) {

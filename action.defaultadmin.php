@@ -22,6 +22,7 @@ if ($is_pro) {
 echo $this->StartTabHeaders();
 echo $this->SetTabHeader('settings', $this->Lang('tab_settings'));
 echo $this->SetTabHeader('templates', $this->Lang('tab_templates'));
+echo $this->SetTabHeader('user_management', $this->Lang('tab_user_management'));
 echo $this->SetTabHeader('premium', $this->Lang('tab_premium'));
 echo $this->SetTabHeader('smscredit', $this->Lang('tab_smscredit'));
 echo $this->EndTabHeaders();
@@ -34,6 +35,10 @@ echo $this->EndTab();
 
 echo $this->StartTab('templates', $params);
 include(__DIR__ . '/function.admin_templates.php');
+echo $this->EndTab();
+
+echo $this->StartTab('user_management', $params);
+include(__DIR__ . '/function.admin_user_management.php');
 echo $this->EndTab();
 
 echo $this->StartTab('premium', $params);
