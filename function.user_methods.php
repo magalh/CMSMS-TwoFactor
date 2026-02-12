@@ -15,6 +15,7 @@ if (isset($params['set_primary'])) {
 $providers = TwoFactorCore::get_providers();
 $enabled_providers = TwoFactorUserMeta::get_enabled_providers($uid);
 $primary_provider = TwoFactorUserMeta::get_primary_provider($uid);
+$smscredit_enabled = get_site_preference('twofactor_smscredit_enabled', '0');
 
 $smarty = cmsms()->GetSmarty();
 $tpl = $smarty->CreateTemplate($this->GetTemplateResource('user_methods.tpl'), null, null, $smarty);
@@ -23,5 +24,6 @@ $tpl->assign('enabled_providers', $enabled_providers);
 $tpl->assign('primary_provider', $primary_provider);
 $tpl->assign('user_id', $uid);
 $tpl->assign('actionid', $id);
+$tpl->assign('smscredit_enabled', $smscredit_enabled);
 $tpl->assign('mod', $this);
 $tpl->display();

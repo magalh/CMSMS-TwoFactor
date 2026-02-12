@@ -13,24 +13,11 @@ if (isset($params['verify_license'])) {
         return;
     }
     
-    // Call API to validate license
     $config = cms_utils::get_config();
     $site_url = $config['root_url'];
-    $api_url = 'https://pixelsolutions.local/api/validate-license?key=' . urlencode($license_key) . '&url=' . urlencode($site_url);
+    $data = TwoFactorAPI::validate_license($license_key, $site_url);
     
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $api_url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // For local dev
-    
-    $response = curl_exec($ch);
-    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    
-    if ($http_code === 200 && $response) {
-        $data = json_decode($response, true);
-        
+    if ($data !== false) {
         if (isset($data['valid']) && $data['valid'] === true) {
             set_site_preference('twofactor_license_key', $license_key);
             set_site_preference('twofactor_pro_enabled', '1');
@@ -47,7 +34,6 @@ if (isset($params['verify_license'])) {
         $this->SetError($this->Lang('license_verification_failed'));
     }
     
-    //$this->RedirectToAdminTab('premium');
     $this->RedirectToAdminTab();
     return;
 }

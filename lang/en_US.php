@@ -28,6 +28,11 @@ $lang['tab_smscredit'] = 'SMS Settings';
 $lang['settings_info'] = 'General module settings.';
 $lang['premium_info'] = 'Premium features coming soon.';
 $lang['smscredit_info'] = 'SMS credit management coming soon.';
+$lang['sms_credits_saved'] = 'SMS credits license saved and validated successfully.';
+$lang['error_empty_license'] = 'License key cannot be empty.';
+$lang['error_invalid_license'] = 'Invalid license key or validation failed.';
+$lang['license_valid'] = 'License is valid and active.';
+$lang['sms_credits_active'] = 'SMS Credits license is activated and currently used as the default method to send SMS messages. Credits remaining: %s';
 $lang['type_TwoFactor'] = 'TwoFactor';
 $lang['type_email_verification'] = 'Email Verification';
 $lang['provider_totp'] = 'Authenticator App (TOTP)';
@@ -206,3 +211,15 @@ $lang['device_revoked'] = 'Device has been revoked.';
 $lang['no_trusted_devices'] = 'You have no trusted devices.';
 $lang['trusted_devices_help'] = 'Trusted devices allow you to skip 2FA verification for 30 days. You can revoke access at any time.';
 $lang['remember_device'] = 'Remember this device for 30 days';
+
+// SMS Settings
+$lang['sms_settings'] = 'SMS Settings';
+$lang['sms_credits_option'] = 'Option 1: SMS Credits from Pixel Solutions';
+$lang['sms_credits_description'] = 'Purchase SMS credits from our store and use them across all your sites. Simple, no API configuration needed.';
+$lang['product_key'] = 'Product Key';
+$lang['product_key_help'] = 'Enter the product key you received after purchasing SMS credits';
+$lang['save_product_key'] = 'Save Product Key';
+$lang['purchase_credits'] = 'Purchase SMS Credits';
+$lang['sms_credits_saved'] = 'SMS credits product key saved successfully.';
+$lang['twilio_api_option'] = 'Option 2: Use Your Own Twilio Account';
+$lang['twilio_api_description'] = 'Configure your own Twilio API credentials to send SMS messages directly from your account.';

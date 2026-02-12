@@ -8,6 +8,7 @@ class TwoFactor extends CMSModule
     const MANAGE_USERS_PERM = 'manage_twofactor_users';
     const MANAGE_TEMPLATES_PERM = 'manage_twofactor_templates';
     const MANAGE_SMS_PERM = 'manage_twofactor_sms';
+    const PRODUCT_URL = 'https://pixelsolutions.local/en/plugins/twofactor/';
 
     public function GetVersion() { return '1.2.3'; }
     public function MinimumCMSVersion() {return '2.1.6';}
@@ -194,7 +195,6 @@ class TwoFactor extends CMSModule
             return false;
         }
         
-        // Check cache (valid for 24 hours)
         $cache_time = get_site_preference('twofactor_license_verified', 0);
         $cache_valid = (time() - $cache_time) < 86400;
         
@@ -202,32 +202,17 @@ class TwoFactor extends CMSModule
             return get_site_preference('twofactor_pro_enabled', '0') == '1';
         }
         
-        // Revalidate with API
         $config = cms_utils::get_config();
         $site_url = $config['root_url'];
-        $api_url = 'https://pixelsolutions.local/api/validate-license?key=' . urlencode($license_key) . '&url=' . urlencode($site_url);
+        $data = TwoFactorAPI::validate_license($license_key, $site_url);
         
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $api_url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        
-        $response = curl_exec($ch);
-        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        
-        if ($http_code === 200 && $response) {
-            $data = json_decode($response, true);
+        if ($data !== false) {
             $is_valid = isset($data['valid']) && $data['valid'] === true;
-            
             set_site_preference('twofactor_pro_enabled', $is_valid ? '1' : '0');
             set_site_preference('twofactor_license_verified', time());
-            
             return $is_valid;
         }
         
-        // On API failure, keep existing status if recently verified
         if ($cache_valid) {
             return get_site_preference('twofactor_pro_enabled', '0') == '1';
         }

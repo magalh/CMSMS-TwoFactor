@@ -79,7 +79,11 @@
         {/if}
       </td>
       <td>
-        <a href="{cms_action_url action='setup_sms'}">{admin_icon icon='edit.gif'}</a>
+        {if $smscredit_enabled == '1'}
+          <a href="{cms_action_url action='setup_sms_credit_enabled'}">{admin_icon icon='edit.gif'}</a>
+        {else}
+          <a href="{cms_action_url action='setup_sms'}">{admin_icon icon='edit.gif'}</a>
+        {/if}
       </td>
     </tr>
     <tr class="row2">
