@@ -27,21 +27,33 @@ class TwoFactorProviderSMS extends TwoFactorProvider
     public function is_available_for_user($user_id)
     {
         $phone = TwoFactorUserMeta::get($user_id, 'sms_phone');
-        $api_key_sid = get_site_preference('twofactor_twilio_api_key_sid');
-        $api_secret = get_site_preference('twofactor_twilio_api_secret');
-        $service_sid = get_site_preference('twofactor_twilio_service_sid');
+        $sms_available = get_site_preference('twofactor_sms_available', false);
         
-        return !empty($phone) && !empty($api_key_sid) && !empty($api_secret) && !empty($service_sid);
+        return !empty($phone) && $sms_available == true;
     }
 
     public function generate_and_send_code($user_id)
     {
         $phone = TwoFactorUserMeta::get($user_id, 'sms_phone');
-        $api_key_sid = get_site_preference('twofactor_twilio_api_key_sid');
+        $smscredit_enabled = get_site_preference('twofactor_smscredit_enabled', false);
+        
+        // Prioritize SMS credits if enabled
+        if ($smscredit_enabled) {
+            $license_key = get_site_preference('twofactor_sms_product_key', '');
+            $config = cms_utils::get_config();
+            $domain = parse_url($config['root_url'], PHP_URL_HOST);
+            
+            if ($license_key) {
+                $result = TwoFactorAPI::send_verification($license_key, $domain, $phone);
+                return isset($result['success']) && $result['success'];
+            }
+        }
+        
+        // Fall back to Twilio API
+        $api_key_sid = get_site_preference('twofactor_twilio_api_key');
         $api_secret = get_site_preference('twofactor_twilio_api_secret');
         $service_sid = get_site_preference('twofactor_twilio_service_sid');
         
-        // Start verification using Twilio Verify API
         $url = "https://verify.twilio.com/v2/Services/{$service_sid}/Verifications";
         
         $data = [
@@ -66,11 +78,25 @@ class TwoFactorProviderSMS extends TwoFactorProvider
     {
         $submitted_code = preg_replace('/\s+/', '', $_POST['authcode'] ?? '');
         $phone = TwoFactorUserMeta::get($user_id, 'sms_phone');
-        $api_key_sid = get_site_preference('twofactor_twilio_api_key_sid');
+        $smscredit_enabled = get_site_preference('twofactor_smscredit_enabled', false);
+        
+        // Prioritize SMS credits if enabled
+        if ($smscredit_enabled) {
+            $license_key = get_site_preference('twofactor_sms_product_key', '');
+            $config = cms_utils::get_config();
+            $domain = parse_url($config['root_url'], PHP_URL_HOST);
+            
+            if ($license_key) {
+                $result = TwoFactorAPI::verify_code($license_key, $domain, $phone, $submitted_code);
+                return isset($result['approved']) && $result['approved'] === true;
+            }
+        }
+        
+        // Fall back to Twilio API
+        $api_key_sid = get_site_preference('twofactor_twilio_api_key');
         $api_secret = get_site_preference('twofactor_twilio_api_secret');
         $service_sid = get_site_preference('twofactor_twilio_service_sid');
         
-        // Check verification using Twilio Verify API
         $url = "https://verify.twilio.com/v2/Services/{$service_sid}/VerificationCheck";
         
         $data = [
@@ -104,5 +130,20 @@ class TwoFactorProviderSMS extends TwoFactorProvider
     public function authentication_page($user_id)
     {
         return '';
+    }
+    
+    public static function verify_twilio_credentials($api_key, $api_secret, $service_sid)
+    {
+        $url = "https://verify.twilio.com/v2/Services/{$service_sid}";
+        
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERPWD, "{$api_key}:{$api_secret}");
+        
+        $result = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        return $http_code == 200;
     }
 }

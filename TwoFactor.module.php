@@ -79,6 +79,19 @@ class TwoFactor extends CMSModule
         exit;
     }
 
+    public function GetHeaderHTML()
+    {
+        $module_path = $this->GetModuleURLPath();
+        $header_links = '<link rel="stylesheet" type="text/css" href="'.$module_path.'/assets/twofactor_admin.css">';
+        // see if custom.css file exists
+        $customCSSfile = 'assets/module_custom/TwoFactor/twofactor_admin.css';
+        if ( file_exists(CMS_ROOT_PATH.'/'.$customCSSfile) ) {
+            $header_links .= '<link rel="stylesheet" type="text/css" href="../'.$customCSSfile.'">';
+        }
+        $header_links .= '<script language="javascript" src="'.$module_path.'/assets/twofactor_admin.js"></script>';
+        return $header_links;
+    }
+
     public function RegisterEvents()
     {
         $this->AddEventHandler('Core', 'LoginPost', false);

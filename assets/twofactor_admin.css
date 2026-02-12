@@ -1,0 +1,34 @@
+a.cta {
+    display: inline-block;
+    position: relative;
+    margin: 10px 0;
+    line-height: 26px;
+    text-decoration: none;
+    padding: 0 8px 0 20px;
+    clear: both;
+    text-align: left;
+}
+a.cta .ui-icon {
+    position: absolute;
+    left: 5px;
+    top: 6px;
+    color: #FFF!important
+}
+a.cta:hover {
+	color: #fff
+}
+.ui-state-highlight,.ui-widget-content .ui-state-highlight,.ui-widget-header .ui-state-highlight {
+    border: 1px solid #fa6704;
+    background: #fa8004 url("ui-bg_highlight-soft_75_fa8004_1x100.png") 50% 50% repeat-x;
+    color: #FFF!important
+}
+.ui-state-highlight:hover {
+    background: #fb9004;
+}
+
+.ui-state-highlight .ui-icon {
+    background-image: url("ui-icons_ffffff_256x240.png")
+}
+.ui-button-text-icon-primary .ui-button-icon-primary, .ui-button-text-icons .ui-button-icon-primary, .ui-button-icons-only .ui-button-icon-primary {
+    left: .5em;
+}

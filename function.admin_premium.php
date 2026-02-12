@@ -38,6 +38,15 @@ if (isset($params['verify_license'])) {
     return;
 }
 
+if (isset($params['remove_license'])) {
+    set_site_preference('twofactor_license_key', '');
+    set_site_preference('twofactor_pro_enabled', '0');
+    set_site_preference('twofactor_license_verified', '');
+    $this->SetMessage($this->Lang('license_removed'));
+    $this->RedirectToAdminTab();
+    return;
+}
+
 $license_key = get_site_preference('twofactor_license_key', '');
 $pro_enabled = get_site_preference('twofactor_pro_enabled', '0');
 

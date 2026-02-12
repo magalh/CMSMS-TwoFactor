@@ -7,6 +7,9 @@
             <div style="display: flex; gap: 10px; align-items: center;">
                 <input type="text" name="{$actionid}license_key" value="{$license_key}" size="40" placeholder="XXXX-XXXX-XXXX-XXXX" style="flex: 1;" />
                 <input type="submit" name="{$actionid}verify_license" value="{$mod->Lang('verify_license')}" class="pagebutton" />
+                {if $license_key}
+                <input type="submit" name="{$actionid}remove_license" value="{$mod->Lang('remove_license')}" class="pagebutton" onclick="return confirm('{$mod->Lang('confirm_remove_license')}');" />
+                {/if}
             </div>
         </form>
     </div>

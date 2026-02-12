@@ -6,7 +6,7 @@
   <div class="warning">
     <p>{$mod->Lang('twilio_not_configured')}</p>
   </div>
-  <p><a href="{cms_action_url action='admin_settings'}">{$mod->Lang('configure_twilio')}</a></p>
+  <p><a href="{cms_action_url action='defaultadmin'}">{$mod->Lang('configure_twilio')}</a></p>
 {else}
   <h4>{$mod->Lang('sms_user_settings')}</h4>
 {if $pending_phone && !$is_enabled}

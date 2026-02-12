@@ -81,7 +81,7 @@
             {if $pro_enabled == '1'}
                 <span class="installed">✓ Active</span>
             {else}
-                <a href="{TwoFactor::PRODUCT_URL}" target="_blank" class="pagebutton" style="display: inline-block;">Upgrade Now</a>
+                <a href="{TwoFactor::PRODUCT_URL}" target="_blank" class="cta" data-icon="ui-icon-star" style="margin-left: 10px;">Upgrade Now</a>
             {/if}
         </td>
     </tr>
@@ -162,7 +162,7 @@
             {if $pro_enabled == '1'}
                 <span class="installed">✓ Active</span>
             {else}
-                <a href="{TwoFactor::PRODUCT_URL}" target="_blank" class="pagebutton" style="display: inline-block;">Upgrade Now</a>
+                <a href="{TwoFactor::PRODUCT_URL}" target="_blank" class="cta" data-icon="ui-icon-star" style="margin-left: 10px;">Upgrade Now</a>
             {/if}
         </td>
     </tr>
