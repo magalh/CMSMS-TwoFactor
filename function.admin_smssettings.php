@@ -43,6 +43,21 @@ if (isset($params['remove_credits'])) {
     return;
 }
 
+if (isset($params['remove_twilio'])) {
+    set_site_preference('twofactor_twilio_api_key', '');
+    set_site_preference('twofactor_twilio_api_secret', '');
+    set_site_preference('twofactor_twilio_service_sid', '');
+    set_site_preference('twofactor_twilio_enabled', '0');
+    $smscredit_enabled = get_site_preference('twofactor_smscredit_enabled', false);
+    if (!$smscredit_enabled) {
+        set_site_preference('twofactor_sms_available', false);
+    }
+    
+    $this->SetMessage($this->Lang('twilio_removed'));
+    $this->RedirectToAdminTab();
+    return;
+}
+
 if (isset($params['submit_twilio'])) {
     $api_key = trim($params['api_key']);
     $api_secret = trim($params['api_secret']);

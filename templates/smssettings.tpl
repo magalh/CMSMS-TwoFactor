@@ -19,15 +19,10 @@
 
 <fieldset style="margin-bottom: 30px;">
     <legend>{$mod->Lang('sms_credits_option')} {if $smscredit_enabled}<span style="color: #28a745;">✓ {$mod->Lang('active')}</span>{/if}</legend>
-    <p style="margin-bottom: 15px;">{$mod->Lang('sms_credits_description')}</p>
-{if $smscredit_enabled}
-    <div class="information">
-        <p><strong>{$mod->Lang('sms_credits_active', $credits_remaining)}</strong></p>
-    </div>
-{/if}
+    <p style="margin-bottom: 5px;">{$mod->Lang('sms_credits_description')}</p>
     {form_start}
     <div class="pageoverflow">
-        <p class="pagetext">{$mod->Lang('product_key')}:</p>
+        <p class="pagetext">{$mod->Lang('product_key')} {if $smscredit_enabled}{$mod->Lang('sms_credits_active', $credits_remaining)}{/if}:</p>
         <p class="pageinput">
             <input type="text" name="{$actionid}product_key" value="{$product_key}" size="50" placeholder="XXXX-XXXX-XXXX-XXXX" />
             <br/><span class="help">{$mod->Lang('product_key_help')}</span>
@@ -78,6 +73,9 @@
         <p class="pagetext">&nbsp;</p>
         <p class="pageinput">
             <input type="submit" name="{$actionid}submit_twilio" value="{$mod->Lang('save_settings')}" class="pagebutton" />
+            {if $twilio_enabled}
+            <input type="submit" name="{$actionid}remove_twilio" value="{$mod->Lang('remove_twilio')}" class="pagebutton" onclick="return confirm('{$mod->Lang('confirm_remove_twilio')}');" />
+            {/if}
         </p>
     </div>
     {form_end}
