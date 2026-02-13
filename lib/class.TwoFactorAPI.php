@@ -9,9 +9,9 @@ class TwoFactorAPI
         
         $data = json_encode([
             'license_key' => $license_key,
-            'domain' => $domain
+            'domain' => self::normalize_domain($domain)
         ]);
-        
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $api_url);
         curl_setopt($ch, CURLOPT_POST, true);
@@ -50,7 +50,7 @@ class TwoFactorAPI
         
         $data = json_encode([
             'license_key' => $license_key,
-            'domain' => $domain,
+            'domain' => self::normalize_domain($domain),
             'phone' => $normalized_phone,
             'country' => $country
         ]);
@@ -139,13 +139,22 @@ class TwoFactorAPI
         return null;
     }
     
+    public static function normalize_domain($domain)
+    {
+        $domain = strtolower(trim($domain));
+        $domain = preg_replace('#^https?://#', '', $domain);
+        $domain = preg_replace('#^www\.#', '', $domain);
+        $domain = rtrim($domain, '/');
+        return $domain;
+    }
+    
     public static function verify_code($license_key, $domain, $phone, $code)
     {
         $api_url = self::API_BASE_URL . '/verification/check';
         
         $data = json_encode([
             'license_key' => $license_key,
-            'domain' => $domain,
+            'domain' => self::normalize_domain($domain),
             'phone' => $phone,
             'country' => 'US',
             'code' => $code

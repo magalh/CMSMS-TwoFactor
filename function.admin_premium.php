@@ -16,7 +16,6 @@ if (isset($params['verify_license'])) {
     $config = cms_utils::get_config();
     $site_url = $config['root_url'];
     $data = TwoFactorAPI::validate_license($license_key, $site_url);
-    
     if ($data !== false) {
         if (isset($data['valid']) && $data['valid'] === true) {
             set_site_preference('twofactor_license_key', $license_key);
@@ -24,10 +23,9 @@ if (isset($params['verify_license'])) {
             set_site_preference('twofactor_license_verified', time());
             $this->SetMessage($this->Lang('license_activated'));
         } else {
-            set_site_preference('twofactor_license_key', $license_key);
+            set_site_preference('twofactor_license_key', "");
             set_site_preference('twofactor_pro_enabled', '0');
-            set_site_preference('twofactor_license_verified', time());
-            $this->SetError($this->Lang('license_invalid'));
+            $this->SetError($data["error"]);
         }
     } else {
         set_site_preference('twofactor_pro_enabled', '0');
