@@ -33,11 +33,6 @@
 							<input class="loginsubmit" name="submit" type="submit" value="Verify"{if isset($locked_seconds) && $locked_seconds !== false} disabled{/if} />
 						</fieldset>
 					</form>
-					{if !isset($locked_seconds) || $locked_seconds === false}
-						<p class="forgotpw">
-							<a href="twofactor.php?resend=1">Resend verification code</a>
-						</p>
-					{/if}
 					{if isset($error) && $error != ''}
 						<div class="message error" id="error-message">
 							{$error}
@@ -62,11 +57,12 @@
 						}, 1000);
 						</script>
 					{/if}
-					{if $has_backup_codes && !$using_backup}
-						<p class="forgotpw">
-							<a href="twofactor.php?provider=TwoFactorProviderBackupCodes">Use a backup code</a>
-						</p>
-					{/if}
+					<p class="forgotpw">
+					
+						{if !isset($locked_seconds) || $locked_seconds === false}<a href="twofactor.php?resend=1">Resend verification code</a>{/if}
+						{if $has_backup_codes && !$using_backup}<a href="twofactor.php?provider=TwoFactorProviderBackupCodes">Use a backup code</a>{/if}
+						
+					</p>
 				</div>
 				<footer>
 					<small class="copyright">Copyright &copy; <a rel="external" href="http://www.cmsmadesimple.org">CMS Made Simple&trade;</a></small>
