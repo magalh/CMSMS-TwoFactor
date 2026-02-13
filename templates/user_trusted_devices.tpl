@@ -1,6 +1,6 @@
 <h3>{$mod->Lang('trusted_devices')}</h3>
 
-{if count($devices) > 0}
+{if $devices && count($devices) > 0}
 <table class="pagetable">
     <thead>
         <tr>

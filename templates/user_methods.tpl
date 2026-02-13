@@ -19,7 +19,11 @@
           <option value="disabled"{if $primary_provider == 'disabled'} selected{/if}>{$mod->Lang('disabled')}</option>
           {foreach $providers as $key => $provider}
             {if in_array($key, $enabled_providers) && $key != 'TwoFactorProviderBackupCodes'}
-              <option value="{$key}"{if $key == $primary_provider} selected{/if}>{$provider->get_label()}</option>
+              {if $key == 'TwoFactorProviderSMS' && !$sms_available}
+                {* Skip SMS if not available *}
+              {else}
+                <option value="{$key}"{if $key == $primary_provider} selected{/if}>{$provider->get_label()}</option>
+              {/if}
             {/if}
           {/foreach}
         </select>
@@ -69,7 +73,11 @@
         <a href="{cms_action_url action='setup_email'}">{admin_icon icon='edit.gif'}</a>
       </td>
     </tr>
+    {if $sms_available}
     <tr>
+    {else}
+    <tr style="opacity: 0.5;">
+    {/if}
       <td class="p_top_10 p_bottom_10"><strong>{$mod->Lang('provider_sms')}</strong><br/><small>{$mod->Lang('sms_description')}</small></td>
       <td>
         {if in_array('TwoFactorProviderSMS', $enabled_providers)}
@@ -79,10 +87,14 @@
         {/if}
       </td>
       <td>
-        {if $smscredit_enabled == '1'}
-          <a href="{cms_action_url action='setup_sms_credit_enabled'}">{admin_icon icon='edit.gif'}</a>
+        {if $sms_available}
+          {if $smscredit_enabled == '1'}
+            <a href="{cms_action_url action='setup_sms_credit_enabled'}">{admin_icon icon='edit.gif'}</a>
+          {else}
+            <a href="{cms_action_url action='setup_sms'}">{admin_icon icon='edit.gif'}</a>
+          {/if}
         {else}
-          <a href="{cms_action_url action='setup_sms'}">{admin_icon icon='edit.gif'}</a>
+          <span style="color: #999;"></span>
         {/if}
       </td>
     </tr>

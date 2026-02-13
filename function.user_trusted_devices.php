@@ -29,6 +29,9 @@ TwoFactorTrustedDevice::cleanup_expired();
 
 // Get user's trusted devices
 $devices = TwoFactorTrustedDevice::get_user_devices($uid);
+if (!is_array($devices)) {
+    $devices = [];
+}
 
 $smarty = cmsms()->GetSmarty();
 $tpl = $smarty->CreateTemplate($this->GetTemplateResource('user_trusted_devices.tpl'), null, null, $smarty);
