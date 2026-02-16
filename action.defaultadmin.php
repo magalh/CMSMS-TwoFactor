@@ -6,6 +6,7 @@ if (!$this->CheckPermission(TwoFactor::MANAGE_PERM) && !$this->CheckPermission(T
 }
 
 $is_pro = TwoFactor::IsProActive();
+$pro = cms_utils::get_module('TwoFactorPro');
 $current_tab = isset($params['__activetab']) ? $params['__activetab'] : ($is_pro ? 'pro_settings' : 'sms');
 
 echo '<h3>TwoFactor Settings</h3>';
@@ -17,9 +18,10 @@ if ($is_pro) {
 }
 
 echo $this->StartTabHeaders();
-if ($is_pro && $this->CheckPermission(TwoFactor::MANAGE_PRO_PERM)) {
-    echo $this->SetTabHeader('pro_settings', 'Pro Settings');
+if ($pro && $is_pro && $this->CheckPermission(TwoFactor::MANAGE_PRO_PERM)) {
+    echo $this->SetTabHeader('pro_settings', 'Settings');
     echo $this->SetTabHeader('user_management', 'User Management');
+    echo $this->SetTabHeader('templates', 'Templates');
 }
 if ($this->CheckPermission(TwoFactor::MANAGE_SMS_PERM)) {
     echo $this->SetTabHeader('sms', 'SMS Settings');
@@ -28,6 +30,9 @@ if ($this->CheckPermission(TwoFactor::MANAGE_SMS_PERM)) {
         echo $this->SetTabHeader('verify_logs', 'Verify Logs');
     }
 }
+if ($pro && $this->CheckPermission(TwoFactor::MANAGE_PRO_PERM)) {
+    echo $this->SetTabHeader('license', 'Pro');
+}
 if (!$is_pro && $this->CheckPermission(TwoFactor::MANAGE_PERM)) {
     echo $this->SetTabHeader('upgrade', 'Upgrade to Pro');
 }
@@ -35,14 +40,17 @@ echo $this->EndTabHeaders();
 
 echo $this->StartTabContent();
 
-if ($is_pro && $this->CheckPermission(TwoFactor::MANAGE_PRO_PERM)) {
+if ($pro && $is_pro && $this->CheckPermission(TwoFactor::MANAGE_PRO_PERM)) {
     echo $this->StartTab('pro_settings', $params);
-    $pro = cms_utils::get_module('TwoFactorPro');
     include($pro->GetModulePath() . '/function.admin_pro_settings.php');
     echo $this->EndTab();
     
     echo $this->StartTab('user_management', $params);
     include($pro->GetModulePath() . '/function.admin_user_management.php');
+    echo $this->EndTab();
+    
+    echo $this->StartTab('templates', $params);
+    include($pro->GetModulePath() . '/function.admin_templates.php');
     echo $this->EndTab();
 }
 
@@ -57,6 +65,12 @@ if ($this->CheckPermission(TwoFactor::MANAGE_SMS_PERM)) {
         include(__DIR__ . '/function.admin_verify_logs.php');
         echo $this->EndTab();
     }
+}
+
+if ($pro && $this->CheckPermission(TwoFactor::MANAGE_PRO_PERM)) {
+    echo $this->StartTab('license', $params);
+    include($pro->GetModulePath() . '/function.admin_license.php');
+    echo $this->EndTab();
 }
 
 if (!$is_pro && $this->CheckPermission(TwoFactor::MANAGE_PERM)) {

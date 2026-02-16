@@ -23,7 +23,7 @@
                 {foreach $logs as $log}
                     <tr>
                         <td>{$log.timestamp|cms_date_format}</td>
-                        <td>{$log.phone}</td>
+                        <td>{$log.phone|default:'-'}</td>
                         <td>{$log.country|default:'-'}</td>
                         <td>
                             {if $log.status == 'success' || $log.status == 'approved'}
@@ -31,7 +31,7 @@
                             {elseif $log.status == 'failed'}
                                 <span style="color: red;">✗ Failed</span>
                             {else}
-                                {$log.status}
+                                {$log.status|default:'-'}
                             {/if}
                         </td>
                         <td>{$log.amount|default:'0'}</td>

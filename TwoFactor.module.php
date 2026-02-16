@@ -190,7 +190,6 @@ class TwoFactor extends CMSModule
         $pro_path = $pro->GetModulePath();
         $core_files = [
             'TwoFactorPro.module.php',
-            'lib/class.TwoFactorProAPI.php',
             'lib/class.TwoFactorRateLimiter.php',
             'lib/class.TwoFactorTrustedDevice.php'
         ];
