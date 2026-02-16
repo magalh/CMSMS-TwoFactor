@@ -16,10 +16,14 @@ if (isset($params['submit_credits'])) {
         $result = TwoFactorAPI::validate_license($product_key, $domain);
         
         if ($result && isset($result['valid']) && $result['valid'] === true) {
-            set_site_preference('twofactor_sms_product_key', $product_key);
-            set_site_preference('twofactor_smscredit_enabled', true);
-            set_site_preference('twofactor_sms_available', true);
-            $this->SetMessage($this->Lang('sms_credits_saved'));
+            if (!isset($result['license_type']) || $result['license_type'] !== 'credits') {
+                $this->SetError($this->Lang('error_subscription_key_not_supported'));
+            } else {
+                set_site_preference('twofactor_sms_product_key', $product_key);
+                set_site_preference('twofactor_smscredit_enabled', true);
+                set_site_preference('twofactor_sms_available', true);
+                $this->SetMessage($this->Lang('sms_credits_saved'));
+            }
         } else {
             $error = isset($result['error']) ? $result['error'] : $this->Lang('error_invalid_license');
             $this->SetError($error);

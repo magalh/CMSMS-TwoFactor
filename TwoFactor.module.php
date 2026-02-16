@@ -4,13 +4,11 @@ class TwoFactor extends CMSModule
 {
     const MANAGE_PERM = 'manage_twofactor';
     const USE_PERM = 'use_twofactor';
-    const VIEW_USERS_PERM = 'view_twofactor_users';
-    const MANAGE_USERS_PERM = 'manage_twofactor_users';
-    const MANAGE_TEMPLATES_PERM = 'manage_twofactor_templates';
     const MANAGE_SMS_PERM = 'manage_twofactor_sms';
-    const PRODUCT_URL = 'https://pixelsolutions.local/en/plugins/twofactor/';
+    const MANAGE_PRO_PERM = 'manage_twofactor_pro';
+    const PRODUCT_URL = 'https://pixelsolutions.biz/en/plugins/twofactor/';
 
-    public function GetVersion() { return '1.2.3'; }
+    public function GetVersion() { return '2.0.0'; }
     public function MinimumCMSVersion() {return '2.1.6';}
     public function GetFriendlyName() { return $this->Lang('friendlyname'); }
     public function GetAdminDescription() { return $this->Lang('admindescription'); }
@@ -51,32 +49,6 @@ class TwoFactor extends CMSModule
     public function InitializeAdmin()
     {
         TwoFactorCore::register_providers();
-        
-        // Check if 2FA enforcement is active
-        $enforce_2fa = get_site_preference('twofactor_enforce_all', '0') == '1';
-        if (!$enforce_2fa) {
-            return;
-        }
-        
-        $uid = get_userid(false);
-        if (!$uid) {
-            return;
-        }
-        
-        // Check if user has 2FA enabled
-        if (TwoFactorCore::is_user_using_two_factor($uid)) {
-            return;
-        }
-        
-        // Allow access to TwoFactor module for setup
-        $current_module = isset($_REQUEST['mact']) ? explode(',', $_REQUEST['mact'])[0] : '';
-        if ($current_module == 'TwoFactor') {
-            return;
-        }
-        
-        // Redirect to setup page
-        $this->RedirectToAdminTab('',array('enforce' => '1'),'user_prefs');
-        exit;
     }
 
     public function GetHeaderHTML()
@@ -95,6 +67,9 @@ class TwoFactor extends CMSModule
     public function RegisterEvents()
     {
         $this->AddEventHandler('Core', 'LoginPost', false);
+        \Events::CreateEvent($this->GetName(), 'BeforeVerification');
+        \Events::CreateEvent($this->GetName(), 'AfterVerificationSuccess');
+        \Events::CreateEvent($this->GetName(), 'AfterVerificationFail');
     }
 
     function DoEvent($originator, $eventname, &$params)
@@ -167,16 +142,11 @@ class TwoFactor extends CMSModule
     {
         $out = [];
         
-        // Show Settings menu if user has any admin permission
-        if ($this->CheckPermission(self::MANAGE_PERM) || 
-            $this->CheckPermission(self::VIEW_USERS_PERM) ||
-            $this->CheckPermission(self::MANAGE_USERS_PERM) ||
-            $this->CheckPermission(self::MANAGE_TEMPLATES_PERM) ||
-            $this->CheckPermission(self::MANAGE_SMS_PERM)) {
+        if ($this->CheckPermission(self::MANAGE_PERM) || $this->CheckPermission(self::MANAGE_SMS_PERM)) {
             $obj = new CmsAdminMenuItem();
             $obj->module = $this->GetName();
             $obj->section = 'siteadmin';
-            $obj->title = 'Settings - TwoFactor';
+            $obj->title = 'TwoFactor Settings';
             $obj->action = 'defaultadmin';
             $obj->url = $this->create_url('m1_', $obj->action);
             $out[] = $obj;
@@ -195,43 +165,52 @@ class TwoFactor extends CMSModule
         return $out;
     }
 
-    /**
-     * Check if Pro features are enabled with license validation
-     * @param bool $revalidate Force API revalidation (default: checks cache)
-     * @return bool
-     */
-    public static function IsProEnabled($revalidate = false)
+    public static function IsProActive()
     {
-        $license_key = get_site_preference('twofactor_license_key', '');
+        $pro = cms_utils::get_module('TwoFactorPro');
+        if (!$pro) return false;
         
-        if (empty($license_key)) {
-            return false;
-        }
+        if (!method_exists($pro, 'IsProEnabled')) return false;
         
-        $cache_time = get_site_preference('twofactor_license_verified', 0);
-        $cache_valid = (time() - $cache_time) < 86400;
+        $enabled = $pro->IsProEnabled();
         
-        if (!$revalidate && $cache_valid) {
-            return get_site_preference('twofactor_pro_enabled', '0') == '1';
-        }
+        if (!$enabled) return false;
         
-        $config = cms_utils::get_config();
-        $site_url = $config['root_url'];
-        $data = TwoFactorAPI::validate_license($license_key, $site_url);
+        $hash = self::_verify_pro_integrity();
+        if (!$hash) return false;
         
-        if ($data !== false) {
-            $is_valid = isset($data['valid']) && $data['valid'] === true;
-            set_site_preference('twofactor_pro_enabled', $is_valid ? '1' : '0');
-            set_site_preference('twofactor_license_verified', time());
-            return $is_valid;
-        }
-        
-        if ($cache_valid) {
-            return get_site_preference('twofactor_pro_enabled', '0') == '1';
-        }
-        
-        return false;
+        return true;
     }
+    
+    private static function _verify_pro_integrity()
+    {
+        $pro = cms_utils::get_module('TwoFactorPro');
+        if (!$pro) return false;
+        
+        $pro_path = $pro->GetModulePath();
+        $core_files = [
+            'TwoFactorPro.module.php',
+            'lib/class.TwoFactorProAPI.php',
+            'lib/class.TwoFactorRateLimiter.php',
+            'lib/class.TwoFactorTrustedDevice.php'
+        ];
+        
+        $hash_data = '';
+        foreach ($core_files as $file) {
+            $path = cms_join_path($pro_path, $file);
+            if (!file_exists($path)) return false;
+            $hash_data .= md5_file($path);
+        }
+        
+        $license_key = get_site_preference('twofactorpro_license_key', '');
+        if (empty($license_key)) return false;
+        
+        $hash_data .= $license_key;
+        
+        return hash('sha256', $hash_data);
+    }
+
+
 
 
 }

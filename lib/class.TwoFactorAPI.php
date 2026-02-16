@@ -5,6 +5,10 @@ class TwoFactorAPI
     
     public static function validate_license($license_key, $domain)
     {
+        if (empty($license_key) || strlen($license_key) < 10) {
+            return ['valid' => false, 'error' => 'Invalid license key format'];
+        }
+        
         $api_url = self::API_BASE_URL . '/licenses/validate';
         
         $data = json_encode([
@@ -19,16 +23,33 @@ class TwoFactorAPI
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         
         $response = curl_exec($ch);
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($ch);
         curl_close($ch);
         
-        if ($response) {
-            return json_decode($response, true);
+        if ($curl_error) {
+            return ['valid' => false, 'error' => 'Connection error: ' . $curl_error];
         }
         
-        return ['valid' => false, 'error' => 'API request failed'];
+        if ($http_code !== 200) {
+            $error_result = json_decode($response, true);
+            if ($error_result && isset($error_result['error'])) {
+                return $error_result;
+            }
+            return ['valid' => false, 'error' => 'API error: ' . $http_code];
+        }
+        
+        if ($response) {
+            $result = json_decode($response, true);
+            if (is_array($result)) {
+                return $result;
+            }
+        }
+        
+        return ['valid' => false, 'error' => 'Invalid API response'];
     }
     
     public static function send_verification($license_key, $domain, $phone, $country = null)
@@ -176,5 +197,43 @@ class TwoFactorAPI
         }
         
         return ['valid' => false, 'error' => 'API request failed'];
+    }
+    
+    public static function get_verification_logs($license_key)
+    {
+        $api_url = self::API_BASE_URL . '/licenses/' . urlencode($license_key) . '/logs';
+        
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $api_url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($ch);
+        curl_close($ch);
+        
+        if ($curl_error) {
+            return ['success' => false, 'error' => 'Connection error: ' . $curl_error];
+        }
+        
+        if ($http_code !== 200) {
+            $error_result = json_decode($response, true);
+            if ($error_result && isset($error_result['error'])) {
+                return $error_result;
+            }
+            return ['success' => false, 'error' => 'API error: ' . $http_code];
+        }
+        
+        if ($response) {
+            $result = json_decode($response, true);
+            if (is_array($result)) {
+                return $result;
+            }
+        }
+        
+        return ['success' => false, 'error' => 'Invalid API response'];
     }
 }

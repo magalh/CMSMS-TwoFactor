@@ -1,79 +1,67 @@
 <?php
-# See doc/LICENSE.txt for full license information.
 if( !defined('CMS_VERSION') ) exit;
 
-// Allow access if user has any admin permission
-if (!$this->CheckPermission(TwoFactor::MANAGE_PERM) && 
-    !$this->CheckPermission(TwoFactor::VIEW_USERS_PERM) &&
-    !$this->CheckPermission(TwoFactor::MANAGE_USERS_PERM) &&
-    !$this->CheckPermission(TwoFactor::MANAGE_TEMPLATES_PERM) &&
-    !$this->CheckPermission(TwoFactor::MANAGE_SMS_PERM)) {
+if (!$this->CheckPermission(TwoFactor::MANAGE_PERM) && !$this->CheckPermission(TwoFactor::MANAGE_SMS_PERM)) {
     return;
 }
 
-$current_tab = isset($params['active_tab']) ? $params['active_tab'] : 'settings';
-$is_pro = TwoFactor::IsProEnabled();
+$is_pro = TwoFactor::IsProActive();
+$current_tab = isset($params['__activetab']) ? $params['__activetab'] : ($is_pro ? 'pro_settings' : 'sms');
 
-echo '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">';
-echo '<h3 style="margin:0;">' . $this->Lang('two_factor_settings') . '</h3>';
-echo '<a href="https://pixelsolutions.biz" target="_blank" rel="noopener noreferrer">';
-echo '<img src="https://pixelsolution.s3.eu-south-1.amazonaws.com/logos/LOGO_3_COLOR_300.png" alt="Pixel Solutions" style="height:40px;" />';
-echo '</a>';
-echo '</div>';
+echo '<h3>TwoFactor Settings</h3>';
 
 if ($is_pro) {
     echo '<div class="information" style="margin-bottom:20px;">';
-    echo '<p><strong>✓ TwoFactor Pro Active</strong> - All premium features are enabled.</p>';
+    echo '<p><strong>✓ TwoFactor Pro Active</strong> - Premium features enabled.</p>';
     echo '</div>';
 }
 
 echo $this->StartTabHeaders();
-if ($is_pro && $this->CheckPermission(TwoFactor::MANAGE_PERM)) {
-    echo $this->SetTabHeader('settings', $this->Lang('tab_settings'));
+if ($is_pro && $this->CheckPermission(TwoFactor::MANAGE_PRO_PERM)) {
+    echo $this->SetTabHeader('pro_settings', 'Pro Settings');
+    echo $this->SetTabHeader('user_management', 'User Management');
 }
 if ($this->CheckPermission(TwoFactor::MANAGE_SMS_PERM)) {
-    echo $this->SetTabHeader('smscredit', $this->Lang('tab_smscredit'));
+    echo $this->SetTabHeader('sms', 'SMS Settings');
+    $smscredit_enabled = get_site_preference('twofactor_smscredit_enabled', 0);
+    if ($smscredit_enabled) {
+        echo $this->SetTabHeader('verify_logs', 'Verify Logs');
+    }
 }
-if ($is_pro && $this->CheckPermission(TwoFactor::MANAGE_TEMPLATES_PERM)) {
-    echo $this->SetTabHeader('templates', $this->Lang('tab_templates'));
-}
-if ($is_pro && $this->CheckPermission(TwoFactor::VIEW_USERS_PERM)) {
-    echo $this->SetTabHeader('user_management', $this->Lang('tab_user_management'));
-}
-if ($this->CheckPermission(TwoFactor::MANAGE_PERM)) {
-    echo $this->SetTabHeader('premium', $this->Lang('tab_premium'));
+if (!$is_pro && $this->CheckPermission(TwoFactor::MANAGE_PERM)) {
+    echo $this->SetTabHeader('upgrade', 'Upgrade to Pro');
 }
 echo $this->EndTabHeaders();
 
 echo $this->StartTabContent();
 
-if ($is_pro && $this->CheckPermission(TwoFactor::MANAGE_PERM)) {
-    echo $this->StartTab('settings', $params);
-    include(__DIR__ . '/function.admin_settings.php');
+if ($is_pro && $this->CheckPermission(TwoFactor::MANAGE_PRO_PERM)) {
+    echo $this->StartTab('pro_settings', $params);
+    $pro = cms_utils::get_module('TwoFactorPro');
+    include($pro->GetModulePath() . '/function.admin_pro_settings.php');
+    echo $this->EndTab();
+    
+    echo $this->StartTab('user_management', $params);
+    include($pro->GetModulePath() . '/function.admin_user_management.php');
     echo $this->EndTab();
 }
 
 if ($this->CheckPermission(TwoFactor::MANAGE_SMS_PERM)) {
-    echo $this->StartTab('smscredit', $params);
+    echo $this->StartTab('sms', $params);
     include(__DIR__ . '/function.admin_smssettings.php');
     echo $this->EndTab();
+    
+    $smscredit_enabled = get_site_preference('twofactor_smscredit_enabled', 0);
+    if ($smscredit_enabled) {
+        echo $this->StartTab('verify_logs', $params);
+        include(__DIR__ . '/function.admin_verify_logs.php');
+        echo $this->EndTab();
+    }
 }
 
-if ($is_pro && $this->CheckPermission(TwoFactor::MANAGE_TEMPLATES_PERM)) {
-    echo $this->StartTab('templates', $params);
-    include(__DIR__ . '/function.admin_templates.php');
-    echo $this->EndTab();
-}
-
-if ($is_pro && $this->CheckPermission(TwoFactor::VIEW_USERS_PERM)) {
-    echo $this->StartTab('user_management', $params);
-    include(__DIR__ . '/function.admin_user_management.php');
-    echo $this->EndTab();
-}
-
-if ($this->CheckPermission(TwoFactor::MANAGE_PERM)) {
-    echo $this->StartTab('premium', $params);
-    include(__DIR__ . '/function.admin_premium.php');
+if (!$is_pro && $this->CheckPermission(TwoFactor::MANAGE_PERM)) {
+    echo $this->StartTab('upgrade', $params);
+    include(__DIR__ . '/function.admin_upgrade.php');
     echo $this->EndTab();
 }
 

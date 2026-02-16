@@ -15,6 +15,39 @@ if (!isset($_SESSION['twofactor_user_id'])) {
 }
 
 $uid = $_SESSION['twofactor_user_id'];
+
+// Fire BeforeVerification event
+$event_params = ['user_id' => $uid, 'blocked' => false, 'trusted_device' => false];
+\Events::SendEvent($this->GetName(), 'BeforeVerification', $event_params);
+
+if (isset($event_params['blocked']) && $event_params['blocked']) {
+    $locked_seconds = $event_params['locked_seconds'] ?? 0;
+    $error_msg = $this->Lang('account_locked') . ' ' . ceil($locked_seconds / 60) . ' minutes.';
+}
+
+if (isset($event_params['trusted_device']) && $event_params['trusted_device']) {
+    // Trusted device - skip verification
+    $user = UserOperations::get_instance()->LoadUserByID($uid);
+    if ($user) {
+        $rememberme = $_SESSION['twofactor_rememberme'] ?? 0;
+        $login_ops = \CMSMS\LoginOperations::get_instance();
+        $key = $login_ops->save_authentication($user);
+        
+        if ($rememberme) {
+            setcookie(CMS_USER_KEY, $key, time() + 2592000);
+        }
+        
+        unset($_SESSION['twofactor_user_id']);
+        unset($_SESSION['twofactor_rememberme']);
+        
+        audit($uid, 'Admin Username: ' . $user->username, 'Logged In (2FA - Trusted Device)');
+        
+        $config = cms_utils::get_config();
+        redirect($config['admin_url'] . '/index.php');
+        exit;
+    }
+}
+
 $provider = TwoFactorCore::get_primary_provider_for_user($uid);
 
 if (!$provider) {
@@ -31,6 +64,13 @@ if (isset($params['submit'])) {
     error_log('TwoFactor verify_login: Validation result = ' . ($result ? 'TRUE' : 'FALSE'));
     
     if ($result) {
+        // Fire AfterVerificationSuccess event
+        $success_params = [
+            'user_id' => $uid,
+            'trust_device' => isset($params['trust_device']) ? true : false
+        ];
+        \Events::SendEvent($this->GetName(), 'AfterVerificationSuccess', $success_params);
+        
         // Valid code - log user back in
         $user = UserOperations::get_instance()->LoadUserByID($uid);
         if ($user) {
@@ -53,6 +93,10 @@ if (isset($params['submit'])) {
             redirect($config['admin_url'] . '/index.php');
             exit;
         }
+    } else {
+        // Fire AfterVerificationFail event
+        $fail_params = ['user_id' => $uid];
+        \Events::SendEvent($this->GetName(), 'AfterVerificationFail', $fail_params);
     }
     $error_msg = $this->Lang('invalid_code');
 }

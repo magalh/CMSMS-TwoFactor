@@ -242,3 +242,4 @@ $lang['active'] = 'Active';
 $lang['remove_twilio'] = 'Disable Twilio API';
 $lang['confirm_remove_twilio'] = 'Are you sure you want to remove Twilio API credentials?';
 $lang['twilio_removed'] = 'Twilio API credentials removed successfully.';
+$lang['error_subscription_key_not_supported'] = 'This is a subscription key. Only credit-based licenses are supported for SMS credits.';

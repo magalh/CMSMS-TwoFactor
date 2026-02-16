@@ -3,10 +3,19 @@ if( !defined('CMS_VERSION') ) exit;
 
 $this->CreatePermission(TwoFactor::MANAGE_PERM, 'Manage TwoFactor');
 $this->CreatePermission(TwoFactor::USE_PERM, 'Use TwoFactor');
-$this->CreatePermission(TwoFactor::VIEW_USERS_PERM, 'View TwoFactor Users');
-$this->CreatePermission(TwoFactor::MANAGE_USERS_PERM, 'Manage TwoFactor Users');
-$this->CreatePermission(TwoFactor::MANAGE_TEMPLATES_PERM, 'Manage TwoFactor Templates');
 $this->CreatePermission(TwoFactor::MANAGE_SMS_PERM, 'Manage TwoFactor SMS');
+
+$pro = cms_utils::get_module('TwoFactorPro');
+if ($pro) {
+    $this->CreatePermission(TwoFactor::MANAGE_PRO_PERM, 'Manage TwoFactor Pro');
+}
+
+$uid = null;
+if( cmsms()->test_state(CmsApp::STATE_INSTALL) ) {
+  $uid = 1; // hardcode to first user
+} else {
+  $uid = get_userid();
+}
 
 $db = $this->GetDb();
 $dict = NewDataDictionary($db);
@@ -21,33 +30,6 @@ $sqlarray = $dict->CreateTableSQL(CMS_DB_PREFIX.'mod_twofactor_usermeta', $flds)
 $dict->ExecuteSQLArray($sqlarray);
 $db->Execute('CREATE INDEX idx_user_key ON '.CMS_DB_PREFIX.'mod_twofactor_usermeta (user_id, meta_key)');
 
-$flds = "
-    id I KEY AUTO,
-    user_id I NOTNULL,
-    ip_address C(45) NOTNULL,
-    attempt_count I DEFAULT 0,
-    first_attempt I,
-    last_attempt I,
-    locked_until I
-";
-$sqlarray = $dict->CreateTableSQL(CMS_DB_PREFIX.'mod_twofactor_failed_attempts', $flds);
-$dict->ExecuteSQLArray($sqlarray);
-$db->Execute('CREATE INDEX idx_user_ip ON '.CMS_DB_PREFIX.'mod_twofactor_failed_attempts (user_id, ip_address)');
-
-$flds = "
-    id I KEY AUTO,
-    user_id I NOTNULL,
-    device_token C(64) NOTNULL,
-    device_fingerprint C(64) NOTNULL,
-    device_name C(255),
-    ip_address C(45),
-    created_at I NOTNULL,
-    expires_at I NOTNULL
-";
-$sqlarray = $dict->CreateTableSQL(CMS_DB_PREFIX.'mod_twofactor_trusted_devices', $flds);
-$dict->ExecuteSQLArray($sqlarray);
-$db->Execute('CREATE INDEX idx_user_token ON '.CMS_DB_PREFIX.'mod_twofactor_trusted_devices (user_id, device_token)');
-
 \Events::CreateEvent('Core', 'LoginPost');
 $this->RegisterEvents();
 
@@ -59,12 +41,7 @@ if (file_exists($source)) {
 }
 
 include_once(dirname(__FILE__) . '/lib/class.ModuleTracker.php');
-ModuleTracker::track('TwoFactor Pro', 'install');
-
-set_site_preference('twofactor_rate_limiting_enabled', '1');
-set_site_preference('twofactor_max_attempts_lockout', '5');
-set_site_preference('twofactor_max_attempts_reset', '10');
-set_site_preference('twofactor_notify_admin', '1');
+ModuleTracker::track('TwoFactor', 'install');
 
 $email_type = new CmsLayoutTemplateType();
 $email_type->set_originator($this->GetName());
@@ -76,8 +53,8 @@ $email_type->reset_content_to_factory();
 $email_type->save();
 
 $tpl = new CmsLayoutTemplate();
-$tpl->set_name($tpl::generate_unique_name('TwoFactor Email Verification'));
-$tpl->set_owner(1);
+$tpl->set_name('Email Verification');
+$tpl->set_owner($uid);
 $tpl->set_type($email_type);
 $tpl->set_content($email_type->get_dflt_contents());
 $tpl->set_type_dflt(TRUE);
