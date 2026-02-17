@@ -1,7 +1,7 @@
 <?php
 #---------------------------------------------------------------------------------------------------
 # Module: GoogleConsentPlatform
-# Authors: Magal Hezi, with CMS Made Simple Foundation.
+# Authors: Pixel Solutions, with CMS Made Simple Foundation.
 # Copyright: (C) 2025 Pixel Solutions, info@pixelsolutions.biz
 # License: MIT License
 #---------------------------------------------------------------------------------------------------

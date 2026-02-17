@@ -1,122 +1,147 @@
-<p>Two-Factor Authentication (2FA) module for CMS Made Simple by Pixel Solutions.</p>
+# TwoFactor - Two-Factor Authentication for CMS Made Simple
 
-<h2>Features</h2>
+Secure your CMS Made Simple installation with two-factor authentication (2FA) by Pixel Solutions.
 
-<ul>
-  <li><strong>Multiple Authentication Methods</strong>:
-    <ul>
-      <li>TOTP (Time-based One-Time Password) - Google Authenticator, Authy, etc.</li>
-      <li>Email Verification - Receive codes via email</li>
-      <li>SMS Verification - Receive codes via Twilio SMS</li>
-      <li>Backup Codes - One-time emergency access codes</li>
-    </ul>
-  </li>
-  <li><strong>Flexible Configuration</strong>:
-    <ul>
-      <li>Users can enable/disable methods individually</li>
-      <li>Choose primary authentication method</li>
-      <li>Multiple methods can be enabled as fallback options</li>
-    </ul>
-  </li>
-  <li><strong>Security Features</strong>:
-    <ul>
-      <li>Intercepts login after username/password validation</li>
-      <li>Session-based verification flow</li>
-      <li>Audit logging for all 2FA events</li>
-      <li>Secure code generation and validation</li>
-    </ul>
-  </li>
-</ul>
+**Already have TwoFactor Pro installed?** [View TwoFactor Pro Documentation]({cms_action_url module=ModuleManager action=defaultadmin modulehelp=TwoFactorPro})
 
-<h2>Installation</h2>
+## Features
 
-<ol>
-  <li>Upload the module files to <code>modules/TwoFactor/</code></li>
-  <li>Install the module from Extensions &gt; Modules</li>
-  <li>The module will automatically:
-    <ul>
-      <li>Create the database table <code>mod_twofactor_usermeta</code></li>
-      <li>Copy <code>admin/twofactor.php</code> verification page</li>
-      <li>Register the Core::LoginPost event handler</li>
-    </ul>
-  </li>
-</ol>
+### Multiple Authentication Methods
+- **TOTP (Time-based One-Time Password)** - Google Authenticator, Authy, Microsoft Authenticator, etc.
+- **Email Verification** - Receive codes via email
+- **SMS Verification** - Receive codes via SMS (Twilio or Managed SMS)
+- **Backup Codes** - One-time emergency access codes
 
-<h2>Configuration</h2>
+### Flexible Configuration
+- Users can enable/disable methods individually
+- Choose primary authentication method
+- Multiple methods can be enabled as fallback options
 
-<h3>TOTP (Authenticator App)</h3>
-<ol>
-  <li>Navigate to Extensions &gt; TwoFactor</li>
-  <li>Click "Configure" for Authenticator App</li>
-  <li>Scan the QR code with your authenticator app</li>
-  <li>Enter the 6-digit code to verify</li>
-</ol>
+### Security Features
+- Intercepts login after username/password validation
+- Session-based verification flow
+- Audit logging for all 2FA events
+- Secure code generation and validation
 
-<h3>Email Verification</h3>
-<ol>
-  <li>Click "Configure" for Email Verification</li>
-  <li>Click "Enable Email Verification"</li>
-  <li>Codes will be sent to your admin account email</li>
-</ol>
+### SMS Options
+**Option 1: Managed SMS Credits**
+- Purchase SMS credits from Pixel Solutions
+- Simple setup - just enter your product key
+- Use credits across all your sites
+- No API configuration needed
 
-<h3>SMS Verification (Twilio)</h3>
-<ol>
-  <li>Create a Twilio account and Verify Service</li>
-  <li>Generate API Key and Secret in Twilio Console</li>
-  <li>Enter credentials in SMS settings:
-    <ul>
-      <li>API Key SID</li>
-      <li>API Secret</li>
-      <li>Verify Service SID</li>
-    </ul>
-  </li>
-  <li>Enter phone number in E.164 format (e.g., +1234567890)</li>
-  <li>Verify the code sent to your phone</li>
-</ol>
+**Option 2: Your Own Twilio Account**
+- Use your existing Twilio account
+- Full control over SMS delivery
+- Configure API credentials in settings
 
-<h3>Backup Codes</h3>
-<ol>
-  <li>Click "Configure" for Backup Codes</li>
-  <li>Click "Generate Backup Codes"</li>
-  <li>Save the codes in a secure location</li>
-  <li>Each code can only be used once</li>
-</ol>
+## Configuration
 
-<h3>Screenshots</h3>
-<p><img src="https://cmsms-downloads.s3.eu-south-1.amazonaws.com/TwoFactor/thumbnail.jpg" alt="TwoFactor module" width="900"></p>
+### For Users (My Preferences > TwoFactor)
 
+#### TOTP (Authenticator App)
+1. Click "Configure" for Authenticator App
+2. Scan the QR code with your authenticator app
+3. Enter the 6-digit code to verify
+4. Save your settings
 
-<h2>Usage</h2>
+#### Email Verification
+1. Click "Configure" for Email Verification
+2. Click "Enable Email Verification"
+3. Codes will be sent to your admin account email
 
-<h3>Login Flow</h3>
-<ol>
-  <li>Enter username and password as normal</li>
-  <li>After successful authentication, you'll be redirected to 2FA verification</li>
-  <li>Enter the code from your primary authentication method</li>
-  <li>Click "Use a backup code" if you need to use an alternative method</li>
-</ol>
+#### SMS Verification
+**Using Managed SMS Credits:**
+1. Admin must configure SMS Credits in TwoFactor Settings > SMS Settings
+2. Click "Configure" for SMS Verification
+3. Enter phone number in E.164 format (e.g., +1234567890)
+4. Verify the code sent to your phone
 
-<h3>Switching Methods</h3>
-<p>During verification, you can switch between enabled methods using the provider dropdown.</p>
+**Using Twilio:**
+1. Admin must configure Twilio in TwoFactor Settings > SMS Settings
+2. Follow same steps as Managed SMS above
 
-<h2>Uninstallation</h2>
+#### Backup Codes
+1. Click "Configure" for Backup Codes
+2. Click "Generate Backup Codes"
+3. Save the codes in a secure location
+4. Each code can only be used once
 
-<p>The module will:</p>
-<ul>
-  <li>Remove the database table</li>
-  <li>Delete the <code>admin/twofactor.php</code> file</li>
-  <li>Remove all user 2FA settings</li>
-</ul>
+### For Administrators (TwoFactor Settings)
 
-<h2>Requirements</h2>
+#### SMS Settings Tab
 
-<ul>
-  <li>CMS Made Simple 2.x</li>
-  <li>PHP 7.4 or higher</li>
-  <li>For TOTP: RobThree/TwoFactorAuth library (included via Composer)</li>
-  <li>For SMS: Twilio account with Verify API access</li>
-</ul>
+**Option 1: SMS Credits from Pixel Solutions**
+1. Purchase SMS credits from https://pixelsolutions.biz
+2. Enter your product key
+3. Click "Save Product Key"
+4. View your remaining credits and plan
 
-<h2>Support</h2>
+**Option 2: Use Your Own Twilio Account**
+1. Create a Twilio account and Verify Service
+2. Generate API Key and Secret in Twilio Console
+3. Enter credentials:
+   - API Key SID
+   - API Secret  
+   - Verify Service SID
+4. Click "Save Twilio Settings"
 
-<p>For issues or questions, visit: <a href="https://pixelsolutions.biz" target="_blank">https://pixelsolutions.biz</a></p>
+**Note:** You can have both configured. SMS Credits will be used first if available.
+
+#### Verify Logs Tab
+(Only visible when SMS Credits are configured)
+- View SMS verification history
+- See credits used per verification
+- Monitor verification success/failure
+- Paginated display (25 logs per page)
+
+## Usage
+
+### Login Flow
+1. Enter username and password as normal
+2. After successful authentication, you'll be redirected to 2FA verification
+3. Enter the code from your primary authentication method
+4. Click "Use a backup code" if you need to use an alternative method
+
+### Switching Methods
+During verification, you can switch between enabled methods using the provider dropdown.
+
+## [Upgrade to Pro]({$product_url})
+
+Unlock enterprise-grade security features with TwoFactor Pro:
+
+- **Enforce 2FA** - Require all admin users to enable 2FA
+- **Rate Limiting** - Protect against brute-force attacks
+- **Trusted Devices** - Remember devices for 30 days
+- **User Management** - Admin dashboard to manage all users
+- **Security Alerts** - Email notifications for suspicious activity
+- **IP Blacklisting** - Block malicious IP addresses
+- **Email Templates** - Customize security notification emails
+
+Visit [our store]({$product_url}) to purchase TwoFactor Pro.
+
+**Already have TwoFactor Pro installed?** [View TwoFactor Pro Documentation]({cms_action_url module=ModuleManager action=defaultadmin modulehelp=TwoFactorPro})
+
+## Requirements
+
+- CMS Made Simple 2.1.6+
+- PHP 7.4 or higher
+- For TOTP: RobThree/TwoFactorAuth library (included via Composer)
+- For SMS: Twilio account OR SMS Credits from Pixel Solutions
+
+## Uninstallation
+
+The module will:
+- Remove the database table
+- Delete the `admin/twofactor.php` file
+- Remove all user 2FA settings
+
+## Support
+
+For issues or questions, visit: https://pixelsolutions.biz
+
+Email: support@pixelsolutions.biz
+
+## License
+
+MIT License - See LICENSE file for details

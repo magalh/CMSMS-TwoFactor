@@ -9,15 +9,16 @@ class TwoFactor extends CMSModule
     const PRODUCT_URL = 'https://pixelsolutions.biz/en/plugins/twofactor/';
 
     public function GetVersion() { return '2.0.0'; }
-    public function MinimumCMSVersion() {return '2.1.6';}
+    public function MinimumCMSVersion() {return '2.2.1';}
     public function GetFriendlyName() { return $this->Lang('friendlyname'); }
     public function GetAdminDescription() { return $this->Lang('admindescription'); }
     public function IsPluginModule() { return FALSE; }
     public function HasAdmin() { return TRUE; }
     public function VisibleToAdminUser() { return FALSE; }
-    public function GetAuthor() { return 'Magal Hezi'; }
-    public function GetAuthorEmail() { return 'magal@pixelsolutions.biz'; }
+    public function GetAuthor() { return 'Pixel Solutions'; }
+    public function GetAuthorEmail() { return 'info@pixelsolutions.biz'; }
     public function GetAdminSection() { return 'siteadmin'; }
+    public function GetDependencies() { return ['CMSMSExt' => '1.5.2']; }
 
     public function __construct()
     {
@@ -28,6 +29,12 @@ class TwoFactor extends CMSModule
         
         spl_autoload_register([$this, '_autoloader']);
         parent::__construct();
+        $smarty = cmsms()->GetSmarty();
+        if(!$smarty){return;}
+
+        $smarty->registerClass('tf_smarty', 'tf_smarty');
+        $plugins_dir = cms_join_path( $this->GetModulePath(), 'lib', 'plugins' );
+        $smarty->addPluginsDir($plugins_dir);
     }
 
     private function _autoloader($classname)
@@ -108,17 +115,26 @@ class TwoFactor extends CMSModule
         $file = realpath(__DIR__.'/README.md');
         if (!$file || !$base_dir || !is_file($file) || !is_readable($file)) return '';
         if (strpos($file, $base_dir) !== 0) return '';
-        if (basename($file) !== 'README.md') return '';
-        return @file_get_contents($file);
+        $markdown = @file_get_contents($file);
+        if (!$markdown) return '';
+        
+        $smarty = cmsms()->GetSmarty();
+        $smarty->assign('actionid', 'm1_');
+        $smarty->assign('product_url', self::PRODUCT_URL);
+        $processed = $smarty->fetch('string:' . $markdown);
+        
+        return tf_smarty::mdToHTML($processed);
     }
 
     public function GetChangeLog() {
         $base_dir = realpath(__DIR__);
-        $file = realpath(__DIR__.'/doc/changelog.inc');
+        $file = realpath(__DIR__.'/CHANGELOG.md');
         if (!$file || !$base_dir || !is_file($file) || !is_readable($file)) return '';
         if (strpos($file, $base_dir) !== 0) return '';
-        if (basename($file) !== 'changelog.inc') return '';
-        return @file_get_contents($file);
+        if (basename($file) !== 'CHANGELOG.md') return '';
+        $markdown = @file_get_contents($file);
+        if (!$markdown) return '';
+        return tf_smarty::mdToHTML($markdown);
     }
 
     public static function page_type_lang_callback($str)
