@@ -8,7 +8,7 @@ class TwoFactorUserMeta
     public static function get($user_id, $key, $single = true)
     {
         $db = cms_utils::get_db();
-        $sql = 'SELECT meta_value FROM '.CMS_DB_PREFIX.'mod_twofactor_usermeta 
+        $sql = 'SELECT meta_value FROM '.CMS_DB_PREFIX.'module_twofactor_usermeta 
                 WHERE user_id = ? AND meta_key = ?';
         
         if ($single) {
@@ -26,21 +26,21 @@ class TwoFactorUserMeta
         $serialized = serialize($value);
         
         $exists = $db->GetOne(
-            'SELECT id FROM '.CMS_DB_PREFIX.'mod_twofactor_usermeta 
+            'SELECT id FROM '.CMS_DB_PREFIX.'module_twofactor_usermeta 
              WHERE user_id = ? AND meta_key = ?',
             [$user_id, $key]
         );
 
         if ($exists) {
             return $db->Execute(
-                'UPDATE '.CMS_DB_PREFIX.'mod_twofactor_usermeta 
+                'UPDATE '.CMS_DB_PREFIX.'module_twofactor_usermeta 
                  SET meta_value = ? WHERE user_id = ? AND meta_key = ?',
                 [$serialized, $user_id, $key]
             );
         }
 
         return $db->Execute(
-            'INSERT INTO '.CMS_DB_PREFIX.'mod_twofactor_usermeta 
+            'INSERT INTO '.CMS_DB_PREFIX.'module_twofactor_usermeta 
              (user_id, meta_key, meta_value) VALUES (?, ?, ?)',
             [$user_id, $key, $serialized]
         );
@@ -50,7 +50,7 @@ class TwoFactorUserMeta
     {
         $db = cms_utils::get_db();
         return $db->Execute(
-            'DELETE FROM '.CMS_DB_PREFIX.'mod_twofactor_usermeta 
+            'DELETE FROM '.CMS_DB_PREFIX.'module_twofactor_usermeta 
              WHERE user_id = ? AND meta_key = ?',
             [$user_id, $key]
         );

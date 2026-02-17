@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '586a877ad8bb45411d03e8ffb7099f4162d3c5f1',
+        'reference' => '92d20dc5777d7ca80345b340f511935a5fa304e7',
         'name' => '__root__',
         'dev' => false,
     ),
@@ -16,7 +16,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '586a877ad8bb45411d03e8ffb7099f4162d3c5f1',
+            'reference' => '92d20dc5777d7ca80345b340f511935a5fa304e7',
             'dev_requirement' => false,
         ),
         'robthree/twofactorauth' => array(

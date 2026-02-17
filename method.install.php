@@ -5,11 +5,6 @@ $this->CreatePermission(TwoFactor::MANAGE_PERM, 'Manage TwoFactor');
 $this->CreatePermission(TwoFactor::USE_PERM, 'Use TwoFactor');
 $this->CreatePermission(TwoFactor::MANAGE_SMS_PERM, 'Manage TwoFactor SMS');
 
-$pro = cms_utils::get_module('TwoFactorPro');
-if ($pro) {
-    $this->CreatePermission(TwoFactor::MANAGE_PRO_PERM, 'Manage TwoFactor Pro');
-}
-
 $uid = null;
 if( cmsms()->test_state(CmsApp::STATE_INSTALL) ) {
   $uid = 1; // hardcode to first user
@@ -19,6 +14,7 @@ if( cmsms()->test_state(CmsApp::STATE_INSTALL) ) {
 
 $db = $this->GetDb();
 $dict = NewDataDictionary($db);
+$taboptarray = ['mysql' => 'ENGINE=InnoDB'];
 
 $flds = "
     id I KEY AUTO,
@@ -26,9 +22,9 @@ $flds = "
     meta_key C(255) NOTNULL,
     meta_value X
 ";
-$sqlarray = $dict->CreateTableSQL(CMS_DB_PREFIX.'mod_twofactor_usermeta', $flds);
+
+$sqlarray = $dict->CreateTableSQL(cms_db_prefix() .'module_twofactor_usermeta', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
-$db->Execute('CREATE INDEX idx_user_key ON '.CMS_DB_PREFIX.'mod_twofactor_usermeta (user_id, meta_key)');
 
 \Events::CreateEvent('Core', 'LoginPost');
 $this->RegisterEvents();
