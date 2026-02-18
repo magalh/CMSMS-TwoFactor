@@ -19,9 +19,9 @@ if (isset($params['submit_credits'])) {
             if (!isset($result['license_type']) || $result['license_type'] !== 'credits') {
                 $this->SetError($this->Lang('error_subscription_key_not_supported'));
             } else {
-                set_site_preference('twofactor_sms_product_key', $product_key);
-                set_site_preference('twofactor_smscredit_enabled', true);
-                set_site_preference('twofactor_sms_available', true);
+                $this->SetPreference('twofactor_sms_product_key', $product_key);
+                $this->SetPreference('twofactor_smscredit_enabled', true);
+                $this->SetPreference('twofactor_sms_available', true);
                 $this->SetMessage($this->Lang('sms_credits_saved'));
             }
         } else {
@@ -35,11 +35,11 @@ if (isset($params['submit_credits'])) {
 }
 
 if (isset($params['remove_credits'])) {
-    set_site_preference('twofactor_sms_product_key', '');
-    set_site_preference('twofactor_smscredit_enabled', '0');
-    $twilio_configured = get_site_preference('twofactor_twilio_enabled', false);
+    $this->SetPreference('twofactor_sms_product_key', '');
+    $this->SetPreference('twofactor_smscredit_enabled', '0');
+    $twilio_configured = $this->GetPreference('twofactor_twilio_enabled', false);
     if (!$twilio_configured) {
-        set_site_preference('twofactor_sms_available', false);
+        $this->SetPreference('twofactor_sms_available', false);
     }
     
     $this->SetMessage($this->Lang('sms_credits_removed'));
@@ -48,13 +48,13 @@ if (isset($params['remove_credits'])) {
 }
 
 if (isset($params['remove_twilio'])) {
-    set_site_preference('twofactor_twilio_api_key', '');
-    set_site_preference('twofactor_twilio_api_secret', '');
-    set_site_preference('twofactor_twilio_service_sid', '');
-    set_site_preference('twofactor_twilio_enabled', '0');
-    $smscredit_enabled = get_site_preference('twofactor_smscredit_enabled', false);
+    $this->SetPreference('twofactor_twilio_api_key', '');
+    $this->SetPreference('twofactor_twilio_api_secret', '');
+    $this->SetPreference('twofactor_twilio_service_sid', '');
+    $this->SetPreference('twofactor_twilio_enabled', '0');
+    $smscredit_enabled = $this->GetPreference('twofactor_smscredit_enabled', false);
     if (!$smscredit_enabled) {
-        set_site_preference('twofactor_sms_available', false);
+        $this->SetPreference('twofactor_sms_available', false);
     }
     
     $this->SetMessage($this->Lang('twilio_removed'));
@@ -71,11 +71,11 @@ if (isset($params['submit_twilio'])) {
         $this->SetError($this->Lang('error_twilio_fields_required'));
     } else {
         if (TwoFactorProviderSMS::verify_twilio_credentials($api_key, $api_secret, $service_sid)) {
-            set_site_preference('twofactor_twilio_api_key', $api_key);
-            set_site_preference('twofactor_twilio_api_secret', $api_secret);
-            set_site_preference('twofactor_twilio_service_sid', $service_sid);
-            set_site_preference('twofactor_twilio_enabled', true);
-            set_site_preference('twofactor_sms_available', true);
+            $this->SetPreference('twofactor_twilio_api_key', $api_key);
+            $this->SetPreference('twofactor_twilio_api_secret', $api_secret);
+            $this->SetPreference('twofactor_twilio_service_sid', $service_sid);
+            $this->SetPreference('twofactor_twilio_enabled', true);
+            $this->SetPreference('twofactor_sms_available', true);
             $this->SetMessage($this->Lang('twilio_settings_saved'));
         } else {
             $this->SetError($this->Lang('error_twilio_invalid_credentials'));
@@ -86,10 +86,10 @@ if (isset($params['submit_twilio'])) {
     return;
 }
 
-$product_key = get_site_preference('twofactor_sms_product_key', '');
-$sms_available = get_site_preference('twofactor_sms_available', false);
-$twilio_enabled = get_site_preference('twofactor_twilio_enabled', false);
-$smscredit_enabled = get_site_preference('twofactor_smscredit_enabled', 0);
+$product_key = $this->GetPreference('twofactor_sms_product_key', '');
+$sms_available = $this->GetPreference('twofactor_sms_available', false);
+$twilio_enabled = $this->GetPreference('twofactor_twilio_enabled', false);
+$smscredit_enabled = $this->GetPreference('twofactor_smscredit_enabled', 0);
 $credits_remaining = 0;
 $license_plan = '';
 
@@ -105,9 +105,9 @@ if (!empty($product_key)) {
 
 
 
-$api_key = get_site_preference('twofactor_twilio_api_key', '');
-$api_secret = get_site_preference('twofactor_twilio_api_secret', '');
-$service_sid = get_site_preference('twofactor_twilio_service_sid', '');
+$api_key = $this->GetPreference('twofactor_twilio_api_key', '');
+$api_secret = $this->GetPreference('twofactor_twilio_api_secret', '');
+$service_sid = $this->GetPreference('twofactor_twilio_service_sid', '');
 
 $tpl = $smarty->CreateTemplate($this->GetTemplateResource('smssettings.tpl'), null, null, $smarty);
 $tpl->assign('product_key', $product_key);

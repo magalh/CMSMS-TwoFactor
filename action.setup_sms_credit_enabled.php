@@ -13,7 +13,7 @@ $uid = get_userid();
 if (isset($params['resend_code'])) {
     $pending = TwoFactorUserMeta::get($uid, 'sms_phone_pending');
     if ($pending) {
-        $license_key = get_site_preference('twofactor_sms_product_key', '');
+        $license_key = $this->GetPreference('twofactor_sms_product_key', '');
         $config = cms_utils::get_config();
         $domain = parse_url($config['root_url'], PHP_URL_HOST);
         
@@ -42,7 +42,7 @@ if (isset($params['verify_code'])) {
     $pending = TwoFactorUserMeta::get($uid, 'sms_phone_pending');
     
     if ($code && $pending) {
-        $license_key = get_site_preference('twofactor_sms_product_key', '');
+        $license_key = $this->GetPreference('twofactor_sms_product_key', '');
         $config = cms_utils::get_config();
         $domain = parse_url($config['root_url'], PHP_URL_HOST);
         
@@ -67,7 +67,7 @@ if (isset($params['verify_code'])) {
 if (isset($params['send_verification'])) {
     $phone = trim($params['phone'] ?? '');
     if ($phone) {
-        $license_key = get_site_preference('twofactor_sms_product_key', '');
+        $license_key = $this->GetPreference('twofactor_sms_product_key', '');
         $config = cms_utils::get_config();
         $domain = parse_url($config['root_url'], PHP_URL_HOST);
         
@@ -103,7 +103,7 @@ $phone = TwoFactorUserMeta::get($uid, 'sms_phone');
 $is_enabled = !empty($phone);
 $pending_phone = TwoFactorUserMeta::get($uid, 'sms_phone_pending');
 
-$product_key = get_site_preference('twofactor_sms_product_key', '');
+$product_key = $this->GetPreference('twofactor_sms_product_key', '');
 $credits_configured = !empty($product_key);
 $credits_remaining = 0;
 $license_plan = '';

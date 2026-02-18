@@ -217,7 +217,7 @@ class TwoFactor extends CMSModule
             $hash_data .= md5_file($path);
         }
         
-        $license_key = get_site_preference('twofactorpro_license_key', '');
+        $license_key = $pro->GetPreference('twofactorpro_license_key', '');
         if (empty($license_key)) return false;
         
         $hash_data .= $license_key;

@@ -4,7 +4,7 @@ $this->SetCurrentTab('verify_logs');
 
 if (!$this->CheckPermission(TwoFactor::MANAGE_SMS_PERM)) return;
 
-$product_key = get_site_preference('twofactor_sms_product_key', '');
+$product_key = $this->GetPreference('twofactor_sms_product_key', '');
 $page = isset($params['page']) ? (int)$params['page'] : 1;
 $per_page = 25;
 

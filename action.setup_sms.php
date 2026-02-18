@@ -29,9 +29,9 @@ function get_friendly_twilio_error($response) {
 if (isset($params['resend_code'])) {
     $pending = TwoFactorUserMeta::get($uid, 'sms_phone_pending');
     if ($pending) {
-        $api_key_sid = get_site_preference('twofactor_twilio_api_key');
-        $api_secret = get_site_preference('twofactor_twilio_api_secret');
-        $service_sid = get_site_preference('twofactor_twilio_service_sid');
+        $api_key_sid = $this->GetPreference('twofactor_twilio_api_key');
+        $api_secret = $this->GetPreference('twofactor_twilio_api_secret');
+        $service_sid = $this->GetPreference('twofactor_twilio_service_sid');
         
         if ($api_key_sid && $api_secret && $service_sid) {
             $url = "https://verify.twilio.com/v2/Services/{$service_sid}/Verifications";
@@ -75,9 +75,9 @@ if (isset($params['verify_code'])) {
     $pending = TwoFactorUserMeta::get($uid, 'sms_phone_pending');
     
     if ($code && $pending) {
-        $api_key_sid = get_site_preference('twofactor_twilio_api_key');
-        $api_secret = get_site_preference('twofactor_twilio_api_secret');
-        $service_sid = get_site_preference('twofactor_twilio_service_sid');
+        $api_key_sid = $this->GetPreference('twofactor_twilio_api_key');
+        $api_secret = $this->GetPreference('twofactor_twilio_api_secret');
+        $service_sid = $this->GetPreference('twofactor_twilio_service_sid');
         
         $url = "https://verify.twilio.com/v2/Services/{$service_sid}/VerificationCheck";
         
@@ -117,9 +117,9 @@ if (isset($params['verify_code'])) {
 if (isset($params['send_verification'])) {
     $phone = trim($params['phone'] ?? '');
     if ($phone) {
-        $api_key_sid = get_site_preference('twofactor_twilio_api_key');
-        $api_secret = get_site_preference('twofactor_twilio_api_secret');
-        $service_sid = get_site_preference('twofactor_twilio_service_sid');
+        $api_key_sid = $this->GetPreference('twofactor_twilio_api_key');
+        $api_secret = $this->GetPreference('twofactor_twilio_api_secret');
+        $service_sid = $this->GetPreference('twofactor_twilio_service_sid');
         
         if ($api_key_sid && $api_secret && $service_sid) {
             $url = "https://verify.twilio.com/v2/Services/{$service_sid}/Verifications";
@@ -167,9 +167,9 @@ $phone = TwoFactorUserMeta::get($uid, 'sms_phone');
 $is_enabled = !empty($phone);
 $pending_phone = TwoFactorUserMeta::get($uid, 'sms_phone_pending');
 
-$twilio_api_key = get_site_preference('twofactor_twilio_api_key', '');
-$twilio_api_secret = get_site_preference('twofactor_twilio_api_secret', '');
-$twilio_service_sid = get_site_preference('twofactor_twilio_service_sid', '');
+$twilio_api_key = $this->GetPreference('twofactor_twilio_api_key', '');
+$twilio_api_secret = $this->GetPreference('twofactor_twilio_api_secret', '');
+$twilio_service_sid = $this->GetPreference('twofactor_twilio_service_sid', '');
 $twilio_configured = !empty($twilio_api_key) && !empty($twilio_api_secret) && !empty($twilio_service_sid);
 
 $tpl = $smarty->CreateTemplate($this->GetTemplateResource('setup_sms.tpl'), null, null, $smarty);

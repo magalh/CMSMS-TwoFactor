@@ -116,6 +116,6 @@ $smarty = Smarty_CMS::get_instance();
 $smarty->template_dir = __DIR__ . '/templates';
 global $error,$warningLogin,$acceptLogin,$changepwhash;
 
-$smarty->assign('lang', get_site_preference('frontendlang'));
+$smarty->assign('lang', $this->GetPreference('frontendlang'));
 $_contents = $smarty->display('verify_totp.tpl');
 return $_contents;

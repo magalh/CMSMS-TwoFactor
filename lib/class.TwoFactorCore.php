@@ -65,9 +65,13 @@ class TwoFactorCore
     public static function is_user_using_two_factor($user_id)
     {
         $primary = TwoFactorUserMeta::get_primary_provider($user_id);
-        if ($primary === 'disabled') {
+        
+        // User must explicitly set a primary provider (not 'disabled' and not null)
+        if (!$primary || $primary === 'disabled') {
             return false;
         }
+        
+        // Verify the primary provider is actually available
         return self::get_primary_provider_for_user($user_id) !== null;
     }
 

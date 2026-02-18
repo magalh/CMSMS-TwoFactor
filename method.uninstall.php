@@ -5,6 +5,18 @@ $this->RemovePermission(TwoFactor::MANAGE_PERM);
 $this->RemovePermission(TwoFactor::USE_PERM);
 $this->RemovePermission(TwoFactor::MANAGE_SMS_PERM);
 
+$this->RemovePreference('twofactor_sms_product_key');
+$this->RemovePreference('twofactor_smscredit_enabled');
+$this->RemovePreference('twofactor_sms_available');
+$this->RemovePreference('twofactor_twilio_api_key');
+$this->RemovePreference('twofactor_twilio_api_secret');
+$this->RemovePreference('twofactor_twilio_service_sid');
+$this->RemovePreference('twofactor_twilio_enabled');
+
+$this->RemoveEventHandler('TwoFactor', 'BeforeVerification');
+$this->RemoveEventHandler('TwoFactor', 'AfterVerificationSuccess');
+$this->RemoveEventHandler('TwoFactor', 'AfterVerificationFail');
+
 $db = $this->GetDb();
 $dict = NewDataDictionary($db);
 
