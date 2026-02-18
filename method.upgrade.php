@@ -14,10 +14,11 @@ if( version_compare($oldver, '2.0.0') < 0 ) {
     $old_table = cms_db_prefix() . 'mod_twofactor_usermeta';
     $new_table = cms_db_prefix() . 'module_twofactor_usermeta';
     
-    $dict = NewDataDictionary($db);
-    $tables = $db->MetaTables();
+    $query = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?";
+    $old_exists = $db->GetOne($query, [$old_table]);
+    $new_exists = $db->GetOne($query, [$new_table]);
     
-    if( in_array($old_table, $tables) && !in_array($new_table, $tables) ) {
+    if( $old_exists && !$new_exists ) {
         $db->Execute("RENAME TABLE $old_table TO $new_table");
     }
 
