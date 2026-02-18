@@ -22,7 +22,7 @@ $uid = $_SESSION['twofactor_user_id'];
 $mod = \cms_utils::get_module('TwoFactor');
 
 // Check if device is trusted
-if (\TwoFactorTrustedDevice::is_trusted($uid)) {
+if (\TwoFactor::IsProActive() && class_exists('\\TwoFactorTrustedDevice') && \TwoFactorTrustedDevice::is_trusted($uid)) {
     $user = \UserOperations::get_instance()->LoadUserByID($uid);
     if ($user) {
         $rememberme = $_SESSION['twofactor_rememberme'] ?? 0;
@@ -90,7 +90,7 @@ if (isset($_SESSION['twofactor_error'])) {
 }
 
 // Check rate limiting (Pro feature)
-if (\TwoFactor::IsProEnabled()) {
+if (\TwoFactor::IsProActive()) {
     $locked_seconds = \TwoFactorRateLimiter::check_rate_limit($uid, $ip_address);
     if ($locked_seconds !== false) {
         $error = sprintf($mod->Lang('account_locked'), ceil($locked_seconds / 60));
@@ -102,12 +102,12 @@ if (isset($_POST['submit']) && $locked_seconds === false) {
     
     if ($result) {
         // Reset failed attempts on success
-        if (\TwoFactor::IsProEnabled()) {
+        if (\TwoFactor::IsProActive()) {
             \TwoFactorRateLimiter::reset_attempts($uid, $ip_address);
         }
         
         // Trust device if requested
-        if (isset($_POST['trust_device']) && $_POST['trust_device'] == '1') {
+        if (\TwoFactor::IsProActive() && class_exists('\\TwoFactorTrustedDevice') && isset($_POST['trust_device']) && $_POST['trust_device'] == '1') {
             \TwoFactorTrustedDevice::trust_device($uid);
         }
         
@@ -136,7 +136,7 @@ if (isset($_POST['submit']) && $locked_seconds === false) {
     }
     
     // Record failed attempt
-    if (\TwoFactor::IsProEnabled()) {
+    if (\TwoFactor::IsProActive()) {
         \TwoFactorRateLimiter::record_failed_attempt($uid, $ip_address);
         // Store error in session for after redirect
         $_SESSION['twofactor_error'] = $mod->Lang('invalid_code');

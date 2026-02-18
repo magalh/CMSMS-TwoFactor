@@ -11,8 +11,6 @@ $dict = NewDataDictionary($db);
 $sqlarray = $dict->DropTableSQL(CMS_DB_PREFIX.'module_twofactor_usermeta');
 $dict->ExecuteSQLArray($sqlarray);
 
-$this->RemoveEventHandler('Core', 'LoginPost');
-
 $config = cms_config::get_instance();
 $twofactor_file = cms_join_path(CMS_ROOT_PATH, $config['admin_dir'], 'twofactor.php');
 if (file_exists($twofactor_file)) {

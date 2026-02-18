@@ -26,7 +26,6 @@ $flds = "
 $sqlarray = $dict->CreateTableSQL(cms_db_prefix() .'module_twofactor_usermeta', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-\Events::CreateEvent('Core', 'LoginPost');
 $this->RegisterEvents();
 
 $config = cms_config::get_instance();
