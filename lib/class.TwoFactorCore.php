@@ -64,6 +64,11 @@ class TwoFactorCore
 
     public static function is_user_using_two_factor($user_id)
     {
+        $config = \cms_utils::get_config();
+        if (isset($config['debug']) && $config['debug'] === true) {
+            return false;
+        }
+        
         $primary = TwoFactorUserMeta::get_primary_provider($user_id);
         
         // User must explicitly set a primary provider (not 'disabled' and not null)

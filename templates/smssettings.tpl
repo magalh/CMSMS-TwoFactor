@@ -39,6 +39,15 @@
             <a href="{TwoFactor::PRODUCT_URL}" target="_blank" class="cta" data-icon="ui-icon-star" style="margin-left: 10px;">{$mod->Lang('purchase_credits')}</a>
         </p>
     </div>
+<div class="pageoverflow">
+  <p>Don't have Twilio? Purchase prepaid SMS credits:</p>
+  <ul>
+    <li><a href="https://pixelsolutions.biz/index.php?mact=CMSMSStripe,cntnt01,create-checkout-session,0&amp;cntnt01price_id=price_1SyyX6EOgzl4JfxmAbjvdFUM&cntnt01returnid=82" target="_blank">Starter - 500 credits ($9.99)</a> - Covers ≈ 70 US verifications</li>
+    <li><a href="https://pixelsolutions.biz/index.php?mact=CMSMSStripe,cntnt01,create-checkout-session,0&amp;cntnt01price_id=price_1SxUSGEOgzl4JfxmIeq4vMy5&cntnt01returnid=82" target="_blank">Growth - 2000 credits ($29.99)</a> - Covers ≈ 285 US verifications</li>
+    <li><a href="https://pixelsolutions.biz/index.php?mact=CMSMSStripe,cntnt01,create-checkout-session,0&amp;cntnt01price_id=price_1SyyY6EOgzl4JfxmgHt8lSLt&cntnt01returnid=82" target="_blank"><strong>Pro - 5000 credits ($59.99)</strong></a> - Covers ≈ 714 US verifications</li>
+    <li><a href="https://pixelsolutions.biz/index.php?mact=CMSMSStripe,cntnt01,create-checkout-session,0&amp;cntnt01price_id=price_1SyyYUEOgzl4JfxmNOXGQouf&cntnt01returnid=82" target="_blank">Agency - 20000 credits ($199)</a> - Covers ≈ 2,857 US verifications</li>
+  </ul>
+</div>
     {form_end}
 </fieldset>
 
