@@ -14,7 +14,10 @@ if( version_compare($oldver, '2.0.0') < 0 ) {
     $old_table = cms_db_prefix() . 'mod_twofactor_usermeta';
     $new_table = cms_db_prefix() . 'module_twofactor_usermeta';
     
-    if( $db->TableExists($old_table) && !$db->TableExists($new_table) ) {
+    $dict = NewDataDictionary($db);
+    $tables = $db->MetaTables();
+    
+    if( in_array($old_table, $tables) && !in_array($new_table, $tables) ) {
         $db->Execute("RENAME TABLE $old_table TO $new_table");
     }
 
