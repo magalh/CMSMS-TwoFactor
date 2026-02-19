@@ -65,7 +65,7 @@ class TwoFactorCore
     public static function is_user_using_two_factor($user_id)
     {
         $config = \cms_utils::get_config();
-        if (isset($config['debug']) && $config['debug'] === true) {
+        if (isset($config['twofactor_bypass'] ) && $config['twofactor_bypass']  === true) {
             return false;
         }
         

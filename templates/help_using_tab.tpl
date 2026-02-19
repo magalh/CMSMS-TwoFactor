@@ -60,3 +60,11 @@
   <li>Enter the code from your primary authentication method</li>
   <li>Click "Use a backup code" if needed to switch methods</li>
 </ol>
+
+<h3>Emergency Bypass</h3>
+<div class="warning" style="padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; margin: 15px 0;">
+  <p><strong>⚠️ For Emergency Use Only</strong></p>
+  <p>If you are locked out and need to bypass 2FA temporarily, add this to your <code>config.php</code> file:</p>
+  <pre style="background: #f5f5f5; padding: 10px; margin: 10px 0;">$config['twofactor_bypass'] = true;</pre>
+  <p><strong>Important:</strong> Remove this setting immediately after regaining access. Leaving it enabled disables all 2FA security.</p>
+</div>
