@@ -37,7 +37,7 @@ if (!$is_pro && !$pro && $this->CheckPermission(TwoFactor::MANAGE_PERM)) {
     echo $this->SetTabHeader('upgrade', 'Upgrade to Pro');
 }
 $config = cms_config::get_instance();
-if ($this->CheckPermission(TwoFactor::MANAGE_PERM) && isset($config['debug']) && $config['debug'] == '1') {
+if ($this->CheckPermission(TwoFactor::MANAGE_PERM) && isset($config['developer_mode'] ) && $config['developer_mode']  == '1') {
     echo $this->SetTabHeader('debug', 'Debug');
 }
 echo $this->EndTabHeaders();
@@ -84,7 +84,7 @@ if (!$is_pro && !$pro && $this->CheckPermission(TwoFactor::MANAGE_PERM)) {
 }
 
 $config = cms_config::get_instance();
-if ($this->CheckPermission(TwoFactor::MANAGE_PERM) && isset($config['debug']) && $config['debug'] == '1') {
+if ($this->CheckPermission(TwoFactor::MANAGE_PERM) && isset($config['developer_mode'] ) && $config['developer_mode']  == '1') {
     echo $this->StartTab('debug', $params);
     include(__DIR__ . '/function.debug.php');
     echo $this->EndTab();

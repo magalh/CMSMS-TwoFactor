@@ -192,4 +192,5 @@ $smarty->assign('error', $error);
 $smarty->assign('has_backup_codes', $has_backup_codes);
 $smarty->assign('using_backup', $using_backup);
 $smarty->assign('locked_seconds', $locked_seconds);
+$smarty->assign('is_pro_active', \TwoFactor::IsProActive());
 $smarty->display($template);

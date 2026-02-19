@@ -1,6 +1,6 @@
 <?php
 # See doc/LICENSE.txt for full license information.
-class TwoFactor extends CMSModule
+class TwoFactor extends \CMSMSExt\XTModule
 {
     const MANAGE_PERM = 'manage_twofactor';
     const USE_PERM = 'use_twofactor';
@@ -111,19 +111,12 @@ class TwoFactor extends CMSModule
     }
 
     public function GetHelp() {
-        $base_dir = realpath(__DIR__);
-        $file = realpath(__DIR__.'/README.md');
-        if (!$file || !$base_dir || !is_file($file) || !is_readable($file)) return '';
-        if (strpos($file, $base_dir) !== 0) return '';
-        $markdown = @file_get_contents($file);
-        if (!$markdown) return '';
-        
-        $smarty = cmsms()->GetSmarty();
-        $smarty->assign('actionid', 'm1_');
-        $smarty->assign('product_url', self::PRODUCT_URL);
-        $processed = $smarty->fetch('string:' . $markdown);
-        
-        return tf_smarty::mdToHTML($processed);
+
+        $mods     = \ModuleOperations::get_instance()->GetInstalledModules();
+        $have_2fpro = in_array('TwoFactorPro', $mods);
+        \cms_utils::get_smarty()->assign('have_2fpro', $have_2fpro);
+
+        return parent::GetHelp();
     }
 
     public function GetChangeLog() {
