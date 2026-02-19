@@ -204,22 +204,6 @@ $lang['2fa_required'] = '2FA Required';
 $lang['2fa_required_message'] = 'Your administrator has enabled mandatory two-factor authentication. You must enable at least one 2FA method below to continue using the admin panel.';
 $lang['permission_denied'] = 'Permission denied. You do not have access to this feature.';
 
-// Trusted Devices
-$lang['tab_methods'] = 'Methods';
-$lang['tab_trusted_devices'] = 'Trusted Devices';
-$lang['trusted_devices'] = 'Trusted Devices';
-$lang['device_name'] = 'Device';
-$lang['ip_address'] = 'IP Address';
-$lang['device_added'] = 'Added';
-$lang['device_expires'] = 'Expires';
-$lang['actions'] = 'Actions';
-$lang['revoke'] = 'Revoke';
-$lang['confirm_revoke_device'] = 'Are you sure you want to revoke this device?';
-$lang['device_revoked'] = 'Device has been revoked.';
-$lang['no_trusted_devices'] = 'You have no trusted devices.';
-$lang['trusted_devices_help'] = 'Trusted devices allow you to skip 2FA verification for 30 days. You can revoke access at any time.';
-$lang['remember_device'] = 'Remember this device for 30 days';
-
 // SMS Settings
 $lang['sms_settings'] = 'SMS Settings';
 $lang['sms_credits_option'] = 'Option 1: SMS Credits from Pixel Solutions';
@@ -243,3 +227,6 @@ $lang['remove_twilio'] = 'Disable Twilio API';
 $lang['confirm_remove_twilio'] = 'Are you sure you want to remove Twilio API credentials?';
 $lang['twilio_removed'] = 'Twilio API credentials removed successfully.';
 $lang['error_subscription_key_not_supported'] = 'This is a subscription key. Only credit-based licenses are supported for SMS credits.';
+
+$lang['tab_methods'] = 'Methods';
+$lang['tab_trusted_devices'] = 'Trusted Devices';

@@ -1,7 +1,7 @@
 <h3>{$mod->Lang('sms_settings')}</h3>
 
 {if $sms_available}
-<div class="information" style="margin-bottom: 20px;">
+<div class="information">
     <strong>✓ {$mod->Lang('sms_status_available')}</strong>
     {if $smscredit_enabled && $twilio_enabled}
         - {$mod->Lang('sms_both_methods_active')} ({$mod->Lang('sms_credits_priority')})
@@ -12,7 +12,7 @@
     {/if}
 </div>
 {else}
-<div class="warning" style="margin-bottom: 20px;">
+<div class="warning">
     <strong>{$mod->Lang('sms_status_unavailable')}</strong> - {$mod->Lang('sms_configure_method')}
 </div>
 {/if}

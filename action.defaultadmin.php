@@ -12,7 +12,7 @@ $current_tab = isset($params['__activetab']) ? $params['__activetab'] : ($is_pro
 echo '<h3>TwoFactor Settings</h3>';
 
 if ($is_pro) {
-    echo '<div class="information" style="margin-bottom:20px;">';
+    echo '<div class="information">';
     echo '<p><strong>✓ TwoFactor Pro Active !!BETA!!</strong> - Premium features enabled.</p>';
     echo '</div>';
 }
