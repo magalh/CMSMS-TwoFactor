@@ -1,15 +1,13 @@
-<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-  <h3 style="margin:0;">{$mod->Lang('two_factor_settings')}</h3>
-  <a href="https://pixelsolutions.biz" target="_blank" rel="noopener noreferrer">
-    <img src="https://pixelsolution.s3.eu-south-1.amazonaws.com/logos/LOGO_3_COLOR_300.png" alt="Pixel Solutions" style="height:40px;" />
-  </a>
-</div>
-
-{if $enabled_providers}
+{if $is_2fa_active}
   <div class="information">
     <p>{$mod->Lang('two_factor_active')}</p>
   </div>
-  
+  {else}
+  <div class="warning">
+    <p>{$mod->Lang('two_factor_inactive')}</p>
+  </div>
+{/if}
+{if $enabled_providers}
   <p class="pagetext">{$mod->Lang('primary_method_info')}:</p>
   <form method="post" action="{cms_action_url action='user_prefs' active_tab='methods'}" style="margin-bottom:20px;">
     <div class="pageoverflow">

@@ -1,6 +1,9 @@
 <?php
 if (!defined('CMS_VERSION')) exit;
 
+$mod_tf = cms_utils::get_module('TwoFactor');
+$mod_pro = cms_utils::get_module('TwoFactorPro');
+
 if (isset($params['clear_all_prefs'])) {
     $basic_prefs = [
         'twofactor_sms_product_key',
@@ -31,9 +34,9 @@ if (isset($params['clear_all_prefs'])) {
     foreach ($basic_prefs as $pref) {
         $this->RemovePreference($pref);
     }
-    if ($pro) {
+    if ($mod_pro) {
         foreach ($pro_prefs as $pref) {
-            $pro->RemovePreference($pref);
+            $mod_pro->RemovePreference($pref);
         }
     }
     $this->SetMessage('All preferences cleared');
@@ -67,36 +70,32 @@ $pro_prefs = [
     'twofactorpro_alert_email_body'
 ];
 
-echo '<h4>Debug Info</h4>';
-echo '<p><strong>$is_pro:</strong> ' . ($is_pro ? 'true' : 'false') . '</p>';
-echo '<p><strong>$pro module:</strong> ' . ($pro ? 'loaded' : 'not loaded') . '</p>';
-if ($pro && method_exists($pro, 'IsProEnabled')) {
-    echo '<p><strong>$pro->IsProEnabled():</strong> ' . ($pro->IsProEnabled() ? 'true' : 'false') . '</p>';
-}
-
-echo '<h4>Basic Preferences (TwoFactor)</h4>';
-echo '<table class="pagetable">';
-echo '<thead><tr><th>Preference</th><th>Value</th></tr></thead><tbody>';
+$basic_prefs_data = [];
 foreach ($basic_prefs as $pref) {
     $val = $this->GetPreference($pref, '');
     if (strpos($pref, 'secret') !== false || strpos($pref, 'key') !== false) {
         $val = $val ? '***' : '';
     }
-    echo '<tr><td>' . htmlspecialchars($pref) . '</td><td>' . htmlspecialchars($val) . '</td></tr>';
+    $basic_prefs_data[] = ['name' => $pref, 'value' => $val];
 }
-echo '</tbody></table>';
 
-if ($pro) {
-    echo '<h4>Pro Preferences (TwoFactorPro)</h4>';
-    echo '<table class="pagetable">';
-    echo '<thead><tr><th>Preference</th><th>Value</th></tr></thead><tbody>';
+$pro_prefs_data = [];
+if ($mod_pro) {
     foreach ($pro_prefs as $pref) {
-        $val = $pro->GetPreference($pref, '');
+        $val = $mod_pro->GetPreference($pref, '');
         if (strpos($pref, 'secret') !== false || strpos($pref, 'key') !== false) {
             $val = $val ? '***' : '';
         }
-        echo '<tr><td>' . htmlspecialchars($pref) . '</td><td>' . htmlspecialchars($val) . '</td></tr>';
+        $pro_prefs_data[] = ['name' => $pref, 'value' => $val];
     }
-    echo '</tbody></table>';
 }
-echo '<p><a href="' . $this->create_url('m1_', 'defaultadmin', '', ['clear_all_prefs' => '1']) . '" onclick="return confirm(\'Are you sure you want to clear all preferences?\');">Clear All Preferences</a></p>';
+
+$smarty = cmsms()->GetSmarty();
+$tpl = $smarty->CreateTemplate($this->GetTemplateResource('admin_debug.tpl'), null, null, $smarty);
+$tpl->assign('is_pro_installed', $is_pro_installed);
+$tpl->assign('is_pro_active', $is_pro_active);
+$tpl->assign('mod_pro', $mod_pro);
+$tpl->assign('basic_prefs', $basic_prefs_data);
+$tpl->assign('pro_prefs', $pro_prefs_data);
+$tpl->assign('clear_url', $this->create_url('m1_', 'defaultadmin', '', ['clear_all_prefs' => '1']));
+$tpl->display();

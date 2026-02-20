@@ -3,15 +3,19 @@
 if( !defined('CMS_VERSION') ) exit;
 if( !$this->CheckPermission(TwoFactor::USE_PERM) ) return;
 
-// Check if 2FA is being enforced
-$enforce_mode = isset($params['enforce']) && $params['enforce'] == '1';
-if ($enforce_mode) {
-    echo '<div class="warning" style="margin: 20px 0; padding: 15px; background: #fff3cd; border: 1px solid #ffc107;">';
-    echo '<h3 style="margin-top: 0;">' . $this->Lang('2fa_required') . '</h3>';
-    echo '<p>' . $this->Lang('2fa_required_message') . '</p>';
-    echo '</div>';
-}
+$tpl = $smarty->CreateTemplate($this->GetTemplateResource('user_prefs.tpl'), null, null, $smarty);
 
+// Check if 2FA is being enforced and user doesn't have it enabled
+$pro = cms_utils::get_module('TwoFactorPro');
+$enforce_2fa = $pro ? $pro->GetPreference('twofactorpro_enforce_all', 0) : 0;
+$uid = get_userid(false);
+$user_has_2fa = TwoFactorCore::is_user_using_two_factor($uid);
+
+$tpl->assign('enforce_2fa', $enforce_2fa);
+$tpl->assign('user_has_2fa', $user_has_2fa);
+$tpl->display();
+
+//TABS
 $is_pro = TwoFactor::IsProActive();
 $current_tab = isset($params['__activetab']) ? $params['__activetab'] : 'methods';
 

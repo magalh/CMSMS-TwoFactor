@@ -5,25 +5,18 @@ if (!$this->CheckPermission(TwoFactor::MANAGE_PERM) && !$this->CheckPermission(T
     return;
 }
 
-$is_pro = TwoFactor::IsProActive();
-$pro = cms_utils::get_module('TwoFactorPro');
-$current_tab = isset($params['__activetab']) ? $params['__activetab'] : ($is_pro ? 'pro_settings' : 'sms');
+$is_pro_installed = TwoFactor::IsProInstalled();
+$is_pro_active = TwoFactor::IsProActive();
 
-echo '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0px;">
-  <h3 style="margin:0;">'.$this->Lang('two_factor_settings').'</h3>
-  <a href="https://pixelsolutions.biz" target="_blank" rel="noopener noreferrer">
-    <img src="https://pixelsolution.s3.eu-south-1.amazonaws.com/logos/LOGO_3_COLOR_300.png" alt="Pixel Solutions" style="height:40px;" />
-  </a>
-</div>';
+$tpl = $smarty->CreateTemplate($this->GetTemplateResource('defaultadmin.tpl'), null, null, $smarty);
+$tpl->assign('is_pro_installed', $is_pro_installed);
+$tpl->assign('is_pro_active', $is_pro_active);
+$tpl->display();
 
-if ($is_pro) {
-    echo '<div class="information">';
-    echo '<p><strong>✓ TwoFactor Pro Active !!BETA!!</strong> - Premium features enabled.</p>';
-    echo '</div>';
-}
+$current_tab = isset($params['__activetab']) ? $params['__activetab'] : ($is_pro_active ? 'pro_settings' : 'sms');
 
 echo $this->StartTabHeaders();
-if ($pro && $is_pro) {
+if ($is_pro_installed && $is_pro_active) {
     echo $this->SetTabHeader('pro_settings', 'Settings');
     echo $this->SetTabHeader('user_management', 'User Management');
     echo $this->SetTabHeader('templates', 'Templates');
@@ -35,10 +28,10 @@ if ($this->CheckPermission(TwoFactor::MANAGE_SMS_PERM)) {
         echo $this->SetTabHeader('verify_logs', 'Verify Logs');
     }
 }
-if ($pro) {
+if ($is_pro_installed) {
     echo $this->SetTabHeader('license', 'Pro License');
 }
-if (!$is_pro && !$pro && $this->CheckPermission(TwoFactor::MANAGE_PERM)) {
+if (!$is_pro_active && !$is_pro_installed && $this->CheckPermission(TwoFactor::MANAGE_PERM)) {
     echo $this->SetTabHeader('upgrade', 'Upgrade to Pro');
 }
 $config = cms_config::get_instance();
@@ -49,8 +42,9 @@ echo $this->EndTabHeaders();
 
 echo $this->StartTabContent();
 
-if ($pro && $is_pro) {
+if ($is_pro_installed && $is_pro_active) {
     echo $this->StartTab('pro_settings', $params);
+    $pro = cms_utils::get_module('TwoFactorPro');
     include($pro->GetModulePath() . '/function.admin_pro_settings.php');
     echo $this->EndTab();
     
@@ -76,19 +70,19 @@ if ($this->CheckPermission(TwoFactor::MANAGE_SMS_PERM)) {
     }
 }
 
-if ($pro) {
+if ($is_pro_installed) {
     echo $this->StartTab('license', $params);
+    $pro = cms_utils::get_module('TwoFactorPro');
     include($pro->GetModulePath() . '/function.admin_license.php');
     echo $this->EndTab();
 }
 
-if (!$is_pro && !$pro && $this->CheckPermission(TwoFactor::MANAGE_PERM)) {
+if (!$is_pro_active && !$is_pro_installed && $this->CheckPermission(TwoFactor::MANAGE_PERM)) {
     echo $this->StartTab('upgrade', $params);
     include(__DIR__ . '/function.admin_upgrade.php');
     echo $this->EndTab();
 }
 
-$config = cms_config::get_instance();
 if ($this->CheckPermission(TwoFactor::MANAGE_PERM) && isset($config['developer_mode'] ) && $config['developer_mode']  == '1') {
     echo $this->StartTab('debug', $params);
     include(__DIR__ . '/function.debug.php');

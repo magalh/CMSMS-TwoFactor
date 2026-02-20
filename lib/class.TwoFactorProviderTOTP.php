@@ -79,9 +79,8 @@ class TwoFactorProviderTOTP extends TwoFactorProvider
 
     public function get_qr_code_url($username, $secret)
     {
-        $sitename = $this->GetPreference('sitename', 'CMSMS');
-        $issuer = $this->GetPreference('siteurl', $sitename);
-        $tfa = new \RobThree\Auth\TwoFactorAuth($issuer);
+        $sitename = get_site_preference('sitename', 'My Website');
+        $tfa = new \RobThree\Auth\TwoFactorAuth($sitename);
         return $tfa->getQRCodeImageAsDataUri($username, $secret);
     }
 }

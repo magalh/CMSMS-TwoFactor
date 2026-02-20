@@ -45,7 +45,8 @@ if (!$is_configured) {
     $key = $provider->generate_key();
 }
 
-$qr_code = $provider->get_qr_code_url($this->GetUserName(), $key);
+$username = get_username($uid);
+$qr_code = $provider->get_qr_code_url($username, $key);
 
 $tpl = $smarty->CreateTemplate($this->GetTemplateResource('setup_totp.tpl'), null, null, $smarty);
 $tpl->assign('secret', $key);

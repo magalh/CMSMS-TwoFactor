@@ -174,6 +174,12 @@ class TwoFactor extends \CMSMSExt\XTModule
         return $out;
     }
 
+    public static function IsProInstalled()
+    {
+        $pro = cms_utils::get_module('TwoFactorPro');
+        return $pro !== false;
+    }
+
     public static function IsProActive()
     {
         $pro = cms_utils::get_module('TwoFactorPro');

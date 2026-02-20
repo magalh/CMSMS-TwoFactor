@@ -5,9 +5,8 @@
   </a>
 </div>
 
-{if $enforce_2fa && !$user_has_2fa} 
-    <div class="warning" style="margin: 20px 0; padding: 15px; background: #fff3cd; border: 1px solid #ffc107;">
-        <h3 style="margin-top: 0;">{$mod->Lang('2fa_required')}</h3>
-        <p>{$mod->Lang('2fa_required_message')}</p>
+{if $is_pro_active}
+    <div class="information">
+        <p><strong>✓ TwoFactor Pro Active !!BETA!!</strong> - Premium features enabled.</p>
     </div>
 {/if}
