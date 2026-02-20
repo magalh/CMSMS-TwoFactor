@@ -9,7 +9,12 @@ $is_pro = TwoFactor::IsProActive();
 $pro = cms_utils::get_module('TwoFactorPro');
 $current_tab = isset($params['__activetab']) ? $params['__activetab'] : ($is_pro ? 'pro_settings' : 'sms');
 
-echo '<h3>TwoFactor Settings</h3>';
+echo '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0px;">
+  <h3 style="margin:0;">'.$this->Lang('two_factor_settings').'</h3>
+  <a href="https://pixelsolutions.biz" target="_blank" rel="noopener noreferrer">
+    <img src="https://pixelsolution.s3.eu-south-1.amazonaws.com/logos/LOGO_3_COLOR_300.png" alt="Pixel Solutions" style="height:40px;" />
+  </a>
+</div>';
 
 if ($is_pro) {
     echo '<div class="information">';
