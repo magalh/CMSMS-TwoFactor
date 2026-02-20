@@ -38,7 +38,7 @@
     <div style="background: #f0f8ff; border: 2px solid #4a90e2; padding: 20px; border-radius: 5px; margin: 20px 0;">
         <h4 style="margin-top: 0;">How to Upgrade</h4>
         <ol>
-            <li>Purchase TwoFactor Pro license at <a href="{TwoFactor::PRODUCT_URL}" target="_blank">pixelsolutions.biz</a></li>
+            <li>Purchase TwoFactor Pro license at <a href="{$product_url}" target="_blank">pixelsolutions.biz</a></li>
             <li>Download and install the TwoFactorPro module</li>
             <li>Enter your license key in the Pro Settings</li>
             <li>All premium features will be unlocked automatically in this interface</li>
@@ -46,6 +46,6 @@
     </div>
     
     <p style="text-align: center; margin-top: 30px;">
-        <a href="{TwoFactor::PRODUCT_URL}" target="_blank" class="cta" data-icon="ui-icon-star" style="margin-left: 10px;">Get TwoFactor Pro</a>
+        <a href="{$product_url}" target="_blank" class="cta" data-icon="ui-icon-star" style="margin-left: 10px;">Get TwoFactor Pro</a>
     </p>
 </div>

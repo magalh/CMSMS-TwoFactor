@@ -119,4 +119,5 @@ $tpl->assign('license_plan', $license_plan);
 $tpl->assign('api_key', $api_key);
 $tpl->assign('api_secret', $api_secret);
 $tpl->assign('service_sid', $service_sid);
+$tpl->assign('product_url', TwoFactor::PRODUCT_URL);
 $tpl->display();
