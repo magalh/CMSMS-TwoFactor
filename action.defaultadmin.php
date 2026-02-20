@@ -7,6 +7,7 @@ if (!$this->CheckPermission(TwoFactor::MANAGE_PERM) && !$this->CheckPermission(T
 
 $is_pro_installed = TwoFactor::IsProInstalled();
 $is_pro_active = TwoFactor::IsProActive();
+$pro = $is_pro_installed ? cms_utils::get_module('TwoFactorPro') : null;
 
 $tpl = $smarty->CreateTemplate($this->GetTemplateResource('defaultadmin.tpl'), null, null, $smarty);
 $tpl->assign('is_pro_installed', $is_pro_installed);
@@ -42,9 +43,8 @@ echo $this->EndTabHeaders();
 
 echo $this->StartTabContent();
 
-if ($is_pro_installed && $is_pro_active) {
+if ($is_pro_installed && $is_pro_active && $pro) {
     echo $this->StartTab('pro_settings', $params);
-    $pro = cms_utils::get_module('TwoFactorPro');
     include($pro->GetModulePath() . '/function.admin_pro_settings.php');
     echo $this->EndTab();
     
@@ -70,9 +70,8 @@ if ($this->CheckPermission(TwoFactor::MANAGE_SMS_PERM)) {
     }
 }
 
-if ($is_pro_installed) {
+if ($is_pro_installed && $pro) {
     echo $this->StartTab('license', $params);
-    $pro = cms_utils::get_module('TwoFactorPro');
     include($pro->GetModulePath() . '/function.admin_license.php');
     echo $this->EndTab();
 }

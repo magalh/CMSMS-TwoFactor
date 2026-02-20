@@ -1,6 +1,7 @@
 <?php
-# See doc/LICENSE.txt for full license information.
-class TwoFactor extends \CMSMSExt\XTModule
+# See LICENSE for full license information.
+
+class TwoFactor extends CMSModule
 {
     const MANAGE_PERM = 'manage_twofactor';
     const USE_PERM = 'use_twofactor';
@@ -111,12 +112,19 @@ class TwoFactor extends \CMSMSExt\XTModule
     }
 
     public function GetHelp() {
-
-        $mods     = \ModuleOperations::get_instance()->GetInstalledModules();
+        $mods = \ModuleOperations::get_instance()->GetInstalledModules();
         $have_2fpro = in_array('TwoFactorPro', $mods);
-        \cms_utils::get_smarty()->assign('have_2fpro', $have_2fpro);
-
-        return parent::GetHelp();
+        
+        $smarty = \cms_utils::get_smarty();
+        $smarty->assign('have_2fpro', $have_2fpro);
+        
+        $tpl_file = cms_join_path($this->GetModulePath(), 'templates', 'help.tpl');
+        if (file_exists($tpl_file)) {
+            $tpl = $smarty->CreateTemplate($this->GetTemplateResource('help.tpl'));
+            return $tpl->fetch();
+        }
+        
+        return '';
     }
 
     public function GetChangeLog() {
@@ -177,7 +185,7 @@ class TwoFactor extends \CMSMSExt\XTModule
     public static function IsProInstalled()
     {
         $pro = cms_utils::get_module('TwoFactorPro');
-        return $pro !== false;
+        return $pro !== false && is_object($pro);
     }
 
     public static function IsProActive()

@@ -1,3 +1,6 @@
+
+{if $enabled_providers}
+
 {if $is_2fa_active}
   <div class="information">
     <p>{$mod->Lang('two_factor_active')}</p>
@@ -7,7 +10,7 @@
     <p>{$mod->Lang('two_factor_inactive')}</p>
   </div>
 {/if}
-{if $enabled_providers}
+
   <p class="pagetext">{$mod->Lang('primary_method_info')}:</p>
   {form_start action='user_prefs' active_tab='methods'}
     <div class="pageoverflow">
