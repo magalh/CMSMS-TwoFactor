@@ -23,11 +23,25 @@ $smscredit_enabled = $this->GetPreference('twofactor_smscredit_enabled', '0');
 $sms_available = $this->GetPreference('twofactor_sms_available', false);
 $sms_action = ($smscredit_enabled == '1') ? 'setup_sms_credit_enabled' : 'setup_sms';
 
+// Build primary method options
+$primary_options = [
+    ['label' => $this->Lang('disabled'), 'value' => 'disabled']
+];
+foreach ($providers as $key => $provider) {
+    if (in_array($key, $enabled_providers) && $key != 'TwoFactorProviderBackupCodes') {
+        if ($key == 'TwoFactorProviderSMS' && !$sms_available) {
+            continue;
+        }
+        $primary_options[] = ['label' => $provider->get_label(), 'value' => $key];
+    }
+}
+
 $smarty = cmsms()->GetSmarty();
 $tpl = $smarty->CreateTemplate($this->GetTemplateResource('user_methods.tpl'), null, null, $smarty);
 $tpl->assign('providers', $providers);
 $tpl->assign('enabled_providers', $enabled_providers);
 $tpl->assign('primary_provider', $primary_provider);
+$tpl->assign('primary_options', $primary_options);
 $tpl->assign('is_2fa_active', $is_2fa_active);
 $tpl->assign('user_id', $uid);
 $tpl->assign('actionid', $id);

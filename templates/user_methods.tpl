@@ -9,26 +9,16 @@
 {/if}
 {if $enabled_providers}
   <p class="pagetext">{$mod->Lang('primary_method_info')}:</p>
-  <form method="post" action="{cms_action_url action='user_prefs' active_tab='methods'}" style="margin-bottom:20px;">
+  {form_start action='user_prefs' active_tab='methods'}
     <div class="pageoverflow">
-      
       <p class="pageinput">
         <select name="{$actionid}set_primary" id="primary_method">
-          <option value="disabled"{if $primary_provider == 'disabled'} selected{/if}>{$mod->Lang('disabled')}</option>
-          {foreach $providers as $key => $provider}
-            {if in_array($key, $enabled_providers) && $key != 'TwoFactorProviderBackupCodes'}
-              {if $key == 'TwoFactorProviderSMS' && !$sms_available}
-                {* Skip SMS if not available *}
-              {else}
-                <option value="{$key}"{if $key == $primary_provider} selected{/if}>{$provider->get_label()}</option>
-              {/if}
-            {/if}
-          {/foreach}
+          {xt_html_options options=$primary_options selected=$primary_provider}
         </select>
         <input type="submit" value="{$mod->Lang('update')}" class="pagebutton" />
       </p>
     </div>
-  </form>
+  {form_end}
 {else}
   <div class="warning">
     <p>{$mod->Lang('no_methods_enabled')}</p>

@@ -173,11 +173,18 @@ class TwoFactorAPI
     {
         $api_url = self::API_BASE_URL . '/verification/check';
         
+        $normalized_phone = self::normalize_phone($phone);
+        $country = self::get_country_from_phone($normalized_phone);
+        
+        if (!$country) {
+            return ['valid' => false, 'error' => 'Country not supported'];
+        }
+        
         $data = json_encode([
             'license_key' => $license_key,
             'domain' => self::normalize_domain($domain),
-            'phone' => $phone,
-            'country' => 'US',
+            'phone' => $normalized_phone,
+            'country' => $country,
             'code' => $code
         ]);
         

@@ -26,9 +26,9 @@
                         <td>{$log.phone|default:'-'}</td>
                         <td>{$log.country|default:'-'}</td>
                         <td>
-                            {if $log.status == 'success' || $log.status == 'approved'}
+                            {if isset($log.status) && ($log.status == 'success' || $log.status == 'approved')}
                                 <span style="color: green;">✓ Success</span>
-                            {elseif $log.status == 'failed'}
+                            {elseif isset($log.status) && $log.status == 'failed'}
                                 <span style="color: red;">✗ Failed</span>
                             {else}
                                 {$log.status|default:'-'}
