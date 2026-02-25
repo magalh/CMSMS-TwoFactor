@@ -7,9 +7,9 @@ class TwoFactor extends CMSModule
     const USE_PERM = 'use_twofactor';
     const MANAGE_SMS_PERM = 'manage_twofactor_sms';
     const MANAGE_PRO_PERM = 'manage_twofactor_pro';
-    const PRODUCT_URL = 'https://pixelsolutions.biz/en/plugins/twofactor/';
+    const PRODUCT_URL = 'https://pixelsolutions.biz/plugins/twofactor/';
 
-    public function GetVersion() { return '2.0.0'; }
+    public function GetVersion() { return '2.0.1'; }
     public function MinimumCMSVersion() {return '2.2.1';}
     public function GetFriendlyName() { return $this->Lang('friendlyname'); }
     public function GetAdminDescription() { return $this->Lang('admindescription'); }

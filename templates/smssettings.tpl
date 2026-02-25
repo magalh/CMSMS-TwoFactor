@@ -36,7 +36,7 @@
             <input type="submit" name="{$actionid}remove_credits" value="{$mod->Lang('remove_license')}" class="pagebutton" onclick="return confirm('{$mod->Lang('confirm_remove_license')}');" />
             {/if}
             
-            <a href="{$product_url}" target="_blank" class="cta" data-icon="ui-icon-star" style="margin-left: 10px;">{$mod->Lang('purchase_credits')}</a>
+            <a href="{$product_url}" target="_blank" class="cta" data-icon="my-icon-star" style="margin-left: 10px;">{$mod->Lang('purchase_credits')}</a>
         </p>
     </div>
 <div class="pageoverflow">
