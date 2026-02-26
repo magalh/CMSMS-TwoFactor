@@ -2,7 +2,30 @@
 # See LICENSE for full license information.
 if( !defined('CMS_VERSION') ) exit;
 
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
+
 $config = cms_utils::get_config();
+
+// Handle query parameters
+if (isset($params['subaction'])) {
+    if ($params['subaction'] === 'resend') {
+        $params['resend'] = 1;
+    } elseif ($params['subaction'] === 'primary') {
+        $params['provider'] = '';
+    } elseif ($params['subaction'] === 'backup-codes') {
+        $params['provider'] = 'TwoFactorProviderBackupCodes';
+    } elseif ($params['subaction'] === 'totp') {
+        $params['provider'] = 'TwoFactorProviderTOTP';
+    } elseif ($params['subaction'] === 'email') {
+        $params['provider'] = 'TwoFactorProviderEmail';
+    } elseif ($params['subaction'] === 'sms') {
+        $params['provider'] = 'TwoFactorProviderSMS';
+    } elseif (strpos($params['subaction'], 'TwoFactorProvider') === 0) {
+        $params['provider'] = $params['subaction'];
+    }
+}
 
 // Check if we have stored 2FA data
 if (!isset($_SESSION['twofactor_user_id'])) {
@@ -36,29 +59,41 @@ if (TwoFactor::IsProActive() && class_exists('TwoFactorTrustedDevice') && TwoFac
 
 // Handle provider switch
 if (isset($params['provider'])) {
-    if ($params['provider']) {
-        // Normalize provider name (fix old singular form)
+    error_log('TwoFactor: provider param = "' . $params['provider'] . '"');
+    if ($params['provider'] !== '') {
+        // Normalize provider name (fix old singular form and aliases)
         $provider_name = $params['provider'];
         if ($provider_name === 'TwoFactorProviderBackupCode') {
             $provider_name = 'TwoFactorProviderBackupCodes';
+        } elseif ($provider_name === 'backup-codes') {
+            $provider_name = 'TwoFactorProviderBackupCodes';
+        } elseif ($provider_name === 'totp') {
+            $provider_name = 'TwoFactorProviderTOTP';
+        } elseif ($provider_name === 'email') {
+            $provider_name = 'TwoFactorProviderEmail';
+        } elseif ($provider_name === 'sms') {
+            $provider_name = 'TwoFactorProviderSMS';
         }
+        error_log('TwoFactor: Setting override to: ' . $provider_name);
         $_SESSION['twofactor_override_provider'] = $provider_name;
     } else {
+        error_log('TwoFactor: Clearing override provider');
         unset($_SESSION['twofactor_override_provider']);
     }
     unset($_SESSION['twofactor_email_sent']);
     unset($_SESSION['twofactor_sms_sent']);
-    $url = $config['root_url'] . '/twofactor/verify';
+    $url = $config['root_url'] . '/twofactor/verify?_=' . time();
     redirect($url);
     exit;
 }
 
 // Handle resend request
 if (isset($params['resend'])) {
+
     unset($_SESSION['twofactor_email_sent']);
     unset($_SESSION['twofactor_sms_sent']);
     $_SESSION['twofactor_message'] = $this->Lang('code_resent');
-    $url = $config['root_url'] . '/twofactor/verify';
+    $url = $config['root_url'] . '/twofactor/verify?_=' . time();
     redirect($url);
     exit;
 }
@@ -68,7 +103,6 @@ if (isset($_SESSION['twofactor_override_provider'])) {
     $provider_key = $_SESSION['twofactor_override_provider'];
     $available = TwoFactorCore::get_available_providers_for_user($uid);
     $provider = $available[$provider_key] ?? null;
-    error_log("TwoFactor: Provider override requested: $provider_key, provider found: " . ($provider ? get_class($provider) : 'NONE'));
     if (!$provider) {
         unset($_SESSION['twofactor_override_provider']);
         $provider = TwoFactorCore::get_primary_provider_for_user($uid);

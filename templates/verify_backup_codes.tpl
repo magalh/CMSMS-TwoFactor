@@ -62,7 +62,7 @@
 						</script>
 					{/if}
 					<p class="forgotpw">
-						<a href="{cms_action_url module="TwoFactor" action="twofactor" showtemplate="false" provider=""}">Back to primary method</a>
+						<a href="{root_url}/twofactor/verify/primary&_={$smarty.now}">Back to primary method</a>
 					</p>
 				</div>
 				<footer>

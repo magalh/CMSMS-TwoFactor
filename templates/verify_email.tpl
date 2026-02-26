@@ -73,12 +73,12 @@
 					{/if}
 					{if !isset($locked_seconds) || $locked_seconds === false}
 						<p class="forgotpw">
-							<a href="{cms_action_url module="TwoFactor" action="twofactor" resend=1}&cntnt01showtemplate=false">{$mod->Lang('resend_verification_code')}</a> &nbsp;
+							<a href="{root_url}/twofactor/verify/resend&_={$smarty.now}">{$mod->Lang('resend_verification_code')}</a> &nbsp;
 						</p>
 					{/if}
 					{if $has_backup_codes && !$using_backup && (!isset($locked_seconds) || $locked_seconds === false)}
 						<p class="forgotpw">
-							<a href="{cms_action_url module="TwoFactor" action="twofactor" provider="TwoFactorProviderBackupCodes"}&cntnt01showtemplate=false">{$mod->Lang('use_backup_code')}</a> &nbsp;
+							<a href="{root_url}/twofactor/verify/backup-codes&_={$smarty.now}">{$mod->Lang('use_backup_code')}</a> &nbsp;
 						</p>
 					{/if}
 				</div>
