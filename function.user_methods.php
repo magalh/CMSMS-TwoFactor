@@ -1,5 +1,5 @@
 <?php
-# See doc/LICENSE.txt for full license information.
+# See LICENSE for full license information.
 if (!defined('CMS_VERSION')) exit;
 
 $uid = get_userid(false);

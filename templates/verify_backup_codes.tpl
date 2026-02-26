@@ -21,19 +21,19 @@
 						<h1>Backup Code</h1>
 					</header>
 					<p>Enter one of your backup codes.</p>
-					{form_start showtemplate="false"}
+					{form_start module="TwoFactor" action="twofactor" showtemplate="false"}
 						{xt_form_csrf}
 						<fieldset>
 							<label for="authcode">Backup Code</label>
-							<input id="authcode" class="focus" placeholder="xxxxxxxx" name="authcode" type="text" size="15" value="" autocomplete="off" autofocus{if isset($locked_seconds) && $locked_seconds !== false} disabled{/if} />
+							<input id="authcode" class="focus" placeholder="xxxxxxxx" name="{$actionid}authcode" type="text" size="15" value="" autocomplete="off" autofocus{if isset($locked_seconds) && $locked_seconds !== false} disabled{/if} />
 							{if $is_pro_active}
 							<div style="margin: 10px 0;">
 								<label style="font-weight: normal; font-size: 13px;">
-									<input type="checkbox" name="trust_device" value="1"{if isset($locked_seconds) && $locked_seconds !== false} disabled{/if} /> Remember this device for 30 days
+									<input type="checkbox" name="{$actionid}trust_device" value="1"{if isset($locked_seconds) && $locked_seconds !== false} disabled{/if} /> Remember this device for 30 days
 								</label>
 							</div>
 							{/if}
-							<input class="loginsubmit" name="submit" type="submit" value="Verify"{if isset($locked_seconds) && $locked_seconds !== false} disabled{/if} />
+							<input class="loginsubmit" name="{$actionid}submit" type="submit" value="Verify"{if isset($locked_seconds) && $locked_seconds !== false} disabled{/if} />
 						</fieldset>
 						{if isset($error) && $error != ''}}
 						<div class="message error" id="error-message">

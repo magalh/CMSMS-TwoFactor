@@ -1,5 +1,5 @@
 <?php
-# See doc/LICENSE.txt for full license information.
+# See LICENSE for full license information.
 class TwoFactorProviderTOTP extends TwoFactorProvider
 {
     const SECRET_META_KEY = '_two_factor_totp_key';

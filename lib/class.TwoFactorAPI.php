@@ -1,4 +1,5 @@
 <?php
+# See LICENSE for full license information.
 class TwoFactorAPI
 {
     const API_BASE_URL = 'https://api.pixelsolutions.biz';

@@ -1,4 +1,5 @@
 <?php
+# See LICENSE for full license information.
 if( !defined('CMS_VERSION') ) exit;
 
 $config = cms_utils::get_config();

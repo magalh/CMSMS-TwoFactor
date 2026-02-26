@@ -3,3 +3,4 @@ releases/
 build.sh
 composer.json
 composer.lock
+.amazonq

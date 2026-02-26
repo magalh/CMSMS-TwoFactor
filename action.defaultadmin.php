@@ -1,4 +1,5 @@
 <?php
+# See LICENSE for full license information.
 if( !defined('CMS_VERSION') ) exit;
 
 if (!$this->CheckPermission(TwoFactor::MANAGE_PERM) && !$this->CheckPermission(TwoFactor::MANAGE_SMS_PERM)) {

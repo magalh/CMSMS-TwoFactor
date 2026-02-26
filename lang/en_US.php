@@ -1,4 +1,5 @@
 <?php
+# See LICENSE for full license information.
 $lang['friendlyname'] = 'Two Factor';
 $lang['admindescription'] = 'Secure CMS Made Simple login with Two Factor Authentication (2FA) - by Pixel Solutions';
 $lang['param_user'] = 'User parameter for frontend integration';

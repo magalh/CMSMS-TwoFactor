@@ -1,6 +1,5 @@
 <?php
-# See doc/LICENSE.txt for full license information.
-# See doc/LICENSE.txt for full license information.
+# See LICENSE for full license information.
 class TwoFactorProviderSMS extends TwoFactorProvider
 {
     private static $instance;

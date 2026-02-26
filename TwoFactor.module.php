@@ -185,6 +185,11 @@ class TwoFactor extends CMSModule
         return $out;
     }
 
+    public function UninstallPreMessage()
+    {
+        return $this->Lang('ask_uninstall');
+    }
+
     public static function IsProInstalled()
     {
         $pro = cms_utils::get_module('TwoFactorPro');

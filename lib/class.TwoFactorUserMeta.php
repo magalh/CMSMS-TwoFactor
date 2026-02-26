@@ -1,5 +1,5 @@
 <?php
-# See doc/LICENSE.txt for full license information.
+# See LICENSE for full license information.
 class TwoFactorUserMeta
 {
     const ENABLED_PROVIDERS_KEY = '_two_factor_enabled_providers';

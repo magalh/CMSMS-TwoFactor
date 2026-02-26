@@ -1,5 +1,5 @@
 <?php
-# See doc/LICENSE.txt for full license information.
+# See LICENSE for full license information.
 abstract class TwoFactorProvider
 {
     protected static $instances = [];
@@ -16,7 +16,7 @@ abstract class TwoFactorProvider
     abstract public function get_key();
     abstract public function get_label();
     abstract public function authentication_page($user);
-    abstract public function validate_authentication($user);
+    abstract public function validate_authentication($user, $params = []);
     abstract public function is_available_for_user($user);
 
     public function get_alternative_label()

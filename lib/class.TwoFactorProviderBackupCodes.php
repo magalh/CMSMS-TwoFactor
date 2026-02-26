@@ -1,6 +1,5 @@
 <?php
-# See doc/LICENSE.txt for full license information.
-# See doc/LICENSE.txt for full license information.
+# See LICENSE for full license information.
 class TwoFactorProviderBackupCodes extends TwoFactorProvider
 {
     private static $instance;
@@ -50,9 +49,9 @@ class TwoFactorProviderBackupCodes extends TwoFactorProvider
         return TwoFactorUserMeta::update($user_id, 'backup_codes', $codes);
     }
 
-    public function validate_authentication($user_id)
+    public function validate_authentication($user_id, $params = [])
     {
-        $submitted_code = strtolower(preg_replace('/\s+/', '', $_POST['authcode'] ?? ''));
+        $submitted_code = strtolower(preg_replace('/\s+/', '', $params['authcode'] ?? ''));
         $codes = $this->get_codes($user_id);
         
         if (in_array($submitted_code, $codes)) {

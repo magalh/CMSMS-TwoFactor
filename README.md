@@ -50,7 +50,7 @@ Go to **Extensions > TwoFactor Settings** to:
 - View SMS verification logs
 - Access Pro features (if installed)
 
-## [Upgrade to Pro](https://pixelsolutions.biz/en/plugins/twofactor/)
+## [Upgrade to Pro](https://pixelsolutions.biz/plugins/twofactor/)
 
 Unlock enterprise-grade security features with TwoFactor Pro:
 
@@ -62,7 +62,7 @@ Unlock enterprise-grade security features with TwoFactor Pro:
 - **IP Blacklisting** - Block malicious IP addresses
 - **Email Templates** - Customize security notification emails
 
-Visit [pixelsolutions.biz](https://pixelsolutions.biz/en/plugins/twofactor/) to purchase TwoFactor Pro.
+Visit [pixelsolutions.biz](https://pixelsolutions.biz/plugins/twofactor/) to purchase TwoFactor Pro.
 
 ## Requirements
 
