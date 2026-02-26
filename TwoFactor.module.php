@@ -97,12 +97,17 @@ class TwoFactor extends CMSModule
     private function InterceptLogin($params)
     {
         if (!isset($params['user'])) return;
+
+        $config = cms_utils::get_config();
+        if(isset($config['twofactor_bypass']) && $config['twofactor_bypass'] == 1) {    
+            return; // 2FA bypass enabled, do not intercept login
+        }
         
         $login_ops = \CMSMS\LoginOperations::get_instance();
         $login_ops->deauthenticate();
 
         $uid = $params['user']->id;
-        $config = cms_utils::get_config();
+        
         
         // Check if user has 2FA enabled
         $has_2fa = TwoFactorCore::is_user_using_two_factor($uid);
