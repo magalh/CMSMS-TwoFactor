@@ -91,6 +91,9 @@ class TwoFactor extends CMSModule
     {
         if (!isset($params['user'])) return;
         
+        $login_ops = \CMSMS\LoginOperations::get_instance();
+        $login_ops->deauthenticate();
+
         $uid = $params['user']->id;
         $config = cms_utils::get_config();
         
