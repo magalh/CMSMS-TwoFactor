@@ -54,6 +54,11 @@ class TwoFactor extends CMSModule
         }
     }
 
+    public function InitializeFrontend()
+    {
+        $this->RegisterRoute('/[Tt]wofactor\/verify/', ['action' => 'default', 'showtemplate' => 'false']);
+    }
+
     public function InitializeAdmin()
     {
         TwoFactorCore::register_providers();
@@ -105,10 +110,7 @@ class TwoFactor extends CMSModule
             $_SESSION['twofactor_user_id'] = $uid;
             $_SESSION['twofactor_rememberme'] = isset($_POST['loginremember']) ? 1 : 0;
 
-            //print_r($_SESSION);
-            error_log("TwoFactor: User ID $uid has 2FA enabled, redirecting to 2FA verification");
-            
-            $url = $config['root_url'] . '/index.php?mact=TwoFactor,cntnt01,twofactor,0&cntnt01showtemplate=false';
+            $url = $config['root_url'] . '/twofactor/verify';
             redirect($url);
             exit;
         }

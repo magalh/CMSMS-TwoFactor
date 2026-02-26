@@ -48,7 +48,8 @@ if (isset($params['provider'])) {
     }
     unset($_SESSION['twofactor_email_sent']);
     unset($_SESSION['twofactor_sms_sent']);
-    redirect($config['root_url'] . '/index.php?mact=TwoFactor,cntnt01,twofactor,0&cntnt01showtemplate=false');
+    $url = $config['root_url'] . '/twofactor/verify';
+    redirect($url);
     exit;
 }
 
@@ -57,7 +58,8 @@ if (isset($params['resend'])) {
     unset($_SESSION['twofactor_email_sent']);
     unset($_SESSION['twofactor_sms_sent']);
     $_SESSION['twofactor_message'] = $this->Lang('code_resent');
-    redirect($config['root_url'] . '/index.php?mact=TwoFactor,cntnt01,twofactor,0&cntnt01showtemplate=false');
+    $url = $config['root_url'] . '/twofactor/verify';
+    redirect($url);
     exit;
 }
 
