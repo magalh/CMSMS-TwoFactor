@@ -7,6 +7,6 @@
 
 {if $is_pro_active}
     <div class="information">
-        <p><strong>✓ TwoFactor Pro Active !!BETA!!</strong> - Premium features enabled.</p>
+        <p><strong>✓ {$mod->Lang('pro_active_beta')}</strong> - {$mod->Lang('pro_features_enabled')}</p>
     </div>
 {/if}

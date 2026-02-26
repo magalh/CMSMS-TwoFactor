@@ -19,26 +19,26 @@ $current_tab = isset($params['__activetab']) ? $params['__activetab'] : ($is_pro
 
 echo $this->StartTabHeaders();
 if ($is_pro_installed && $is_pro_active) {
-    echo $this->SetTabHeader('pro_settings', 'Settings');
-    echo $this->SetTabHeader('user_management', 'User Management');
-    echo $this->SetTabHeader('templates', 'Templates');
+    echo $this->SetTabHeader('pro_settings', $this->Lang('tab_pro_settings'));
+    echo $this->SetTabHeader('user_management', $this->Lang('tab_user_management'));
+    echo $this->SetTabHeader('templates', $this->Lang('tab_templates'));
 }
 if ($this->CheckPermission(TwoFactor::MANAGE_SMS_PERM)) {
-    echo $this->SetTabHeader('sms', 'SMS Settings');
+    echo $this->SetTabHeader('sms', $this->Lang('tab_sms'));
     $smscredit_enabled = $this->GetPreference('twofactor_smscredit_enabled', 0);
     if ($smscredit_enabled) {
-        echo $this->SetTabHeader('verify_logs', 'Verify Logs');
+        echo $this->SetTabHeader('verify_logs', $this->Lang('tab_verify_logs'));
     }
 }
 if ($is_pro_installed) {
-    echo $this->SetTabHeader('license', 'Pro License');
+    echo $this->SetTabHeader('license', $this->Lang('tab_license'));
 }
 if (!$is_pro_active && !$is_pro_installed && $this->CheckPermission(TwoFactor::MANAGE_PERM)) {
-    echo $this->SetTabHeader('upgrade', 'Upgrade to Pro');
+    echo $this->SetTabHeader('upgrade', $this->Lang('tab_upgrade'));
 }
 $config = cms_config::get_instance();
 if ($this->CheckPermission(TwoFactor::MANAGE_PERM) && isset($config['twofactor_debug_mode'] ) && $config['twofactor_debug_mode']  == '1') {
-    echo $this->SetTabHeader('debug', 'Debug');
+    echo $this->SetTabHeader('debug', $this->Lang('tab_debug'));
 }
 echo $this->EndTabHeaders();
 

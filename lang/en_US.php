@@ -178,6 +178,14 @@ $lang['alert_email_body'] = 'Admin Alert Email Body';
 $lang['alert_email_placeholders'] = 'Available placeholders: {username}, {ip_address}, {attempts}, {time}';
 $lang['rate_limiting_settings'] = 'Rate Limiting & Brute Force Protection';
 $lang['tab_templates'] = 'Templates';
+$lang['tab_pro_settings'] = 'Settings';
+$lang['tab_sms'] = 'SMS Settings';
+$lang['tab_verify_logs'] = 'Verify Logs';
+$lang['tab_license'] = 'Pro License';
+$lang['tab_upgrade'] = 'Upgrade to Pro';
+$lang['tab_debug'] = 'Debug';
+$lang['pro_active_beta'] = 'TwoFactor Pro Active';
+$lang['pro_features_enabled'] = 'Premium features enabled.';
 $lang['password_reset_email'] = 'Password Reset Email';
 $lang['admin_alert_email'] = 'Admin Alert Email';
 
