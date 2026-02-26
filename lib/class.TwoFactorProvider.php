@@ -45,4 +45,12 @@ abstract class TwoFactorProvider
         if ($length && strlen($code) !== $length) return false;
         return $code;
     }
+    
+    protected function sanitize_code($value, $length = 0)
+    {
+        if (empty($value)) return false;
+        $code = preg_replace('/\s+/', '', $value);
+        if ($length && strlen($code) !== $length) return false;
+        return $code;
+    }
 }

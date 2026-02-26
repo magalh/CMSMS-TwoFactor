@@ -9,11 +9,11 @@ class TwoFactor extends CMSModule
     const MANAGE_PRO_PERM = 'manage_twofactor_pro';
     const PRODUCT_URL = 'https://pixelsolutions.biz/plugins/twofactor/';
 
-    public function GetVersion() { return '2.0.1'; }
+    public function GetVersion() { return '2.1.0'; }
     public function MinimumCMSVersion() {return '2.2.1';}
     public function GetFriendlyName() { return $this->Lang('friendlyname'); }
     public function GetAdminDescription() { return $this->Lang('admindescription'); }
-    public function IsPluginModule() { return FALSE; }
+    public function IsPluginModule() { return TRUE; }
     public function HasAdmin() { return TRUE; }
     public function VisibleToAdminUser() { return FALSE; }
     public function GetAuthor() { return 'Pixel Solutions'; }
@@ -101,8 +101,11 @@ class TwoFactor extends CMSModule
             // User has 2FA, proceed with verification
             $_SESSION['twofactor_user_id'] = $uid;
             $_SESSION['twofactor_rememberme'] = isset($_POST['loginremember']) ? 1 : 0;
+
+            //print_r($_SESSION);
+            error_log("TwoFactor: User ID $uid has 2FA enabled, redirecting to 2FA verification");
             
-            $url = $config['admin_url'] . '/twofactor.php';
+            $url = $config['root_url'] . '/index.php?mact=TwoFactor,cntnt01,twofactor,0&cntnt01showtemplate=false';
             redirect($url);
             exit;
         }

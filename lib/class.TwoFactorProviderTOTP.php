@@ -37,21 +37,16 @@ class TwoFactorProviderTOTP extends TwoFactorProvider
         echo '<script>setTimeout(function(){document.getElementById("authcode").focus();}, 200);</script>';
     }
 
-    public function validate_authentication($user_id)
+    public function validate_authentication($user_id, $params = [])
     {
-        $code = $this->sanitize_code_from_request('authcode', 6);
-        error_log('TwoFactor TOTP: Received code: ' . ($code ? $code : 'empty'));
-        
-        if (!$code) return false;
+        $code = $this->sanitize_code($params['authcode'] ?? '', 6);
 
         $key = $this->get_user_totp_key($user_id);
-        error_log('TwoFactor TOTP: Secret key exists: ' . ($key ? 'yes' : 'no'));
         
         if (!$key) return false;
 
         $tfa = new \RobThree\Auth\TwoFactorAuth();
         $result = $tfa->verifyCode($key, $code, 2);
-        error_log('TwoFactor TOTP: Verification result: ' . ($result ? 'true' : 'false'));
         
         return $result;
     }

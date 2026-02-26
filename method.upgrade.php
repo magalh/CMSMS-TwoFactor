@@ -42,13 +42,13 @@ if( version_compare($oldver, '2.0.0') < 0 ) {
     $tpl->save();
 }
 
-// Always update twofactor.php file on upgrade
-$config = cms_config::get_instance();
-$source = cms_join_path($this->GetModulePath(), 'admin_files', 'orig.twofactor.php');
-$dest = cms_join_path(CMS_ROOT_PATH, $config['admin_dir'], 'twofactor.php');
-if (file_exists($source)) {
-    copy($source, $dest);
+if( version_compare($oldver, '2.1.0') < 0 ) {
+    // Remove legacy twofactor.php file if it exists
+    $config = cms_config::get_instance();
+    $dest = cms_join_path(CMS_ROOT_PATH, $config['admin_dir'], 'twofactor.php');
+    if (file_exists($dest)) {
+        @unlink($dest);
+    }
 }
-
 include_once(dirname(__FILE__) . '/lib/class.ModuleTracker.php');
 ModuleTracker::track('TwoFactor', 'upgrade');

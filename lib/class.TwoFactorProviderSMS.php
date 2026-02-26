@@ -76,9 +76,11 @@ class TwoFactorProviderSMS extends TwoFactorProvider
         return $http_code >= 200 && $http_code < 300;
     }
 
-    public function validate_authentication($user_id)
+    public function validate_authentication($user_id, $params = [])
     {
-        $submitted_code = preg_replace('/\s+/', '', $_POST['authcode'] ?? '');
+        $submitted_code = $this->sanitize_code($params['authcode'] ?? '', 6);
+        if (!$submitted_code) return false;
+        
         $phone = TwoFactorUserMeta::get($user_id, 'sms_phone');
         $mod = cms_utils::get_module('TwoFactor');
         $smscredit_enabled = $mod->GetPreference('twofactor_smscredit_enabled', false);

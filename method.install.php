@@ -28,13 +28,6 @@ $dict->ExecuteSQLArray($sqlarray);
 
 $this->RegisterEvents();
 
-$config = cms_config::get_instance();
-$source = cms_join_path($this->GetModulePath(), 'admin_files', 'orig.twofactor.php');
-$dest = cms_join_path(CMS_ROOT_PATH, $config['admin_dir'], 'twofactor.php');
-if (file_exists($source)) {
-    copy($source, $dest);
-}
-
 include_once(dirname(__FILE__) . '/lib/class.ModuleTracker.php');
 ModuleTracker::track('TwoFactor', 'install');
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## Version 2.1.0
+- Migrated verification flow to module action (removed standalone admin/twofactor.php)
+- Added language string support for all verification templates (TOTP, Email, SMS)
+- Improved form field handling with actionid prefixes for proper parameter passing
+- Enhanced rate limiting with automatic cleanup when disabled
+- Updated all providers to accept $params parameter for consistent validation
+- Improved countdown timer with language-based messages
+- Added message display support for resend notifications
+- Enhanced form security with CSRF token validation
+
 ## Version 2.0.0
 - Split module into TwoFactor (Free) and TwoFactorPro (Premium)
 - Added Managed SMS Credits system

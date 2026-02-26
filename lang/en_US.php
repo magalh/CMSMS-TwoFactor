@@ -103,6 +103,7 @@ $lang['two_factor_required'] = 'Two-Factor Authentication Required';
 $lang['enter_code_from_app'] = 'Enter the 6-digit code from your authenticator app';
 $lang['authentication_code'] = 'Authentication Code';
 $lang['invalid_code'] = 'Invalid code. Please try again.';
+$lang['code_resent'] = 'A new verification code has been sent.';
 $lang['verify'] = 'Verify';
 
 $lang['provider_email'] = 'Email Verification';
@@ -233,3 +234,16 @@ $lang['trusted_devices'] = 'Trusted Devices';
 $lang['tab_methods'] = 'Methods';
 $lang['tab_trusted_devices'] = 'Trusted Devices';
 $lang['actions'] = 'Actions';
+
+// Verification page strings
+$lang['email_verification_title'] = 'Email Verification';
+$lang['email_verification_sent'] = 'A verification code has been sent to your email address.';
+$lang['remember_device'] = 'Remember this device for 30 days';
+$lang['account_locked_seconds'] = 'Too many failed attempts. Please try again in %d second%s.';
+$lang['account_locked_minutes'] = 'Too many failed attempts. Please try again in %d minute%s.';
+$lang['resend_verification_code'] = 'Resend verification code';
+$lang['use_backup_code'] = 'Use a backup code';
+$lang['totp_verification_title'] = 'Two-Factor Authentication';
+$lang['verification_code_label'] = 'Verification Code';
+$lang['sms_verification_title'] = 'SMS Verification';
+$lang['sms_verification_sent'] = 'A verification code has been sent to your phone.';

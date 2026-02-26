@@ -7,7 +7,7 @@
 		<meta name="robots" content="noindex, nofollow" />
 		<meta name="viewport" content="initial-scale=1.0 maximum-scale=1.0 user-scalable=no" />
 		<link rel="shortcut icon" href="{$config.admin_url}/themes/OneEleven/images/favicon/cmsms-favicon.ico"/>
-		<link rel="stylesheet" href="loginstyle.php" />
+		<link rel="stylesheet" href="{$config.admin_url}/loginstyle.php" />
 		{cms_jquery}
 	</head>
 	<body id="login">
@@ -21,7 +21,8 @@
 						<h1>Backup Code</h1>
 					</header>
 					<p>Enter one of your backup codes.</p>
-					<form method="post" action="twofactor.php">
+					{form_start showtemplate="false"}
+						{xt_form_csrf}
 						<fieldset>
 							<label for="authcode">Backup Code</label>
 							<input id="authcode" class="focus" placeholder="xxxxxxxx" name="authcode" type="text" size="15" value="" autocomplete="off" autofocus{if isset($locked_seconds) && $locked_seconds !== false} disabled{/if} />
@@ -39,7 +40,7 @@
 							{$error}
 						</div>
 					{/if}
-					</form>
+					{form_end}
 					
 					{if isset($locked_seconds) && $locked_seconds !== false}
 						<script>
@@ -47,7 +48,7 @@
 						var timer = setInterval(function() {
 							countdown--;
 							if (countdown <= 0) {
-								window.location.href = 'twofactor.php';
+								window.location.reload();
 							} else {
 								var minutes = Math.ceil(countdown / 60);
 								var seconds = countdown % 60;
@@ -61,7 +62,7 @@
 						</script>
 					{/if}
 					<p class="forgotpw">
-						<a href="twofactor.php?provider=">Back to primary method</a>
+						<a href="{cms_action_url module="TwoFactor" action="twofactor" showtemplate="false" provider=""}">Back to primary method</a>
 					</p>
 				</div>
 				<footer>

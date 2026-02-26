@@ -62,9 +62,9 @@ class TwoFactorProviderEmail extends TwoFactorProvider
         return $mailer->Send();
     }
 
-    public function validate_authentication($user_id)
+    public function validate_authentication($user_id, $params = [])
     {
-        $submitted_code = preg_replace('/\s+/', '', $_POST['authcode'] ?? '');
+        $submitted_code = preg_replace('/\s+/', '', $params['authcode'] ?? '');
         $stored_code = TwoFactorUserMeta::get($user_id, 'email_code');
         $expiry = TwoFactorUserMeta::get($user_id, 'email_code_expiry');
         
@@ -72,7 +72,6 @@ class TwoFactorProviderEmail extends TwoFactorProvider
             return false;
         }
         
-        // Convert both to strings for comparison
         if (strval($submitted_code) === strval($stored_code)) {
             TwoFactorUserMeta::delete($user_id, 'email_code');
             TwoFactorUserMeta::delete($user_id, 'email_code_expiry');

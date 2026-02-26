@@ -7,7 +7,7 @@
 		<meta name="robots" content="noindex, nofollow" />
 		<meta name="viewport" content="initial-scale=1.0 maximum-scale=1.0 user-scalable=no" />
 		<link rel="shortcut icon" href="{$config.admin_url}/themes/OneEleven/images/favicon/cmsms-favicon.ico"/>
-		<link rel="stylesheet" href="loginstyle.php" />
+		<link rel="stylesheet" href="{$config.admin_url}/loginstyle.php" />
 		{cms_jquery}
 	</head>
 	<body id="login">
@@ -18,22 +18,23 @@
 						<img src="{$config.admin_url}/themes/OneEleven/images/layout/cmsms_login_logo.png" width="180" height="36" alt="CMS Made Simple&trade;" />
 					</div>
 					<header>
-						<h1>Two-Factor Authentication</h1>
+						<h1>{$mod->Lang('totp_verification_title')}</h1>
 					</header>
-					<form method="post" action="twofactor.php">
+					{form_start action='twofactor' module='TwoFactor' showtemplate='false'}
+						{xt_form_csrf}
 						<fieldset>
-							<label for="authcode">Authentication Code</label>
-							<input id="authcode" class="focus" placeholder="123 456" name="authcode" type="text" inputmode="numeric" pattern="[0-9 ]*" size="15" value="" autocomplete="off" autofocus{if isset($locked_seconds) && $locked_seconds !== false} disabled{/if} />
+							<label for="authcode">{$mod->Lang('verification_code_label')}</label>
+							<input id="authcode" class="focus" placeholder="123 456" name="{$actionid}authcode" type="text" inputmode="numeric" pattern="[0-9 ]*" size="15" value="" autocomplete="off" autofocus{if isset($locked_seconds) && $locked_seconds !== false} disabled{/if} />
 							{if $is_pro_active}
 							<div style="margin: 10px 0;">
 								<label style="font-weight: normal; font-size: 13px;">
-									<input type="checkbox" name="trust_device" value="1"{if isset($locked_seconds) && $locked_seconds !== false} disabled{/if} /> Remember this device for 30 days
+									<input type="checkbox" name="{$actionid}trust_device" value="1"{if isset($locked_seconds) && $locked_seconds !== false} disabled{/if} /> {$mod->Lang('remember_device')}
 								</label>
 							</div>
 							{/if}
-							<input class="loginsubmit" name="submit" type="submit" value="Verify"{if isset($locked_seconds) && $locked_seconds !== false} disabled{/if} />
+							<input class="loginsubmit" name="{$actionid}submit" type="submit" value="Verify"{if isset($locked_seconds) && $locked_seconds !== false} disabled{/if} />
 						</fieldset>
-					</form>
+					{form_end}
 					{if isset($error) && $error != ''}
 						<div class="message error" id="error-message">
 							{$error}
@@ -41,26 +42,31 @@
 					{/if}
 					{if isset($locked_seconds) && $locked_seconds !== false}
 						<script>
-						var countdown = {$locked_seconds};
+						{literal}
+						var countdown = {/literal}{$locked_seconds}{literal};
+						var msgSeconds = '{/literal}{$mod->Lang('account_locked_seconds')}{literal}';
+						var msgMinutes = '{/literal}{$mod->Lang('account_locked_minutes')}{literal}';
 						var timer = setInterval(function() {
 							countdown--;
 							if (countdown <= 0) {
-								window.location.href = 'twofactor.php';
+								window.location.reload();
 							} else {
 								var minutes = Math.ceil(countdown / 60);
-								var seconds = countdown % 60;
+								var msg;
 								if (countdown < 60) {
-									document.getElementById('error-message').innerHTML = 'Too many failed attempts. Please try again in ' + countdown + ' second' + (countdown > 1 ? 's' : '') + '.';
+									msg = msgSeconds.replace('%d', countdown).replace('%s', countdown > 1 ? 's' : '');
 								} else {
-									document.getElementById('error-message').innerHTML = 'Too many failed attempts. Please try again in ' + minutes + ' minute' + (minutes > 1 ? 's' : '') + '.';
+									msg = msgMinutes.replace('%d', minutes).replace('%s', minutes > 1 ? 's' : '');
 								}
+								document.getElementById('error-message').innerHTML = msg;
 							}
 						}, 1000);
+						{/literal}
 						</script>
 					{/if}
 					{if $has_backup_codes && !$using_backup}
 						<p class="forgotpw">
-							<a href="twofactor.php?provider=TwoFactorProviderBackupCodes">Use a backup code</a>
+							<a href="{cms_action_url module="TwoFactor" action="twofactor" provider="TwoFactorProviderBackupCodes"}&cntnt01showtemplate=false">{$mod->Lang('use_backup_code')}</a> &nbsp;
 						</p>
 					{/if}
 				</div>
