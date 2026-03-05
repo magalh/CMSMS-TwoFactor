@@ -30,7 +30,7 @@ $dict->ExecuteSQLArray($sqlarray);
 $this->RegisterEvents();
 
 include_once(dirname(__FILE__) . '/lib/class.ModuleTracker.php');
-ModuleTracker::track('TwoFactor', 'install');
+\TwoFactor\ModuleTracker::track($this->GetName(), 'install', CMS_VERSION, $this->GetVersion());
 
 $email_type = new CmsLayoutTemplateType();
 $email_type->set_originator($this->GetName());

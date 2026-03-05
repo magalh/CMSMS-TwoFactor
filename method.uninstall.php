@@ -31,7 +31,7 @@ if (file_exists($twofactor_file)) {
 }
 
 include_once(dirname(__FILE__) . '/lib/class.ModuleTracker.php');
-ModuleTracker::track('TwoFactor', 'uninstall');
+\TwoFactor\ModuleTracker::track('TwoFactor', 'uninstall', CMS_VERSION, $this->GetVersion());
 
 try {
   $types = CmsLayoutTemplateType::load_all_by_originator($this->GetName());

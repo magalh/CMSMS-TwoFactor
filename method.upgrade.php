@@ -52,4 +52,4 @@ if( version_compare($oldver, '2.1.0') < 0 ) {
     }
 }
 include_once(dirname(__FILE__) . '/lib/class.ModuleTracker.php');
-ModuleTracker::track('TwoFactor', 'upgrade');
+\TwoFactor\ModuleTracker::track('TwoFactor', 'upgrade', CMS_VERSION, $this->GetVersion());
