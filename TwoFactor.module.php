@@ -103,17 +103,16 @@ class TwoFactor extends CMSModule
             return; // 2FA bypass enabled, do not intercept login
         }
         
-        $login_ops = \CMSMS\LoginOperations::get_instance();
-        $login_ops->deauthenticate();
-
         $uid = $params['user']->id;
-        
         
         // Check if user has 2FA enabled
         $has_2fa = TwoFactorCore::is_user_using_two_factor($uid);
         
         if ($has_2fa) {
             // User has 2FA, proceed with verification
+            $login_ops = \CMSMS\LoginOperations::get_instance();
+            $login_ops->deauthenticate();
+            
             $_SESSION['twofactor_user_id'] = $uid;
             $_SESSION['twofactor_rememberme'] = isset($_POST['loginremember']) ? 1 : 0;
 
