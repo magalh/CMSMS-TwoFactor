@@ -22,6 +22,7 @@ $current_tab = isset($params['__activetab']) ? $params['__activetab'] : 'methods
 echo $this->StartTabHeaders();
 echo $this->SetTabHeader('methods', $this->Lang('tab_methods'));
 if ($is_pro) {
+    echo $this->SetTabHeader('security_keys', $this->Lang('tab_security_keys'));
     echo $this->SetTabHeader('trusted_devices', $this->Lang('tab_trusted_devices'));
 }
 echo $this->EndTabHeaders();
@@ -33,6 +34,13 @@ include(__DIR__ . '/function.user_methods.php');
 echo $this->EndTab();
 
 if ($is_pro) {
+    echo $this->StartTab('security_keys', $params);
+    $pro = cms_utils::get_module('TwoFactorPro');
+    if ($pro) {
+        include($pro->GetModulePath() . '/function.user_security_keys.php');
+    }
+    echo $this->EndTab();
+
     echo $this->StartTab('trusted_devices', $params);
     $pro = cms_utils::get_module('TwoFactorPro');
     if ($pro) {

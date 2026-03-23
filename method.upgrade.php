@@ -51,5 +51,9 @@ if( version_compare($oldver, '2.1.0') < 0 ) {
         @unlink($dest);
     }
 }
-include_once(dirname(__FILE__) . '/lib/class.ModuleTracker.php');
-\TwoFactor\ModuleTracker::track('TwoFactor', 'upgrade', CMS_VERSION, $this->GetVersion());
+
+if( version_compare($oldver, '3.0.0') < 0 ) {
+    // Passkey/WebAuthn support - no schema changes needed for free tier
+    // Free tier stores single passkey credential in usermeta table
+    // Pro tier creates module_twofactor_webauthn_credentials table in its own upgrade
+}

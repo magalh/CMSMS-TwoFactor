@@ -256,3 +256,47 @@ $lang['totp_verification_title'] = 'Two-Factor Authentication';
 $lang['verification_code_label'] = 'Verification Code';
 $lang['sms_verification_title'] = 'SMS Verification';
 $lang['sms_verification_sent'] = 'A verification code has been sent to your phone.';
+
+// Passkey / WebAuthn
+$lang['provider_passkey'] = 'Passkey';
+$lang['passkey_description'] = 'Use device biometrics (Touch ID, Windows Hello, Face ID) or a security key';
+$lang['setup_passkey'] = 'Setup Passkey';
+$lang['passkey_setup_info'] = 'Register a passkey to use your device biometrics (fingerprint, face recognition) or a security key for two-factor authentication.';
+$lang['register_passkey'] = 'Register Passkey';
+$lang['passkey_configured'] = 'Passkey is configured and active.';
+$lang['passkey_name'] = 'Key Name';
+$lang['passkey_registered'] = 'Registered';
+$lang['reset_passkey'] = 'Remove Passkey';
+$lang['confirm_reset_passkey'] = 'Are you sure you want to remove this passkey? You will need to register again.';
+$lang['passkey_reset'] = 'Passkey has been removed.';
+$lang['passkey_enabled'] = 'Passkey has been successfully registered!';
+$lang['passkey_verification_title'] = 'Passkey Verification';
+$lang['passkey_touch_prompt'] = 'Touch your security key or use your device biometrics to verify.';
+$lang['passkey_retry'] = 'Try Again';
+$lang['passkey_requires_https'] = 'Passkeys require HTTPS. Please ensure your site is served over a secure connection.';
+$lang['passkey_browser_unsupported'] = 'Your browser does not support passkeys.';
+$lang['passkey_pro_multi_key'] = 'With TwoFactor Pro, you can register multiple keys and use physical security keys.';
+
+// Shared key management strings (used by Pro templates via $mod)
+$lang['key_management_title'] = 'Security Key Management';
+$lang['key_management_help'] = 'View and manage WebAuthn security keys and passkeys for all users.';
+$lang['no_keys_registered'] = 'No users have registered security keys or passkeys yet.';
+$lang['key_count'] = 'Keys';
+$lang['key_details'] = 'Key Details';
+$lang['key_type'] = 'Type';
+$lang['security_key'] = 'Security Key';
+$lang['passkey'] = 'Passkey';
+$lang['last_used'] = 'Last Used';
+$lang['delete'] = 'Delete';
+$lang['confirm_delete_key'] = 'Are you sure you want to delete this key?';
+$lang['confirm_delete_all_keys'] = 'Are you sure you want to remove ALL keys for user \"%s\"?';
+$lang['remove_all_keys'] = 'Remove All Keys';
+$lang['key_deleted'] = 'Key has been deleted.';
+$lang['user_keys_deleted'] = 'All keys removed for user: %s';
+$lang['security_keys_title'] = 'Security Keys & Passkeys';
+$lang['security_keys_info'] = 'Register additional passkeys or physical security keys (YubiKey, Titan Key, etc.) for your account.';
+$lang['register_new_key'] = 'Register New Key';
+$lang['register_key'] = 'Register Key';
+$lang['passkey_type_desc'] = 'Touch ID, Windows Hello, Face ID';
+$lang['security_key_type_desc'] = 'YubiKey, Titan Key, USB/NFC';
+$lang['tab_security_keys'] = 'Security Keys';

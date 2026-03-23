@@ -27,3 +27,15 @@
 </ul>
 
 <p>Your CMS Made Simple installation is now protected with enterprise-grade two-factor authentication. Configure Pro features in the <strong>Settings</strong> tab.</p>
+
+<h2>Pro Features Overview</h2>
+<ul>
+  <li><strong>Multiple Passkeys &amp; Security Keys:</strong> Register multiple passkeys and physical security keys (YubiKey, Titan Key) per user</li>
+  <li><strong>Key Management Dashboard:</strong> Admin overview of all registered keys across all users</li>
+  <li><strong>Enforce 2FA:</strong> Require all admin users to enable 2FA</li>
+  <li><strong>Rate Limiting:</strong> Brute-force protection with exponential backoff</li>
+  <li><strong>Trusted Devices:</strong> Remember devices for 30 days</li>
+  <li><strong>User Management:</strong> View and manage all users' 2FA status</li>
+  <li><strong>Security Alerts:</strong> Email notifications for suspicious activity</li>
+  <li><strong>IP Blacklisting:</strong> Block malicious IP addresses</li>
+</ul>

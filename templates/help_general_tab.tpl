@@ -3,11 +3,13 @@
 
 <h3>Features</h3>
 <ul>
-  <li><strong>Multiple Authentication Methods:</strong> TOTP (Authenticator apps), Email, SMS, and Backup Codes</li>
+  <li><strong>Multiple Authentication Methods:</strong> TOTP (Authenticator apps), Passkeys (biometrics/device), Email, SMS, and Backup Codes</li>
+  <li><strong>Passkey / WebAuthn Support:</strong> Use Touch ID, Windows Hello, Face ID, or other platform authenticators</li>
   <li><strong>Flexible Configuration:</strong> Users choose their preferred primary method with fallback options</li>
   <li><strong>SMS Options:</strong> Use Managed SMS Credits from Pixel Solutions or your own Twilio account</li>
   <li><strong>Security Logging:</strong> Audit trail of all 2FA events</li>
   <li><strong>User-Friendly:</strong> Simple setup process for both admins and users</li>
+  <li><strong>No External Dependencies:</strong> Built-in WebAuthn server library, TOTP via bundled RobThree library</li>
 </ul>
 
 <h3>Upgrade to TwoFactor Pro</h3>
@@ -16,6 +18,8 @@
   <li>Enforce 2FA for all admin users</li>
   <li>Rate limiting and brute-force protection</li>
   <li>Trusted devices (remember for 30 days)</li>
+  <li>Multiple passkeys and physical security keys per user (YubiKey, Titan Key)</li>
+  <li>Security key management dashboard</li>
   <li>Admin user management dashboard</li>
   <li>Email security alerts</li>
   <li>IP blacklisting</li>

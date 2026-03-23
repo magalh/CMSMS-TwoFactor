@@ -9,7 +9,7 @@ class TwoFactor extends CMSModule
     const MANAGE_PRO_PERM = 'manage_twofactor_pro';
     const PRODUCT_URL = 'https://pixelsolutions.biz/plugins/twofactor/';
 
-    public function GetVersion() { return '2.1.0'; }
+    public function GetVersion() { return '3.0.0'; }
     public function MinimumCMSVersion() {return '2.2.1';}
     public function GetFriendlyName() { return $this->Lang('friendlyname'); }
     public function GetAdminDescription() { return $this->Lang('admindescription'); }
@@ -233,7 +233,8 @@ class TwoFactor extends CMSModule
         $core_files = [
             'TwoFactorPro.module.php',
             'lib/class.TwoFactorRateLimiter.php',
-            'lib/class.TwoFactorTrustedDevice.php'
+            'lib/class.TwoFactorTrustedDevice.php',
+            'lib/class.TwoFactorWebAuthnPro.php'
         ];
         
         $hash_data = '';

@@ -89,7 +89,22 @@
         {/if}
       </td>
     </tr>
+    {if $passkey_supported}
     <tr class="row2">
+      <td class="p_top_10 p_bottom_10"><strong>{$mod->Lang('provider_passkey')}</strong><br/><small>{$mod->Lang('passkey_description')}</small></td>
+      <td>
+        {if in_array('TwoFactorProviderPasskey', $enabled_providers)}
+          {admin_icon title='Enabled' icon='true.gif'}
+        {else}
+          {admin_icon title='Disabled' icon='false.gif'}
+        {/if}
+      </td>
+      <td>
+        <a href="{cms_action_url action='setup_passkey'}">{admin_icon icon='edit.gif'}</a>
+      </td>
+    </tr>
+    {/if}
+    <tr>
       <td class="p_top_10 p_bottom_10"><strong>{$mod->Lang('provider_backup_codes')}</strong><br/><small>{$mod->Lang('backup_codes_description')}</small></td>
       <td>
         {if in_array('TwoFactorProviderBackupCodes', $enabled_providers)}

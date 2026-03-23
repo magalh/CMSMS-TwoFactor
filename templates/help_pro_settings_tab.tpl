@@ -61,6 +61,33 @@
   <li>Force enable/disable 2FA for specific users</li>
 </ul>
 
+<h3>Security Key Management</h3>
+
+<p>View and manage all users' registered passkeys and security keys from <strong>TwoFactor Pro Settings > Key Management</strong> tab:</p>
+<ul>
+  <li>See all registered keys across all users</li>
+  <li>View key type (passkey vs physical security key), registration date, and last used date</li>
+  <li>Delete individual keys for any user</li>
+  <li>Remove all keys for a specific user</li>
+</ul>
+
+<h4>Physical Security Keys</h4>
+<p>TwoFactor Pro enables support for physical security keys (cross-platform authenticators):</p>
+<ul>
+  <li><strong>USB keys:</strong> YubiKey, Google Titan Key, Feitian, SoloKeys</li>
+  <li><strong>NFC keys:</strong> YubiKey NFC, Titan Security Key</li>
+  <li><strong>Bluetooth keys:</strong> Titan Security Key (BLE)</li>
+</ul>
+<p>Users can register physical keys from <strong>My Preferences > TwoFactor > Security Keys</strong> tab by selecting "Security Key" as the key type during registration.</p>
+
+<h4>Multiple Keys Per User</h4>
+<p>Pro users can register multiple passkeys and security keys. This is recommended for:</p>
+<ul>
+  <li>Having a backup key in case the primary is lost</li>
+  <li>Using different keys on different devices (e.g., laptop fingerprint + USB key)</li>
+  <li>Keeping a physical backup key in a secure location</li>
+</ul>
+
 <h3>Email Templates</h3>
 
 <p>Customize security notification emails from <strong>TwoFactor Settings > Email Templates</strong> tab:</p>

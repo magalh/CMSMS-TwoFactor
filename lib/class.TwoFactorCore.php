@@ -10,6 +10,7 @@ class TwoFactorCore
             'TwoFactorProviderTOTP' => dirname(__FILE__) . '/class.TwoFactorProviderTOTP.php',
             'TwoFactorProviderEmail' => dirname(__FILE__) . '/class.TwoFactorProviderEmail.php',
             'TwoFactorProviderSMS' => dirname(__FILE__) . '/class.TwoFactorProviderSMS.php',
+            'TwoFactorProviderPasskey' => dirname(__FILE__) . '/class.TwoFactorProviderPasskey.php',
             'TwoFactorProviderBackupCodes' => dirname(__FILE__) . '/class.TwoFactorProviderBackupCodes.php',
         ];
         

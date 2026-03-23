@@ -1,5 +1,19 @@
 # Changelog
 
+## Version 3.0.0
+- Added Passkey / WebAuthn (FIDO2) support as a new authentication method
+- Built self-contained WebAuthn server library (no external dependencies)
+- Includes CBOR decoder for FIDO2 attestation and COSE key parsing
+- Platform authenticator support (Touch ID, Windows Hello, Face ID)
+- Single passkey registration per user in free tier
+- Auto-triggered browser authentication on verification page
+- AJAX-based registration ceremony with real-time status feedback
+- Passkey provider integrates with existing provider switching and backup codes
+- Added WebAuthn challenge session management with proper cleanup
+- HTTPS detection for WebAuthn availability
+- Pro integration: authentication checks both base and Pro multi-key credentials
+- Added ~40 new language strings for passkey and key management features
+
 ## Version 2.1.0
 - Migrated verification flow to module action (removed standalone admin/twofactor.php)
 - Added language string support for all verification templates (TOTP, Email, SMS)

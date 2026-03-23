@@ -53,11 +53,41 @@
   <li>Save codes in a secure location (each code works only once)</li>
 </ol>
 
+<h5>Passkey (Biometrics / Device)</h5>
+<div class="information" style="padding: 10px; background: #e8f4f8; border-left: 4px solid #2196F3; margin: 15px 0;">
+  <p><strong>ℹ️ Requires HTTPS</strong> — Passkeys use the WebAuthn standard which only works over secure connections (HTTPS or localhost).</p>
+</div>
+<ol>
+  <li>Click "Configure" for Passkey</li>
+  <li>Click "Register Passkey"</li>
+  <li>Your browser will prompt you to use your device biometrics (fingerprint, face recognition) or device PIN</li>
+  <li>Once registered, select Passkey as your primary method and save</li>
+</ol>
+<p><strong>How it works:</strong> When logging in, instead of entering a code, your browser will automatically prompt you to verify using your device's biometric sensor or PIN. This is the most convenient and secure 2FA method available.</p>
+<p><strong>Supported authenticators:</strong> Touch ID (macOS), Windows Hello (Windows), Face ID / Touch ID (iOS/iPadOS), Android biometrics</p>
+
+{if $have_2fpro}
+<h5>Security Keys &amp; Multiple Passkeys (Pro)</h5>
+<p>With TwoFactor Pro, you can also:</p>
+<ul>
+  <li>Register <strong>multiple passkeys</strong> (e.g., laptop + phone)</li>
+  <li>Register <strong>physical security keys</strong> (YubiKey, Google Titan Key, Feitian, etc.)</li>
+  <li>Manage all your keys from the <strong>Security Keys</strong> tab in My Preferences</li>
+  <li>Name each key for easy identification</li>
+</ul>
+<p>Go to <strong>My Preferences > TwoFactor > Security Keys</strong> tab to register additional keys.</p>
+{/if}
+
 <h3>Login Flow</h3>
 <ol>
   <li>Enter username and password as normal</li>
   <li>After successful authentication, you'll be redirected to 2FA verification</li>
-  <li>Enter the code from your primary authentication method</li>
+  <li>Depending on your primary method:
+    <ul>
+      <li><strong>TOTP / Email / SMS:</strong> Enter the verification code</li>
+      <li><strong>Passkey:</strong> Your browser will automatically prompt for biometric verification or security key touch</li>
+    </ul>
+  </li>
   <li>Click "Use a backup code" if needed to switch methods</li>
 </ol>
 

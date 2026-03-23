@@ -22,6 +22,8 @@ if (isset($params['subaction'])) {
         $params['provider'] = 'TwoFactorProviderEmail';
     } elseif ($params['subaction'] === 'sms') {
         $params['provider'] = 'TwoFactorProviderSMS';
+    } elseif ($params['subaction'] === 'passkey') {
+        $params['provider'] = 'TwoFactorProviderPasskey';
     } elseif (strpos($params['subaction'], 'TwoFactorProvider') === 0) {
         $params['provider'] = $params['subaction'];
     }
@@ -73,6 +75,8 @@ if (isset($params['provider'])) {
             $provider_name = 'TwoFactorProviderEmail';
         } elseif ($provider_name === 'sms') {
             $provider_name = 'TwoFactorProviderSMS';
+        } elseif ($provider_name === 'passkey') {
+            $provider_name = 'TwoFactorProviderPasskey';
         }
         error_log('TwoFactor: Setting override to: ' . $provider_name);
         $_SESSION['twofactor_override_provider'] = $provider_name;
@@ -182,6 +186,7 @@ if (isset($params['submit']) && $locked_seconds === false) {
                 unset($_SESSION['twofactor_sms_sent']);
                 unset($_SESSION['twofactor_override_provider']);
                 unset($_SESSION['twofactor_error']);
+                unset($_SESSION['twofactor_webauthn_challenge']);
                 
                 audit($uid, 'Admin Username: ' . $user->username, 'Logged In (2FA)');
                 
@@ -222,6 +227,11 @@ if (strpos($provider_class, 'TOTP') !== false) {
         $provider->generate_and_send_code($uid);
         $_SESSION['twofactor_sms_sent'] = true;
     }
+} elseif (strpos($provider_class, 'Passkey') !== false) {
+    $template = 'verify_passkey.tpl';
+    // Pre-process to generate challenge
+    $provider->pre_process_authentication($uid);
+    $webauthn_options = $provider->get_authentication_options($uid);
 } elseif (strpos($provider_class, 'BackupCodes') !== false) {
     $template = 'verify_backup_codes.tpl';
 }
@@ -239,4 +249,7 @@ $tpl->assign('has_backup_codes', $has_backup_codes);
 $tpl->assign('using_backup', $using_backup);
 $tpl->assign('locked_seconds', $locked_seconds);
 $tpl->assign('is_pro_active', TwoFactor::IsProActive());
+if (isset($webauthn_options)) {
+    $tpl->assign('webauthn_options_json', json_encode($webauthn_options));
+}
 $tpl->display();
