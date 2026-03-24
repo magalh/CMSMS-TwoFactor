@@ -61,31 +61,49 @@
   <li>Force enable/disable 2FA for specific users</li>
 </ul>
 
-<h3>Security Key Management</h3>
+<h3>Passkeys &amp; Security Keys (Pro)</h3>
 
-<p>View and manage all users' registered passkeys and security keys from <strong>TwoFactor Pro Settings > Key Management</strong> tab:</p>
-<ul>
-  <li>See all registered keys across all users</li>
-  <li>View key type (passkey vs physical security key), registration date, and last used date</li>
-  <li>Delete individual keys for any user</li>
-  <li>Remove all keys for a specific user</li>
-</ul>
+<p>TwoFactor Pro adds full WebAuthn support with two separate authentication methods:</p>
 
-<h4>Physical Security Keys</h4>
-<p>TwoFactor Pro enables support for physical security keys (cross-platform authenticators):</p>
-<ul>
-  <li><strong>USB keys:</strong> YubiKey, Google Titan Key, Feitian, SoloKeys</li>
-  <li><strong>NFC keys:</strong> YubiKey NFC, Titan Security Key</li>
-  <li><strong>Bluetooth keys:</strong> Titan Security Key (BLE)</li>
-</ul>
-<p>Users can register physical keys from <strong>My Preferences > TwoFactor > Security Keys</strong> tab by selecting "Security Key" as the key type during registration.</p>
+<h4>Passkey vs Security Key</h4>
+<table class="pagetable">
+  <thead>
+    <tr><th>Feature</th><th>Passkey (Free + Pro)</th><th>Security Key (Pro only)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Authenticator type</td><td>Platform (built into device)</td><td>Cross-platform (external hardware)</td></tr>
+    <tr class="row2"><td>Examples</td><td>Windows Hello, Touch ID, Face ID</td><td>YubiKey, Google Titan Key, Feitian, SoloKeys</td></tr>
+    <tr><td>Keys per user (Free)</td><td>1</td><td>—</td></tr>
+    <tr class="row2"><td>Keys per user (Pro)</td><td>Unlimited</td><td>Unlimited</td></tr>
+    <tr><td>Selectable as primary method</td><td>Yes</td><td>Yes (Pro only)</td></tr>
+    <tr class="row2"><td>Login prompt</td><td>Biometric / device PIN</td><td>Insert key and tap</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Security Key</strong> appears as a separate selectable primary method in the user's method list when Pro is active and the user has registered at least one physical key. This means users can choose to always log in with their YubiKey without being prompted for biometrics.</p>
 
 <h4>Multiple Keys Per User</h4>
-<p>Pro users can register multiple passkeys and security keys. This is recommended for:</p>
+<p>Pro users can register multiple passkeys and security keys from <strong>My Preferences &gt; TwoFactor &gt; Security Keys</strong> tab. This is recommended for:</p>
 <ul>
   <li>Having a backup key in case the primary is lost</li>
   <li>Using different keys on different devices (e.g., laptop fingerprint + USB key)</li>
   <li>Keeping a physical backup key in a secure location</li>
+</ul>
+
+<h4>Key Management Dashboard</h4>
+<p>Admins can view and manage all users' registered keys from <strong>TwoFactor Settings &gt; User Management</strong>:</p>
+<ul>
+  <li>See all registered keys across all users</li>
+  <li>View key type, authenticator name (auto-detected via AAGUID), registration date, and last used date</li>
+  <li>Delete individual keys for any user</li>
+  <li>Remove all keys for a specific user</li>
+</ul>
+
+<h4>Supported Physical Security Keys</h4>
+<ul>
+  <li><strong>USB:</strong> YubiKey 5 series, Google Titan USB-A/USB-C, Feitian, SoloKeys</li>
+  <li><strong>NFC:</strong> YubiKey 5 NFC, Google Titan Key</li>
+  <li><strong>Bluetooth:</strong> Titan Security Key (BLE)</li>
 </ul>
 
 <h3>Email Templates</h3>

@@ -1,5 +1,6 @@
 <?php
 # See LICENSE for full license information.
+if (!defined('CMS_VERSION')) exit;
 class TwoFactorProviderTOTP extends TwoFactorProvider
 {
     const SECRET_META_KEY = '_two_factor_totp_key';

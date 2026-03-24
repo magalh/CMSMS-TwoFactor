@@ -1,86 +1,97 @@
-# TwoFactor - Two-Factor Authentication for CMS Made Simple
+=== Two Factor ===
+Contributors: Pixel Solutions
+Tags: security, two-factor, authentication, 2fa, login
+Requires at least: 2.2.1
+Tested up to: 2.2.22
+Stable tag: 3.0.0
+Requires PHP: 7.4
+License: MIT
 
-Secure your CMS Made Simple installation with two-factor authentication (2FA) by Pixel Solutions.
+Secure your CMS Made Simple login with two-factor authentication (2FA).
 
-## Features
+== Description ==
 
-### Multiple Authentication Methods
-- **TOTP (Time-based One-Time Password)** - Google Authenticator, Authy, Microsoft Authenticator, etc.
-- **Email Verification** - Receive codes via email
-- **SMS Verification** - Receive codes via SMS (Twilio or Managed SMS)
-- **Backup Codes** - One-time emergency access codes
+TwoFactor adds two-factor authentication to your CMS Made Simple admin login. Supports multiple authentication methods including TOTP (authenticator apps), Passkeys (WebAuthn/FIDO2), Email, SMS, and Backup Codes.
 
-### Flexible Configuration
+**Multiple Authentication Methods**
+
+- TOTP (Time-based One-Time Password) — Google Authenticator, Authy, Microsoft Authenticator, etc.
+- Passkey / WebAuthn — Windows Hello, Touch ID, Face ID, Android biometrics
+- Email Verification — Receive codes via email
+- SMS Verification — Receive codes via SMS (Twilio or Managed SMS Credits)
+- Backup Codes — One-time emergency access codes
+
+**Passkey Support (WebAuthn / FIDO2)**
+
+- Built-in WebAuthn server — no external dependencies
+- One passkey per user (free tier)
+- Auto-detects authenticator type via AAGUID
+- Works with Touch ID, Windows Hello, Face ID, and device PIN
+
+**Flexible Configuration**
+
 - Users can enable/disable methods individually
 - Choose primary authentication method
 - Multiple methods can be enabled as fallback options
+- "Use a different method" links on all verification pages
 
-### Security Features
-- Intercepts login after username/password validation
-- Session-based verification flow
-- Event system for extensibility
-- Secure code generation and validation
+**SMS Options**
 
-### SMS Options
-**Option 1: Managed SMS Credits**
-- Purchase SMS credits from Pixel Solutions
-- Simple setup - just enter your product key
-- Use credits across all your sites
-- No API configuration needed
+Option 1: Managed SMS Credits — Purchase SMS credits from Pixel Solutions. Simple setup, no API configuration needed.
 
-**Option 2: Your Own Twilio Account**
-- Use your existing Twilio account
-- Full control over SMS delivery
-- Configure API credentials in settings
+Option 2: Your Own Twilio Account — Use your existing Twilio account with full control over SMS delivery.
 
-## Quick Start
+**Upgrade to Pro**
 
-### For Users
-Go to **My Preferences > TwoFactor** to enable 2FA methods:
-- Scan QR code for TOTP (authenticator apps)
-- Enable email verification
-- Add phone number for SMS
-- Generate backup codes
+Unlock enterprise-grade security features with [TwoFactor Pro](https://pixelsolutions.biz/plugins/twofactor/):
 
-Select your primary method and save.
+- Unlimited Passkeys — Register multiple passkeys per user
+- Physical Security Keys — YubiKey, Titan Key, USB/NFC as a standalone login method
+- Security Key as Primary Method — Separate from Passkey, selectable as primary 2FA
+- AAGUID Detection — Auto-identifies authenticator make/model
+- Enforce 2FA — Require all admin users to enable 2FA
+- Rate Limiting — Protect against brute-force attacks
+- Trusted Devices — Remember devices for 30 days
+- User Management — Admin dashboard to manage all users
+- Security Alerts — Email notifications for suspicious activity
+- IP Blacklisting — Block malicious IP addresses
+- Email Templates — Customize security notification emails
 
-### For Administrators
-Go to **Extensions > TwoFactor Settings** to:
-- Configure SMS Credits or Twilio API
-- View SMS verification logs
-- Access Pro features (if installed)
+== Installation ==
 
-## [Upgrade to Pro](https://pixelsolutions.biz/plugins/twofactor/)
+1. Upload the TwoFactor module files to modules/TwoFactor/
+2. Install the module from Extensions > Modules
+3. Grant users the "Use TwoFactor" permission
+4. Users can enable 2FA from My Preferences > TwoFactor
 
-Unlock enterprise-grade security features with TwoFactor Pro:
+== Screenshots ==
 
-- **Enforce 2FA** - Require all admin users to enable 2FA
-- **Rate Limiting** - Protect against brute-force attacks
-- **Trusted Devices** - Remember devices for 30 days
-- **User Management** - Admin dashboard to manage all users
-- **Security Alerts** - Email notifications for suspicious activity
-- **IP Blacklisting** - Block malicious IP addresses
-- **Email Templates** - Customize security notification emails
+1. User preferences — enable and configure authentication methods
+2. Admin settings — configure SMS credits and Twilio API
 
-Visit [pixelsolutions.biz](https://pixelsolutions.biz/plugins/twofactor/) to purchase TwoFactor Pro.
+== Changelog ==
 
-## Requirements
+= 3.0.0 =
+- Added Passkey / WebAuthn (FIDO2) support as a new authentication method
+- Built self-contained WebAuthn server library (no external dependencies)
+- Platform authenticator support (Touch ID, Windows Hello, Face ID)
+- Single passkey registration per user in free tier
+- AJAX-based registration ceremony with real-time status feedback
+- Pro integration: authentication checks both base and Pro multi-key credentials
 
-- CMS Made Simple 2.1.6+
-- PHP 7.4 or higher
-- For TOTP: RobThree/TwoFactorAuth library (included)
-- For SMS: Twilio account OR SMS Credits from Pixel Solutions
+= 2.1.0 =
+- Migrated verification flow to module action
+- Added language string support for all verification templates
+- Enhanced rate limiting with automatic cleanup
+- Improved countdown timer with language-based messages
 
-## Documentation
+= 2.0.0 =
+- Split module into TwoFactor (Free) and TwoFactorPro (Premium)
+- Added Managed SMS Credits system
+- Added SMS verification logs with pagination
+- Added event system for Pro integration
 
-View complete documentation in **Extensions > TwoFactor > Help** tab.
-
-## Support
-
-- **Website:** https://pixelsolutions.biz
-- **Email:** support@pixelsolutions.biz
-- **Documentation:** https://pixelsolutions.biz/documentation/twofactor/
-
-## License
-
-MIT License - See LICENSE file for details
+= 1.0.0 =
+- Initial stable release
+- TOTP, Email, SMS, and Backup Codes support
+- Login interception via Core::LoginPost event

@@ -18,7 +18,9 @@
   <li>Enforce 2FA for all admin users</li>
   <li>Rate limiting and brute-force protection</li>
   <li>Trusted devices (remember for 30 days)</li>
-  <li>Multiple passkeys and physical security keys per user (YubiKey, Titan Key)</li>
+  <li>Unlimited passkeys per user (free tier allows one)</li>
+  <li>Physical security keys as a standalone login method (YubiKey, Titan Key)</li>
+  <li>AAGUID-based authenticator detection (auto-identifies key make/model)</li>
   <li>Security key management dashboard</li>
   <li>Admin user management dashboard</li>
   <li>Email security alerts</li>

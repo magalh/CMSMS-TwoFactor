@@ -1,5 +1,6 @@
 <?php
 # See LICENSE for full license information.
+if (!defined('CMS_VERSION')) exit;
 
 require_once __DIR__ . '/WebAuthn/WebAuthn.php';
 require_once __DIR__ . '/WebAuthn/CborDecoder.php';

@@ -1,5 +1,6 @@
 <?php
 # See LICENSE for full license information.
+if (!defined('CMS_VERSION')) exit;
 class TwoFactorUserMeta
 {
     const ENABLED_PROVIDERS_KEY = '_two_factor_enabled_providers';

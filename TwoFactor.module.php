@@ -11,7 +11,6 @@ class TwoFactor extends CMSModule
 
     public function GetVersion() { return '3.0.0'; }
     public function MinimumCMSVersion() {return '2.2.1';}
-    public function MaximumCMSVersion() {return '2.2.22';}
     public function GetFriendlyName() { return $this->Lang('friendlyname'); }
     public function GetAdminDescription() { return $this->Lang('admindescription'); }
     public function IsPluginModule() { return TRUE; }

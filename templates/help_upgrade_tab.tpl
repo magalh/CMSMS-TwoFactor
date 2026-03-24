@@ -30,7 +30,10 @@
 
 <h2>Pro Features Overview</h2>
 <ul>
-  <li><strong>Multiple Passkeys &amp; Security Keys:</strong> Register multiple passkeys and physical security keys (YubiKey, Titan Key) per user</li>
+  <li><strong>Multiple Passkeys:</strong> Register unlimited passkeys per user (free tier allows one)</li>
+  <li><strong>Physical Security Keys:</strong> Use YubiKey, Titan Key, or other FIDO2 hardware keys as a standalone login method</li>
+  <li><strong>Security Key as Primary Method:</strong> Users can select "Security Key" as their primary 2FA method, separate from Passkey</li>
+  <li><strong>AAGUID Detection:</strong> Automatically identifies authenticator make/model (e.g., "YubiKey 5 NFC")</li>
   <li><strong>Key Management Dashboard:</strong> Admin overview of all registered keys across all users</li>
   <li><strong>Enforce 2FA:</strong> Require all admin users to enable 2FA</li>
   <li><strong>Rate Limiting:</strong> Brute-force protection with exponential backoff</li>

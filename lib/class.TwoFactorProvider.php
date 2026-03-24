@@ -1,5 +1,6 @@
 <?php
 # See LICENSE for full license information.
+if (!defined('CMS_VERSION')) exit;
 abstract class TwoFactorProvider
 {
     protected static $instances = [];
