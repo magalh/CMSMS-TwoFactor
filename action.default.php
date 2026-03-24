@@ -317,4 +317,8 @@ foreach ($available as $key => $p) {
 }
 $tpl->assign('alt_methods', $alt_methods);
 
-$tpl->display();
+$handlers = ob_list_handlers();
+for ($cnt = 0; $cnt < sizeof($handlers); $cnt++) { ob_end_clean(); }
+header('Content-Type: text/html; charset=' . get_encoding());
+echo $tpl->fetch();
+exit;

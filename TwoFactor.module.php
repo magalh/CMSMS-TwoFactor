@@ -57,8 +57,8 @@ class TwoFactor extends CMSModule
     public function InitializeFrontend()
     { 
         $this->SetParameterType(CLEAN_REGEXP . '/subaction.*/', CLEAN_STRING);
-        $this->RegisterRoute('/[Tt]wofactor\/verify$/', ['action' => 'default', 'showtemplate' => 'false']);
-        $this->RegisterRoute('/[Tt]wofactor\/verify\/(?P<subaction>.*)$/', ['action' => 'default', 'showtemplate' => 'false']);
+        $this->RegisterRoute('/[Tt]wofactor\/verify$/', ['action' => 'default']);
+        $this->RegisterRoute('/[Tt]wofactor\/verify\/(?P<subaction>.*)$/', ['action' => 'default']);
     }
 
     public static function hasNewLoginFlow()

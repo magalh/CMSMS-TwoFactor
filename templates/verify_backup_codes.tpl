@@ -21,7 +21,7 @@
 						<h1>Backup Code</h1>
 					</header>
 					<p>Enter one of your backup codes.</p>
-					{form_start module="TwoFactor" action="twofactor" showtemplate="false"}
+					{form_start module="TwoFactor" action="twofactor"}
 						{xt_form_csrf}
 						<fieldset>
 							<label for="authcode">Backup Code</label>

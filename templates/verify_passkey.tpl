@@ -28,7 +28,7 @@
 						<h1>{$mod->Lang('passkey_verification_title')}</h1>
 					</header>
 
-					{form_start action='twofactor' module='TwoFactor' showtemplate='false'}
+					{form_start action='twofactor' module='TwoFactor'}
 						{xt_form_csrf}
 						<fieldset>
 							<input type="hidden" name="{$actionid}webauthn_response" id="webauthn_response" value="" />

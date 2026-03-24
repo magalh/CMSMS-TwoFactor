@@ -21,7 +21,7 @@
 						<h1>{$mod->Lang('sms_verification_title')}</h1>
 					</header>
 					<p>{$mod->Lang('sms_verification_sent')}</p>
-					{form_start action='twofactor' module='TwoFactor' showtemplate='false'}
+					{form_start action='twofactor' module='TwoFactor'}
 						{xt_form_csrf}
 						<fieldset>
 							<label for="authcode">{$mod->Lang('verification_code_label')}</label>
