@@ -13,6 +13,14 @@ class TwoFactorCore
             'TwoFactorProviderPasskey' => dirname(__FILE__) . '/class.TwoFactorProviderPasskey.php',
             'TwoFactorProviderBackupCodes' => dirname(__FILE__) . '/class.TwoFactorProviderBackupCodes.php',
         ];
+
+        // Pro: register Security Key provider
+        if (\TwoFactor::IsProActive()) {
+            $pro_path = dirname(dirname(__FILE__)) . '/../TwoFactorPro/lib/class.TwoFactorProviderSecurityKey.php';
+            if (file_exists($pro_path)) {
+                self::$providers['TwoFactorProviderSecurityKey'] = $pro_path;
+            }
+        }
         
         foreach (self::$providers as $class => $path) {
             if (file_exists($path)) {

@@ -12,15 +12,6 @@ $uid = get_userid();
 $provider = TwoFactorProviderPasskey::get_instance();
 $error = '';
 
-// Handle reset
-if (isset($params['reset'])) {
-    $provider->delete_credential($uid);
-    TwoFactorCore::disable_provider_for_user($uid, 'TwoFactorProviderPasskey');
-    $this->SetMessage($this->Lang('passkey_reset'));
-    $this->RedirectToAdminTab('', '', 'user_prefs');
-    return;
-}
-
 $is_configured = $provider->is_available_for_user($uid);
 $credential = $provider->get_credential($uid);
 $webauthn_supported = TwoFactorProviderPasskey::is_webauthn_supported();
@@ -29,6 +20,7 @@ $is_pro = TwoFactor::IsProActive();
 // Build passkey cards
 $passkey_cards = [];
 if ($credential) {
+    $auth_name = TwoFactorProviderPasskey::get_authenticator_name($credential['aaguid'] ?? '');
     $passkey_cards[] = [
         'id'          => 'base',
         'name'        => $credential['name'] ?? 'Passkey',
@@ -37,11 +29,13 @@ if ($credential) {
         'last_used_at'=> $credential['last_used_at'] ?? 0,
         'sign_count'  => $credential['sign_count'] ?? 0,
         'source'      => 'free',
+        'authenticator' => $auth_name,
     ];
 }
 if ($is_pro && class_exists('TwoFactorWebAuthnPro')) {
     $pro_keys = TwoFactorWebAuthnPro::get_credentials($uid);
     foreach ($pro_keys as $k) {
+        $auth_name = TwoFactorProviderPasskey::get_authenticator_name($k['aaguid'] ?? '');
         $passkey_cards[] = [
             'id'          => $k['id'],
             'name'        => $k['name'] ?: ($k['type'] === 'cross-platform' ? 'Security Key' : 'Passkey'),
@@ -50,6 +44,7 @@ if ($is_pro && class_exists('TwoFactorWebAuthnPro')) {
             'last_used_at'=> $k['last_used_at'] ?? 0,
             'sign_count'  => $k['sign_count'] ?? 0,
             'source'      => 'pro',
+            'authenticator' => $auth_name,
         ];
     }
 }

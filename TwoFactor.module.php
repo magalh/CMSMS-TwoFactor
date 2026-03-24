@@ -229,6 +229,11 @@ class TwoFactor extends CMSModule
 
     public static function IsProActive()
     {
+        static $result = null;
+        if ($result !== null) return $result;
+
+        $result = false;
+
         $pro = cms_utils::get_module('TwoFactorPro');
         if (!$pro) return false;
         
@@ -241,6 +246,7 @@ class TwoFactor extends CMSModule
         $hash = self::_verify_pro_integrity();
         if (!$hash) return false;
         
+        $result = true;
         return true;
     }
     

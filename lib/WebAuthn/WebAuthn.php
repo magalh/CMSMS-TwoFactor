@@ -72,7 +72,7 @@ class WebAuthn
                 ['type' => 'public-key', 'alg' => -257],  // RS256
             ],
             'timeout' => 60000,
-            'attestation' => 'none',
+            'attestation' => 'direct',
             'authenticatorSelection' => [
                 'residentKey'      => $residentKey,
                 'userVerification' => $userVerification,
@@ -120,7 +120,7 @@ class WebAuthn
                 $args['allowCredentials'][] = [
                     'type' => 'public-key',
                     'id'   => $credId,
-                    'transports' => ['internal', 'hybrid'],
+                    'transports' => ['internal', 'hybrid', 'usb', 'nfc', 'ble'],
                 ];
             }
         }
@@ -191,6 +191,7 @@ class WebAuthn
             'credentialId'        => self::base64UrlEncode($parsed['credentialId']),
             'credentialPublicKey' => $publicKeyPem,
             'signCount'           => $parsed['signCount'],
+            'aaguid'              => $parsed['aaguid'],
         ];
     }
 
@@ -275,6 +276,7 @@ class WebAuthn
         if ($flags & 0x40) {
             $offset = 37;
             // AAGUID (16 bytes)
+            $aaguid = substr($authData, $offset, 16);
             $offset += 16;
             // Credential ID length (2 bytes, big-endian)
             $credIdLen = unpack('n', substr($authData, $offset, 2))[1];
@@ -286,12 +288,23 @@ class WebAuthn
             $credentialPublicKey = CborDecoder::decode(substr($authData, $offset));
         }
 
+        // Format AAGUID as UUID string
+        $aaguidHex = isset($aaguid) ? bin2hex($aaguid) : str_repeat('0', 32);
+        $aaguidFormatted = sprintf('%s-%s-%s-%s-%s',
+            substr($aaguidHex, 0, 8),
+            substr($aaguidHex, 8, 4),
+            substr($aaguidHex, 12, 4),
+            substr($aaguidHex, 16, 4),
+            substr($aaguidHex, 20, 12)
+        );
+
         return [
             'rpIdHash'            => $rpIdHash,
             'flags'               => $flags,
             'signCount'           => $signCount,
             'credentialId'        => $credentialId,
             'credentialPublicKey' => $credentialPublicKey,
+            'aaguid'              => $aaguidFormatted,
         ];
     }
 

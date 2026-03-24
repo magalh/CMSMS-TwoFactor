@@ -49,5 +49,6 @@ $tpl->assign('smscredit_enabled', $smscredit_enabled);
 $tpl->assign('sms_available', $sms_available);
 $tpl->assign('sms_action', $sms_action);
 $tpl->assign('passkey_supported', TwoFactorProviderPasskey::is_webauthn_supported());
+$tpl->assign('is_pro', TwoFactor::IsProActive());
 $tpl->assign('mod', $this);
 $tpl->display();

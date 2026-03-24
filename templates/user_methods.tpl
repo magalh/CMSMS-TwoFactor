@@ -104,7 +104,22 @@
       </td>
     </tr>
     {/if}
+    {if $is_pro && $passkey_supported}
     <tr>
+      <td class="p_top_10 p_bottom_10"><strong>{$mod->Lang('provider_security_key')}</strong><br/><small>{$mod->Lang('security_key_description')}</small></td>
+      <td>
+        {if in_array('TwoFactorProviderSecurityKey', $enabled_providers)}
+          {admin_icon title='Enabled' icon='true.gif'}
+        {else}
+          {admin_icon title='Disabled' icon='false.gif'}
+        {/if}
+      </td>
+      <td>
+        <a href="{cms_action_url action='setup_security_key'}">{admin_icon icon='edit.gif'}</a>
+      </td>
+    </tr>
+    {/if}
+    <tr class="row2">
       <td class="p_top_10 p_bottom_10"><strong>{$mod->Lang('provider_backup_codes')}</strong><br/><small>{$mod->Lang('backup_codes_description')}</small></td>
       <td>
         {if in_array('TwoFactorProviderBackupCodes', $enabled_providers)}

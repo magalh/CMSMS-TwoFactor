@@ -24,6 +24,8 @@ if (isset($params['subaction'])) {
         $params['provider'] = 'TwoFactorProviderSMS';
     } elseif ($params['subaction'] === 'passkey') {
         $params['provider'] = 'TwoFactorProviderPasskey';
+    } elseif ($params['subaction'] === 'security-key') {
+        $params['provider'] = 'TwoFactorProviderSecurityKey';
     } elseif (strpos($params['subaction'], 'TwoFactorProvider') === 0) {
         $params['provider'] = $params['subaction'];
     }
@@ -100,6 +102,8 @@ if (isset($params['provider'])) {
             $provider_name = 'TwoFactorProviderSMS';
         } elseif ($provider_name === 'passkey') {
             $provider_name = 'TwoFactorProviderPasskey';
+        } elseif ($provider_name === 'security-key') {
+            $provider_name = 'TwoFactorProviderSecurityKey';
         }
         $_SESSION['twofactor_override_provider'] = $provider_name;
     } else {
@@ -259,6 +263,9 @@ if (strpos($provider_class, 'TOTP') !== false) {
 } elseif (strpos($provider_class, 'Passkey') !== false) {
     $template = 'verify_passkey.tpl';
     $webauthn_options = $provider->get_authentication_options($uid);
+} elseif (strpos($provider_class, 'SecurityKey') !== false) {
+    $template = 'verify_security_key.tpl';
+    $webauthn_options = $provider->get_authentication_options($uid);
 } elseif (strpos($provider_class, 'BackupCodes') !== false) {
     $template = 'verify_backup_codes.tpl';
 }
@@ -285,16 +292,18 @@ if (isset($webauthn_options)) {
 $available = TwoFactorCore::get_available_providers_for_user($uid);
 $alt_methods = [];
 $slug_map = [
-    'TwoFactorProviderTOTP'    => 'totp',
-    'TwoFactorProviderEmail'   => 'email',
-    'TwoFactorProviderSMS'     => 'sms',
-    'TwoFactorProviderPasskey' => 'passkey',
+    'TwoFactorProviderTOTP'        => 'totp',
+    'TwoFactorProviderEmail'       => 'email',
+    'TwoFactorProviderSMS'         => 'sms',
+    'TwoFactorProviderPasskey'     => 'passkey',
+    'TwoFactorProviderSecurityKey' => 'security-key',
 ];
 $label_map = [
-    'TwoFactorProviderTOTP'    => 'provider_totp',
-    'TwoFactorProviderEmail'   => 'provider_email',
-    'TwoFactorProviderSMS'     => 'provider_sms',
-    'TwoFactorProviderPasskey' => 'provider_passkey',
+    'TwoFactorProviderTOTP'        => 'provider_totp',
+    'TwoFactorProviderEmail'       => 'provider_email',
+    'TwoFactorProviderSMS'         => 'provider_sms',
+    'TwoFactorProviderPasskey'     => 'provider_passkey',
+    'TwoFactorProviderSecurityKey' => 'provider_security_key',
 ];
 foreach ($available as $key => $p) {
     if ($key === $provider_class) continue;

@@ -279,7 +279,7 @@ $lang['passkey_type_platform'] = 'This device';
 $lang['passkey_type_cross_platform'] = 'Security key';
 $lang['reset_passkey'] = 'Remove Passkey';
 $lang['confirm_reset_passkey'] = 'Are you sure you want to remove this passkey? You will need to register again.';
-$lang['passkey_reset'] = 'Passkey has been removed.';
+$lang['passkey_reset'] = 'Passkey has been removed from your account. You may also need to remove it from your device (e.g. Windows Settings &rarr; Accounts &rarr; Passkeys).';
 $lang['passkey_enabled'] = 'Passkey has been successfully registered!';
 $lang['passkey_verification_title'] = 'Use your passkey';
 $lang['passkey_touch_prompt'] = 'Follow the steps on your browser to verify your identity with your passkey.';
@@ -291,6 +291,18 @@ $lang['passkey_unsupported'] = 'Passkeys are not supported in this browser.';
 $lang['passkey_requires_https'] = 'Passkeys require HTTPS. Please ensure your site is served over a secure connection.';
 $lang['passkey_browser_unsupported'] = 'Your browser does not support passkeys.';
 $lang['passkey_pro_multi_key'] = 'With TwoFactor Pro, you can register multiple keys and use physical security keys.';
+$lang['passkey_add_key'] = 'Add another passkey';
+$lang['passkey_remove_key'] = 'Remove';
+$lang['confirm_remove_key'] = 'Remove this passkey? You may also need to delete it from your device (e.g. browser settings or Windows Settings > Accounts > Passkeys).';
+$lang['passkey_removing'] = 'Removing...';
+$lang['passkey_remove_failed'] = 'Could not remove passkey. Please try again.';
+
+$lang['provider_security_key'] = 'Security Key';
+$lang['security_key_description'] = 'Use a physical security key (YubiKey, Titan Key, USB/NFC)';
+$lang['security_key_verification_title'] = 'Insert your security key';
+$lang['security_key_touch_prompt'] = 'Insert your security key and tap it when it flashes.';
+$lang['security_key_cancelled'] = 'Authentication was cancelled or timed out.';
+$lang['security_key_failed'] = 'Authentication failed. Please try again.';
 
 // Shared key management strings (used by Pro templates via $mod)
 $lang['key_management_title'] = 'Security Key Management';

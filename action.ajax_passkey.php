@@ -26,6 +26,23 @@ switch ($op) {
         }
         break;
 
+    case 'remove':
+        try {
+            $provider->delete_credential($uid);
+            // If no Pro keys remain either, disable the provider
+            $has_keys = false;
+            if (\TwoFactor::IsProActive() && class_exists('TwoFactorWebAuthnPro')) {
+                $has_keys = TwoFactorWebAuthnPro::get_credential_count($uid) > 0;
+            }
+            if (!$has_keys) {
+                TwoFactorCore::disable_provider_for_user($uid, 'TwoFactorProviderPasskey');
+            }
+            \xt_utils::send_ajax_and_exit(['success' => true]);
+        } catch (\Exception $e) {
+            \xt_utils::send_ajax_and_exit(['success' => false, 'error' => $e->getMessage()]);
+        }
+        break;
+
     default:
         \xt_utils::send_ajax_and_exit(['success' => false, 'error' => 'Invalid operation']);
         break;

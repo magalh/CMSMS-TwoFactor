@@ -27,8 +27,7 @@ class TwoFactorProviderPasskey extends TwoFactorProvider
 
     public function is_available_for_user($user_id)
     {
-        $cred = $this->get_credential($user_id);
-        return !empty($cred);
+        return !empty($this->get_credential($user_id));
     }
 
     public function authentication_page($user)
@@ -167,9 +166,11 @@ class TwoFactorProviderPasskey extends TwoFactorProvider
             'credential_id' => $result->credentialId,
             'public_key'    => $result->credentialPublicKey,
             'sign_count'    => $result->signCount,
+            'aaguid'        => $result->aaguid ?? null,
             'type'          => 'platform',
-            'name'          => 'Passkey',
+            'name'          => self::get_authenticator_name($result->aaguid ?? '') ?: 'Passkey',
             'created_at'    => time(),
+            'last_used_at'  => 0,
         ];
 
         $this->save_credential($user_id, $credential);
@@ -202,6 +203,61 @@ class TwoFactorProviderPasskey extends TwoFactorProvider
     }
 
     // --- Utility ---
+
+    /**
+     * Known AAGUID to authenticator name mapping.
+     * Source: https://github.com/niclas-niclas/aaguid
+     */
+    private static $AAGUID_MAP = [
+        // Apple
+        'fbfc3007-154e-4ecc-8c0b-6e020557d7bd' => 'iCloud Keychain',
+        '00000000-0000-0000-0000-000000000000' => null, // No AAGUID (attestation=none)
+        // Google
+        'ea9b8d66-4d01-1d21-3ce4-b6b48cb575d4' => 'Google Password Manager',
+        'adce0002-35bc-c60a-648b-0b25f1f05503' => 'Google Password Manager',
+        'b5397723-31b1-4a5d-8af7-39fdac2bc9de' => 'Google Password Manager',
+        // Microsoft
+        '08987058-cadc-4b81-b6e1-30de50dcbe96' => 'Windows Hello',
+        '9ddd1817-af5a-4672-a2b9-3e3dd95000a9' => 'Windows Hello',
+        '6028b017-b1d4-4c02-b4b3-afcdafc96bb2' => 'Windows Hello',
+        // 1Password
+        'bada5566-a7aa-401f-bd96-45619a55120d' => '1Password',
+        'd548826e-79b4-db40-a3d8-11116f7e8349' => '1Password',
+        // Bitwarden
+        'd548826e-79b4-db40-a3d8-11116f7e8349' => 'Bitwarden',
+        'aaguidaa-bbcc-ddee-1122-334455667788' => 'Bitwarden',
+        // Dashlane
+        '531126d6-e717-415c-9320-3d9aa6981239' => 'Dashlane',
+        // Samsung
+        '53414d53-554e-4700-0000-000000000000' => 'Samsung Pass',
+        // YubiKey
+        '2fc0579f-8113-47ea-b116-bb5a8db9202a' => 'YubiKey 5 NFC',
+        'fa2b99dc-9e39-4257-8f92-4a30d23c4118' => 'YubiKey 5 NFC FIPS',
+        'cb69481e-8ff7-4039-93ec-0a2729a154a8' => 'YubiKey 5 Nano',
+        'ee882879-721c-4913-9775-3dfcee97617a' => 'YubiKey 5 Nano',
+        'c5ef55ff-ad9a-4b9f-b580-adebafe026d0' => 'YubiKey 5Ci',
+        'd8522d9f-575b-4866-88a9-ba99fa02f35b' => 'YubiKey Bio',
+        '73bb0cd4-e502-49b8-9c6f-b59445bf720b' => 'YubiKey 5 FIPS',
+        'c1f9a0bc-1dd2-404a-b27f-8e29047a43fd' => 'YubiKey 5 NFC FIPS',
+        'b92c3f9a-c014-4056-887f-140a2501163b' => 'Security Key by Yubico',
+        'f8a011f3-8c0a-4d15-8006-17111f9edc7d' => 'Security Key NFC by Yubico',
+        // Titan
+        '42b4fb4a-2866-43b2-9bf7-6c6669c2e5d3' => 'Google Titan Security Key',
+        // Feitian
+        '77010bd7-212a-4fc9-b236-d2ca5e9d4084' => 'Feitian BioPass FIDO2',
+        // SoloKeys
+        '8876631b-d4a0-427f-5773-0ec71c9e0279' => 'SoloKeys Solo 2',
+    ];
+
+    /**
+     * Resolve AAGUID to a human-readable authenticator name.
+     */
+    public static function get_authenticator_name($aaguid)
+    {
+        if (!$aaguid) return null;
+        $aaguid = strtolower($aaguid);
+        return self::$AAGUID_MAP[$aaguid] ?? null;
+    }
 
     public static function get_webauthn_instance()
     {
