@@ -14,7 +14,8 @@ class TwoFactorAPI
         
         $data = json_encode([
             'license_key' => $license_key,
-            'domain' => self::normalize_domain($domain)
+            'domain' => self::normalize_domain($domain),
+            'module' => 'TwoFactorPro',
         ]);
 
         $ch = curl_init();

@@ -31,6 +31,11 @@ class WebAuthn
      * @param int $length
      * @return string Base64url-encoded challenge
      */
+    public function getRpId()
+    {
+        return $this->rpId;
+    }
+
     public function createChallenge($length = 32)
     {
         $challenge = random_bytes($length);
@@ -111,9 +116,11 @@ class WebAuthn
         if (!empty($allowCredentialIds)) {
             $args['allowCredentials'] = [];
             foreach ($allowCredentialIds as $credId) {
+                if ($credId === null || $credId === '') continue;
                 $args['allowCredentials'][] = [
                     'type' => 'public-key',
                     'id'   => $credId,
+                    'transports' => ['internal', 'hybrid'],
                 ];
             }
         }
@@ -389,6 +396,7 @@ class WebAuthn
 
     public static function base64UrlDecode($data)
     {
+        if ($data === null || $data === '') return '';
         return base64_decode(strtr($data, '-_', '+/') . str_repeat('=', (4 - strlen($data) % 4) % 4));
     }
 }

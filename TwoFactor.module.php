@@ -11,6 +11,7 @@ class TwoFactor extends CMSModule
 
     public function GetVersion() { return '3.0.0'; }
     public function MinimumCMSVersion() {return '2.2.1';}
+    public function MaximumCMSVersion() {return '2.2.22';}
     public function GetFriendlyName() { return $this->Lang('friendlyname'); }
     public function GetAdminDescription() { return $this->Lang('admindescription'); }
     public function IsPluginModule() { return TRUE; }
@@ -61,9 +62,20 @@ class TwoFactor extends CMSModule
         $this->RegisterRoute('/[Tt]wofactor\/verify\/(?P<subaction>.*)$/', ['action' => 'default', 'showtemplate' => 'false']);
     }
 
+    public static function hasNewLoginFlow()
+    {
+        return version_compare(CMS_VERSION, '2.2.22', '>');
+    }
+
     public function InitializeAdmin()
     {
         TwoFactorCore::register_providers();
+
+        if (self::hasNewLoginFlow()) {
+            \CMSMS\HookManager::add_hook('Core::LoginVerified', function($params) {
+                $this->InterceptLoginNew($params);
+            });
+        }
     }
 
     public function GetHeaderHTML()
@@ -89,40 +101,48 @@ class TwoFactor extends CMSModule
 
     function DoEvent($originator, $eventname, &$params)
     {
-        if ($originator == 'Core' && $eventname == 'LoginPost') {
-            $this->InterceptLogin($params);
+        // Old core only — new core uses HookManager in InitializeAdmin
+        if (!self::hasNewLoginFlow() && $originator == 'Core' && $eventname == 'LoginPost') {
+            $this->InterceptLoginLegacy($params);
         }
     }
 
-    private function InterceptLogin($params)
+    // New core: LoginVerified fires BEFORE finalization, session has cms_pending_auth_userid
+    private function InterceptLoginNew($params)
     {
         if (!isset($params['user'])) return;
 
         $config = cms_utils::get_config();
-        if(isset($config['twofactor_bypass']) && $config['twofactor_bypass'] == 1) {    
-            return; // 2FA bypass enabled, do not intercept login
-        }
-        
-        $uid = $params['user']->id;
-        
-        // Check if user has 2FA enabled
-        $has_2fa = TwoFactorCore::is_user_using_two_factor($uid);
-        
-        if ($has_2fa) {
-            // User has 2FA, proceed with verification
-            $login_ops = \CMSMS\LoginOperations::get_instance();
-            $login_ops->deauthenticate();
-            
-            $_SESSION['twofactor_user_id'] = $uid;
-            $_SESSION['twofactor_rememberme'] = isset($_POST['loginremember']) ? 1 : 0;
+        if (isset($config['twofactor_bypass']) && $config['twofactor_bypass'] == 1) return;
 
-            $url = $config['root_url'] . '/twofactor/verify';
-            redirect($url);
-            exit;
-        }
-        
-        // Let login complete normally
-        return;
+        $uid = $params['user']->id;
+        if (!TwoFactorCore::is_user_using_two_factor($uid)) return;
+
+        $_SESSION['twofactor_rememberme'] = isset($_POST['loginremember']) ? 1 : 0;
+        \redirect($config['root_url'] . '/twofactor/verify');
+        exit;
+    }
+
+    // Old core: LoginPost fires AFTER full auth, must deauthenticate and redirect to frontend route
+    private function InterceptLoginLegacy($params)
+    {
+        if (!isset($params['user'])) return;
+
+        $config = cms_utils::get_config();
+        if (isset($config['twofactor_bypass']) && $config['twofactor_bypass'] == 1) return;
+
+        $uid = $params['user']->id;
+        if (!TwoFactorCore::is_user_using_two_factor($uid)) return;
+
+        $login_ops = \CMSMS\LoginOperations::get_instance();
+        $login_ops->deauthenticate();
+
+        $_SESSION['twofactor_user_id'] = $uid;
+        $_SESSION['twofactor_rememberme'] = isset($_POST['loginremember']) ? 1 : 0;
+
+        $url = $config['root_url'] . '/twofactor/verify';
+        redirect($url);
+        exit;
     }
 
     public function GetHelp() {

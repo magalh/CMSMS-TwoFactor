@@ -44,8 +44,14 @@ class TwoFactorProviderPasskey extends TwoFactorProvider
         $response = $params['webauthn_response'] ?? '';
         if (empty($response)) return false;
 
+        // CMSMS form processing HTML-encodes values — decode before JSON parse
+        $response = html_entity_decode($response, ENT_QUOTES, 'UTF-8');
+
         $challenge = $_SESSION['twofactor_webauthn_challenge'] ?? '';
         if (empty($challenge)) return false;
+
+        $decoded = json_decode($response, true);
+        if (!$decoded || !isset($decoded['clientDataJSON'], $decoded['authenticatorData'], $decoded['signature'])) return false;
 
         // Try base credential first
         $cred = $this->get_credential($user_id);
@@ -53,18 +59,20 @@ class TwoFactorProviderPasskey extends TwoFactorProvider
             try {
                 $webauthn = self::get_webauthn_instance();
                 $result = $webauthn->processGet(
-                    json_decode($response, true)['clientDataJSON'],
-                    json_decode($response, true)['authenticatorData'],
-                    json_decode($response, true)['signature'],
+                    $decoded['clientDataJSON'],
+                    $decoded['authenticatorData'],
+                    $decoded['signature'],
                     $cred['public_key'],
                     $challenge,
                     $cred['sign_count'] ?? 0
                 );
                 $cred['sign_count'] = $result->signCount;
+                $cred['last_used_at'] = time();
                 $this->save_credential($user_id, $cred);
                 unset($_SESSION['twofactor_webauthn_challenge']);
                 return true;
             } catch (\Exception $e) {
+                error_log('TwoFactor Passkey: base credential validation failed: ' . $e->getMessage());
                 // Fall through to Pro credentials
             }
         }

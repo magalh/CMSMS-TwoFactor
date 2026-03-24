@@ -7,22 +7,31 @@
 {else}
 
   {if $error}
-    <div class="warning">{$error}</div>
+    <div class="warning">
+      <p>{$error}</p>
+    </div>
   {/if}
 
   {if $is_configured}
-    <div class="pageoverflow">
-      <p class="information">
-        ✓ {$mod->Lang('passkey_configured')}
-      </p>
-    </div>
 
-    {if $credential.name}
-      <div class="pageoverflow">
-        <p class="pagetext">{$mod->Lang('passkey_name')}: <strong>{$credential.name}</strong></p>
-        <p class="pagetext">{$mod->Lang('passkey_registered')}: {$credential.created_at|date_format:'%Y-%m-%d %H:%M'}</p>
+    {foreach $passkey_cards as $card}
+    <div style="border: 1px solid #ddd; border-radius: 6px; padding: 12px 15px; margin-bottom: 10px; background: #fafafa;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <img src="{$mod_url}/assets/canonical-passkey-icon.png" alt="" width="32" height="32" />
+        <div style="flex: 1;">
+          <strong>{$card.name}</strong>
+          <div style="font-size: 12px; color: #666; margin-top: 2px;">
+            {if $card.type === 'cross-platform'}{$mod->Lang('passkey_type_cross_platform')}{else}{$mod->Lang('passkey_type_platform')}{/if}
+          </div>
+        </div>
       </div>
-    {/if}
+      <div style="font-size: 12px; color: #888; margin-top: 8px; padding-left: 44px;">
+        {$mod->Lang('passkey_created')}: {$card.created_at|date_format:'%b %d, %Y'}
+        &nbsp;&middot;&nbsp;
+        {$mod->Lang('passkey_last_used')}: {if $card.last_used_at > 0}{$card.last_used_at|date_format:'%b %d, %Y'}{else}{$mod->Lang('passkey_never_used')}{/if}
+      </div>
+    </div>
+    {/foreach}
 
     {if $is_pro}
       <div class="information">
@@ -41,110 +50,123 @@
     {form_end}
 
   {else}
-    <div class="pageoverflow">
-      <p class="pagetext">{$mod->Lang('passkey_setup_info')}</p>
+    <div class="pageoverflow" style="padding: 10px 0;">
+      <img src="{$mod_url}/assets/canonical-passkey-icon.png" alt="Passkey" width="48" height="48" />
+      <p>{$mod->Lang('passkey_setup_info')}</p>
     </div>
 
-    <div id="passkey-register-area">
+    {form_start action='setup_passkey'}
       <div class="pageoverflow">
         <p class="pageinput">
-          <button type="button" id="btn-register-passkey" class="pagebutton">
-            {$mod->Lang('register_passkey')}
-          </button>
-          <span id="passkey-status" style="margin-left: 10px;"></span>
+          <input type="submit" id="btn-register-passkey" name="{$actionid}register" value="{$mod->Lang('register_passkey')}" />
+          <input type="submit" name="{$actionid}cancel" value="{$mod->Lang('cancel')}" />
         </p>
       </div>
-    </div>
+    {form_end}
 
-    <div class="pageoverflow">
+    <div class="pageoverflow" id="passkey-status-row" style="display:none;">
       <p class="pageinput">
-        <a href="{cms_action_url action='user_prefs'}">{$mod->Lang('cancel')}</a>
+        <span id="passkey-status"></span>
       </p>
     </div>
 
     <script>
     {literal}
-    (function() {
-      var regOptionsUrl = '{/literal}{cms_action_url action="setup_passkey"}{literal}';
-      var registerUrl = '{/literal}{cms_action_url action="setup_passkey"}{literal}';
-      var successUrl = '{/literal}{cms_action_url action="user_prefs"}{literal}';
+    $(function() {
+      var ajaxUrl = '{/literal}{cms_action_url action="ajax_passkey" forjs=1}{literal}';
       var actionId = '{/literal}{$actionid}{literal}';
+      var successUrl = '{/literal}{cms_action_url action="user_prefs" forjs=1}{literal}';
+      var $btn = $('#btn-register-passkey');
 
-      function base64UrlToBuffer(base64url) {
-        var base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
-        while (base64.length % 4) base64 += '=';
-        var binary = atob(base64);
-        var bytes = new Uint8Array(binary.length);
-        for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-        return bytes.buffer;
+      function base64UrlToBuffer(b) {
+        var s = b.replace(/-/g, '+').replace(/_/g, '/');
+        while (s.length % 4) s += '=';
+        var bin = atob(s), arr = new Uint8Array(bin.length);
+        for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+        return arr.buffer;
       }
 
-      function bufferToBase64Url(buffer) {
-        var bytes = new Uint8Array(buffer);
-        var binary = '';
-        for (var i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-        return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      function bufferToBase64Url(buf) {
+        var arr = new Uint8Array(buf), s = '';
+        for (var i = 0; i < arr.length; i++) s += String.fromCharCode(arr[i]);
+        return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
       }
 
-      document.getElementById('btn-register-passkey').addEventListener('click', function() {
-        var statusEl = document.getElementById('passkey-status');
-        statusEl.textContent = 'Requesting options...';
+      function setStatus(msg) {
+        $('#passkey-status-row').show();
+        $('#passkey-status').text(msg);
+      }
 
-        // Get registration options from server
-        var form = new FormData();
-        form.append(actionId + 'get_reg_options', '1');
+      if (!window.PublicKeyCredential) {
+        $btn.prop('disabled', true);
+        setStatus('{/literal}{$mod->Lang('passkey_unsupported')}{literal}');
+        return;
+      }
 
-        fetch(regOptionsUrl, { method: 'POST', body: form })
-          .then(function(r) { return r.json(); })
-          .then(function(options) {
-            // Convert base64url fields to ArrayBuffers
-            options.challenge = base64UrlToBuffer(options.challenge);
-            options.user.id = base64UrlToBuffer(options.user.id);
-            if (options.excludeCredentials) {
-              options.excludeCredentials.forEach(function(c) {
-                c.id = base64UrlToBuffer(c.id);
-              });
-            }
+      $btn.on('click', function(e) {
+        e.preventDefault();
+        $btn.prop('disabled', true);
 
-            statusEl.textContent = 'Waiting for authenticator...';
+        var data = {};
+        data[actionId + 'op'] = 'get_reg_options';
 
-            return navigator.credentials.create({ publicKey: options });
-          })
-          .then(function(credential) {
-            var response = {
+        $.ajax({
+          url: ajaxUrl,
+          type: 'POST',
+          data: data,
+          dataType: 'json'
+        }).done(function(options) {
+          options.challenge = base64UrlToBuffer(options.challenge);
+          options.user.id = base64UrlToBuffer(options.user.id);
+          if (options.excludeCredentials) {
+            $.each(options.excludeCredentials, function(i, c) {
+              c.id = base64UrlToBuffer(c.id);
+            });
+          }
+
+          setStatus('{/literal}{$mod->Lang('passkey_reg_waiting')}{literal}');
+
+          navigator.credentials.create({ publicKey: options }).then(function(credential) {
+            var response = JSON.stringify({
               clientDataJSON: bufferToBase64Url(credential.response.clientDataJSON),
               attestationObject: bufferToBase64Url(credential.response.attestationObject)
-            };
+            });
 
-            statusEl.textContent = 'Verifying...';
+            setStatus('{/literal}{$mod->Lang('passkey_reg_saving')}{literal}');
 
-            var form2 = new FormData();
-            form2.append(actionId + 'register_passkey', '1');
-            form2.append(actionId + 'webauthn_response', JSON.stringify(response));
+            var data2 = {};
+            data2[actionId + 'op'] = 'register';
+            data2[actionId + 'webauthn_response'] = response;
 
-            return fetch(registerUrl, { method: 'POST', body: form2 });
-          })
-          .then(function(r) { return r.json(); })
-          .then(function(result) {
-            if (result.success) {
-              statusEl.textContent = 'Success!';
-              window.location.href = successUrl;
-            } else {
-              statusEl.textContent = 'Error: ' + (result.error || 'Registration failed');
-            }
-          })
-          .catch(function(err) {
-            statusEl.textContent = 'Error: ' + err.message;
-            console.error('Passkey registration error:', err);
+            $.ajax({
+              url: ajaxUrl,
+              type: 'POST',
+              data: data2,
+              dataType: 'json'
+            }).done(function(result) {
+              if (result.success) {
+                setStatus('{/literal}{$mod->Lang('passkey_reg_success')}{literal}');
+                setTimeout(function() { window.location.href = successUrl; }, 800);
+              } else {
+                setStatus(result.error || '{/literal}{$mod->Lang('passkey_reg_failed')}{literal}');
+                $btn.prop('disabled', false);
+              }
+            }).fail(function() {
+              setStatus('{/literal}{$mod->Lang('passkey_reg_failed')}{literal}');
+              $btn.prop('disabled', false);
+            });
+
+          }, function(err) {
+            setStatus('{/literal}{$mod->Lang('passkey_reg_cancelled')}{literal}');
+            $btn.prop('disabled', false);
           });
-      });
 
-      // Check browser support
-      if (!window.PublicKeyCredential) {
-        document.getElementById('btn-register-passkey').disabled = true;
-        document.getElementById('passkey-status').textContent = '{/literal}{$mod->Lang('passkey_browser_unsupported')}{literal}';
-      }
-    })();
+        }).fail(function() {
+          setStatus('{/literal}{$mod->Lang('passkey_reg_failed')}{literal}');
+          $btn.prop('disabled', false);
+        });
+      });
+    });
     {/literal}
     </script>
   {/if}

@@ -61,6 +61,14 @@
 						}, 1000);
 						</script>
 					{/if}
+					{if !empty($alt_methods)}
+						<p class="forgotpw">
+							{$mod->Lang('use_other_method')}:
+							{foreach $alt_methods as $alt}
+								<a href="{root_url}/twofactor/verify/{$alt.slug}&_={$smarty.now}">{$alt.label}</a>{if !$alt@last} | {/if}
+							{/foreach}
+						</p>
+					{/if}
 					<p class="forgotpw">
 						<a href="{root_url}/twofactor/verify/primary&_={$smarty.now}">Back to primary method</a>
 					</p>

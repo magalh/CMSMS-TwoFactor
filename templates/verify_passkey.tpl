@@ -9,6 +9,13 @@
 		<link rel="shortcut icon" href="{$config.admin_url}/themes/OneEleven/images/favicon/cmsms-favicon.ico"/>
 		<link rel="stylesheet" href="{$config.admin_url}/loginstyle.php" />
 		{cms_jquery}
+		<style>
+			.passkey-icon { display: block; margin: 0 auto 10px; }
+			#passkey-prompt { text-align: center; padding: 15px 0; }
+			#passkey-status { color: #666; font-size: 13px; min-height: 20px; }
+			#passkey-status.status-error { color: #c00; }
+			#btn-retry-passkey { margin-top: 10px; }
+		</style>
 	</head>
 	<body id="login">
 		<div id="wrapper">
@@ -25,10 +32,11 @@
 						{xt_form_csrf}
 						<fieldset>
 							<input type="hidden" name="{$actionid}webauthn_response" id="webauthn_response" value="" />
-							<div id="passkey-prompt" style="text-align: center; padding: 20px 0;">
+							<div id="passkey-prompt">
+								<img class="passkey-icon" src="{$mod_url}/assets/canonical-passkey-icon.svg" alt="Passkey" width="48" height="48" />
 								<p>{$mod->Lang('passkey_touch_prompt')}</p>
-								<div id="passkey-spinner" style="font-size: 2em;">🔐</div>
-								<p id="passkey-status" style="color: #666; font-size: 13px;"></p>
+								<p id="passkey-status"></p>
+								<input type="button" id="btn-retry-passkey" class="loginsubmit" value="{$mod->Lang('passkey_retry')}" style="display:none;" />
 							</div>
 							{if $is_pro_active}
 							<div style="margin: 10px 0;">
@@ -45,11 +53,16 @@
 						<div class="message error" id="error-message">
 							{$error}
 						</div>
-						<p style="text-align: center;">
-							<button type="button" id="btn-retry-passkey" class="loginsubmit">{$mod->Lang('passkey_retry')}</button>
-						</p>
 					{/if}
 
+					{if !empty($alt_methods)}
+						<p class="forgotpw">
+							{$mod->Lang('use_other_method')}:
+							{foreach $alt_methods as $alt}
+								<a href="{root_url}/twofactor/verify/{$alt.slug}&_={$smarty.now}">{$alt.label}</a>{if !$alt@last} | {/if}
+							{/foreach}
+						</p>
+					{/if}
 					{if $has_backup_codes && !$using_backup}
 						<p class="forgotpw">
 							<a href="{root_url}/twofactor/verify/backup-codes&_={$smarty.now}">{$mod->Lang('use_backup_code')}</a> &nbsp;
@@ -67,6 +80,8 @@
 		(function() {
 			var webauthnOptions = {/literal}{$webauthn_options_json}{literal};
 			var actionId = '{/literal}{$actionid}{literal}';
+			var statusEl = document.getElementById('passkey-status');
+			var retryBtn = document.getElementById('btn-retry-passkey');
 
 			function base64UrlToBuffer(base64url) {
 				var base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
@@ -84,21 +99,41 @@
 				return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 			}
 
-			function doAuthentication() {
-				var statusEl = document.getElementById('passkey-status');
-				statusEl.textContent = 'Waiting for authenticator...';
+			function showError(msg) {
+				statusEl.textContent = msg;
+				statusEl.className = 'status-error';
+				retryBtn.style.display = '';
+			}
 
-				var opts = Object.assign({}, webauthnOptions);
-				opts.challenge = base64UrlToBuffer(opts.challenge);
-				if (opts.allowCredentials) {
-					opts.allowCredentials.forEach(function(c) {
-						c.id = base64UrlToBuffer(c.id);
-					});
+			function doAuthentication() {
+				statusEl.textContent = '';
+				statusEl.className = '';
+				retryBtn.style.display = 'none';
+
+				var opts = {
+					challenge: base64UrlToBuffer(webauthnOptions.challenge),
+					rpId: webauthnOptions.rpId,
+					timeout: webauthnOptions.timeout,
+					userVerification: webauthnOptions.userVerification
+				};
+
+				if (webauthnOptions.allowCredentials) {
+					opts.allowCredentials = [];
+					for (var i = 0; i < webauthnOptions.allowCredentials.length; i++) {
+						var c = webauthnOptions.allowCredentials[i];
+						opts.allowCredentials.push({
+							type: c.type,
+							id: base64UrlToBuffer(c.id)
+						});
+					}
 				}
 
 				navigator.credentials.get({ publicKey: opts })
 					.then(function(assertion) {
+						statusEl.textContent = '{/literal}{$mod->Lang('passkey_verifying')}{literal}';
+
 						var response = {
+							id: assertion.id,
 							clientDataJSON: bufferToBase64Url(assertion.response.clientDataJSON),
 							authenticatorData: bufferToBase64Url(assertion.response.authenticatorData),
 							signature: bufferToBase64Url(assertion.response.signature)
@@ -106,25 +141,22 @@
 
 						document.getElementById('webauthn_response').value = JSON.stringify(response);
 						document.getElementById('passkey-submit').click();
-					})
-					.catch(function(err) {
-						statusEl.textContent = 'Authentication cancelled or failed: ' + err.message;
-						console.error('Passkey auth error:', err);
+					}, function(err) {
+						if (err.name === 'NotAllowedError') {
+							showError('{/literal}{$mod->Lang('passkey_cancelled')}{literal}');
+						} else {
+							showError('{/literal}{$mod->Lang('passkey_failed')}{literal}');
+						}
 					});
 			}
 
-			// Auto-trigger on page load
 			if (window.PublicKeyCredential) {
 				setTimeout(doAuthentication, 500);
 			} else {
-				document.getElementById('passkey-status').textContent = 'Passkeys are not supported in this browser.';
+				showError('{/literal}{$mod->Lang('passkey_unsupported')}{literal}');
 			}
 
-			// Retry button
-			var retryBtn = document.getElementById('btn-retry-passkey');
-			if (retryBtn) {
-				retryBtn.addEventListener('click', doAuthentication);
-			}
+			retryBtn.addEventListener('click', doAuthentication);
 		})();
 		{/literal}
 		</script>

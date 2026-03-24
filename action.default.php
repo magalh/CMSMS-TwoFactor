@@ -29,13 +29,31 @@ if (isset($params['subaction'])) {
     }
 }
 
-// Check if we have stored 2FA data
-if (!isset($_SESSION['twofactor_user_id'])) {
+// Determine which login flow we're in
+$new_flow = TwoFactor::hasNewLoginFlow() && isset($_SESSION['cms_pending_auth_userid']);
+
+if ($new_flow) {
+    // New core: pending auth timeout check (5 minutes)
+    $pending_time = $_SESSION['cms_pending_auth_time'] ?? null;
+    if (!$pending_time || $pending_time < (time() - 300)) {
+        unset($_SESSION['cms_pending_auth_userid'], $_SESSION['cms_pending_effective_userid'], $_SESSION['cms_pending_auth_time']);
+        redirect($config['admin_url'] . '/login.php');
+        exit;
+    }
+    $uid = (int) $_SESSION['cms_pending_auth_userid'];
+} elseif (isset($_SESSION['twofactor_user_id'])) {
+    // Old core
+    $uid = $_SESSION['twofactor_user_id'];
+} else {
     redirect($config['admin_url'] . '/login.php');
     exit;
 }
 
-$uid = $_SESSION['twofactor_user_id'];
+// Load effective user for new core
+$effective_user = null;
+if ($new_flow && !empty($_SESSION['cms_pending_effective_userid'])) {
+    $effective_user = UserOperations::get_instance()->LoadUserByID((int)$_SESSION['cms_pending_effective_userid']);
+}
 
 // Check if device is trusted
 if (TwoFactor::IsProActive() && class_exists('TwoFactorTrustedDevice') && TwoFactorTrustedDevice::is_trusted($uid)) {
@@ -43,13 +61,19 @@ if (TwoFactor::IsProActive() && class_exists('TwoFactorTrustedDevice') && TwoFac
     if ($user) {
         $login_ops = CMSMS\LoginOperations::get_instance();
         $rememberme = $_SESSION['twofactor_rememberme'] ?? 0;
-        $key = $login_ops->save_authentication($user);
+
+        if ($new_flow) {
+            $key = $login_ops->finalize_authentication($user, $effective_user);
+            unset($_SESSION['cms_pending_auth_userid'], $_SESSION['cms_pending_effective_userid'], $_SESSION['cms_pending_auth_time']);
+        } else {
+            $key = $login_ops->save_authentication($user);
+            unset($_SESSION['twofactor_user_id']);
+        }
         
         if ($rememberme) {
             setcookie(CMS_USER_KEY, $key, time() + 2592000);
         }
         
-        unset($_SESSION['twofactor_user_id']);
         unset($_SESSION['twofactor_rememberme']);
         
         audit($uid, 'Admin Username: ' . $user->username, 'Logged In (2FA - Trusted Device)');
@@ -61,7 +85,6 @@ if (TwoFactor::IsProActive() && class_exists('TwoFactorTrustedDevice') && TwoFac
 
 // Handle provider switch
 if (isset($params['provider'])) {
-    error_log('TwoFactor: provider param = "' . $params['provider'] . '"');
     if ($params['provider'] !== '') {
         // Normalize provider name (fix old singular form and aliases)
         $provider_name = $params['provider'];
@@ -78,10 +101,8 @@ if (isset($params['provider'])) {
         } elseif ($provider_name === 'passkey') {
             $provider_name = 'TwoFactorProviderPasskey';
         }
-        error_log('TwoFactor: Setting override to: ' . $provider_name);
         $_SESSION['twofactor_override_provider'] = $provider_name;
     } else {
-        error_log('TwoFactor: Clearing override provider');
         unset($_SESSION['twofactor_override_provider']);
     }
     unset($_SESSION['twofactor_email_sent']);
@@ -116,7 +137,11 @@ if (isset($_SESSION['twofactor_override_provider'])) {
 }
 
 if (!$provider) {
-    unset($_SESSION['twofactor_user_id']);
+    if ($new_flow) {
+        unset($_SESSION['cms_pending_auth_userid'], $_SESSION['cms_pending_effective_userid'], $_SESSION['cms_pending_auth_time']);
+    } else {
+        unset($_SESSION['twofactor_user_id']);
+    }
     redirect($config['admin_url'] . '/login.php');
     exit;
 }
@@ -171,16 +196,20 @@ if (isset($params['submit']) && $locked_seconds === false) {
             if ($user) {
                 $login_ops = CMSMS\LoginOperations::get_instance();
                 $rememberme = $_SESSION['twofactor_rememberme'] ?? 0;
-                $key = $login_ops->save_authentication($user);
+
+                if ($new_flow) {
+                    $key = $login_ops->finalize_authentication($user, $effective_user);
+                    unset($_SESSION['cms_pending_auth_userid'], $_SESSION['cms_pending_effective_userid'], $_SESSION['cms_pending_auth_time']);
+                } else {
+                    $key = $login_ops->save_authentication($user);
+                    session_regenerate_id(true);
+                    unset($_SESSION['twofactor_user_id']);
+                }
                 
                 if ($rememberme) {
                     setcookie(CMS_USER_KEY, $key, time() + 2592000);
                 }
                 
-                // Regenerate session ID for security
-                session_regenerate_id(true);
-                
-                unset($_SESSION['twofactor_user_id']);
                 unset($_SESSION['twofactor_rememberme']);
                 unset($_SESSION['twofactor_email_sent']);
                 unset($_SESSION['twofactor_sms_sent']);
@@ -229,8 +258,6 @@ if (strpos($provider_class, 'TOTP') !== false) {
     }
 } elseif (strpos($provider_class, 'Passkey') !== false) {
     $template = 'verify_passkey.tpl';
-    // Pre-process to generate challenge
-    $provider->pre_process_authentication($uid);
     $webauthn_options = $provider->get_authentication_options($uid);
 } elseif (strpos($provider_class, 'BackupCodes') !== false) {
     $template = 'verify_backup_codes.tpl';
@@ -239,6 +266,7 @@ if (strpos($provider_class, 'TOTP') !== false) {
 $smarty = cmsms()->GetSmarty();
 $tpl = $smarty->CreateTemplate($this->GetTemplateResource($template), null, null, $smarty);
 $tpl->assign('mod', $this);
+$tpl->assign('mod_url', $this->GetModuleURLPath());
 $tpl->assign('actionid', $id);
 $tpl->assign('config', $config);
 $tpl->assign('encoding', get_encoding());
@@ -252,4 +280,32 @@ $tpl->assign('is_pro_active', TwoFactor::IsProActive());
 if (isset($webauthn_options)) {
     $tpl->assign('webauthn_options_json', json_encode($webauthn_options));
 }
+
+// Build alternative methods list (exclude current provider and backup codes)
+$available = TwoFactorCore::get_available_providers_for_user($uid);
+$alt_methods = [];
+$slug_map = [
+    'TwoFactorProviderTOTP'    => 'totp',
+    'TwoFactorProviderEmail'   => 'email',
+    'TwoFactorProviderSMS'     => 'sms',
+    'TwoFactorProviderPasskey' => 'passkey',
+];
+$label_map = [
+    'TwoFactorProviderTOTP'    => 'provider_totp',
+    'TwoFactorProviderEmail'   => 'provider_email',
+    'TwoFactorProviderSMS'     => 'provider_sms',
+    'TwoFactorProviderPasskey' => 'provider_passkey',
+];
+foreach ($available as $key => $p) {
+    if ($key === $provider_class) continue;
+    if (strpos($key, 'BackupCodes') !== false) continue;
+    if (isset($slug_map[$key])) {
+        $alt_methods[] = [
+            'slug'  => $slug_map[$key],
+            'label' => $this->Lang($label_map[$key]),
+        ];
+    }
+}
+$tpl->assign('alt_methods', $alt_methods);
+
 $tpl->display();
