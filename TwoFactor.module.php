@@ -61,20 +61,27 @@ class TwoFactor extends CMSModule
         $this->RegisterRoute('/[Tt]wofactor\/verify\/(?P<subaction>.*)$/', ['action' => 'default']);
     }
 
+    private static $new_login_flow = null;
+
     public static function hasNewLoginFlow()
     {
-        return version_compare(CMS_VERSION, '2.2.22', '>');
+        // If we've already determined the flow, return the cached value
+        if (self::$new_login_flow !== null) {
+            return self::$new_login_flow;
+        }
+        // Check if we're in new flow by looking for the session variable
+        return isset($_SESSION['cms_pending_auth_userid']);
     }
 
     public function InitializeAdmin()
     {
         TwoFactorCore::register_providers();
-
-        if (self::hasNewLoginFlow()) {
-            \CMSMS\HookManager::add_hook('Core::LoginVerified', function($params) {
-                $this->InterceptLoginNew($params);
-            });
-        }
+        self::$new_login_flow = true;
+        \CMSMS\HookManager::add_hook('Core::LoginVerified', function($params) {
+            error_log('TwoFactor: LoginVerified hook fired for user ' . (isset($params['user']) ? $params['user']->username : 'unknown'));
+            $this->InterceptLoginNew($params);
+        });
+        
     }
 
     public function GetHeaderHTML()
@@ -100,10 +107,17 @@ class TwoFactor extends CMSModule
 
     function DoEvent($originator, $eventname, &$params)
     {
-        // Old core only — new core uses HookManager in InitializeAdmin
-        if (!self::hasNewLoginFlow() && $originator == 'Core' && $eventname == 'LoginPost') {
-            $this->InterceptLoginLegacy($params);
+        if ($originator !== 'Core' || $eventname !== 'LoginPost') {
+            return;
         }
+
+        if (class_exists('\CMSMS\LoginOperations') &&
+            method_exists(\CMSMS\LoginOperations::class, 'initialize_authentication')) {
+            return;
+        }
+
+        error_log('TwoFactor: LoginPost hook fired for user ' . (isset($params['user']) ? $params['user']->username : 'unknown'));
+        $this->InterceptLoginLegacy($params);
     }
 
     // New core: LoginVerified fires BEFORE finalization, session has cms_pending_auth_userid
@@ -111,15 +125,44 @@ class TwoFactor extends CMSModule
     {
         if (!isset($params['user'])) return;
 
+        error_log('TwoFactor: InterceptLoginNew - user is set');
         $config = cms_utils::get_config();
-        if (isset($config['twofactor_bypass']) && $config['twofactor_bypass'] == 1) return;
+        if (isset($config['twofactor_bypass']) && $config['twofactor_bypass'] == 1) {
+            error_log('TwoFactor: InterceptLoginNew - 2FA bypass enabled');
+            return;
+        }
 
         $uid = $params['user']->id;
-        if (!TwoFactorCore::is_user_using_two_factor($uid)) return;
+        error_log('TwoFactor: InterceptLoginNew - checking if user ' . $uid . ' uses 2FA');
+        if (!TwoFactorCore::is_user_using_two_factor($uid)) {
+            error_log('TwoFactor: InterceptLoginNew - user ' . $uid . ' does not use 2FA');
+            return;
+        }
 
+        error_log('TwoFactor: InterceptLoginNew - user ' . $uid . ' uses 2FA, blocking login and redirecting to verify');
+        // Clear old flow session variable
+        unset($_SESSION['twofactor_user_id']);
+        
+        // Ensure effective user is set (same as auth user if not impersonating)
+        if (empty($_SESSION['cms_pending_effective_userid'])) {
+            $_SESSION['cms_pending_effective_userid'] = $uid;
+            error_log('TwoFactor: Set cms_pending_effective_userid to ' . $uid);
+        }
+        
         $_SESSION['twofactor_rememberme'] = isset($_POST['loginremember']) ? 1 : 0;
-        \redirect($config['root_url'] . '/twofactor/verify');
-        exit;
+        $redirect_url = $config['root_url'] . '/twofactor/verify';
+        error_log('TwoFactor: InterceptLoginNew - redirecting to ' . $redirect_url);
+        
+        // Clear any output buffers
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        
+        error_log('TwoFactor: About to send Location header to ' . $redirect_url);
+        session_write_close();
+        header('Location: ' . $redirect_url, true, 302);
+        error_log('TwoFactor: Location header sent, throwing exception to stop core processing');
+        throw new \RuntimeException('TwoFactor: Redirect in progress');
     }
 
     // Old core: LoginPost fires AFTER full auth, must deauthenticate and redirect to frontend route
