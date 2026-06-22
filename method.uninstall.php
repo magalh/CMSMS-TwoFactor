@@ -26,8 +26,8 @@ $dict->ExecuteSQLArray($sqlarray);
 
 $config = cms_config::get_instance();
 $twofactor_file = cms_join_path(CMS_ROOT_PATH, $config['admin_dir'], 'twofactor.php');
-if (file_exists($twofactor_file)) {
-    @unlink($twofactor_file);
+if (is_file($twofactor_file)) {
+    unlink($twofactor_file);
 }
 
 try {

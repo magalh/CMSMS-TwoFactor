@@ -33,7 +33,7 @@ class TwoFactor extends CMSModule
         $smarty = cmsms()->GetSmarty();
         if(!$smarty){return;}
 
-        $smarty->registerClass('tf_smarty', 'tf_smarty');
+        $smarty->registerClass('TwoFactorSmarty', 'TwoFactorSmarty');
         $plugins_dir = cms_join_path( $this->GetModulePath(), 'lib', 'plugins' );
         $smarty->addPluginsDir($plugins_dir);
     }
@@ -56,7 +56,6 @@ class TwoFactor extends CMSModule
 
     public function InitializeFrontend()
     { 
-        $this->SetParameterType(CLEAN_REGEXP . '/subaction.*/', CLEAN_STRING);
         $this->RegisterRoute('/[Tt]wofactor\/verify$/', ['action' => 'default']);
         $this->RegisterRoute('/[Tt]wofactor\/verify\/(?P<subaction>.*)$/', ['action' => 'default']);
     }
@@ -78,7 +77,7 @@ class TwoFactor extends CMSModule
         if ( file_exists(CMS_ROOT_PATH.'/'.$customCSSfile) ) {
             $header_links .= '<link rel="stylesheet" type="text/css" href="../'.$customCSSfile.'">';
         }
-        $header_links .= '<script language="javascript" src="'.$module_path.'/assets/twofactor_admin.js"></script>';
+        $header_links .= '<script src="'.$module_path.'/assets/twofactor_admin.js"></script>';
         return $header_links;
     }
 
@@ -140,9 +139,9 @@ class TwoFactor extends CMSModule
         if (!$file || !$base_dir || !is_file($file) || !is_readable($file)) return '';
         if (strpos($file, $base_dir) !== 0) return '';
         if (basename($file) !== 'CHANGELOG.md') return '';
-        $markdown = @file_get_contents($file);
+        $markdown = file_get_contents($file);
         if (!$markdown) return '';
-        return tf_smarty::mdToHTML($markdown);
+        return TwoFactorSmarty::mdToHTML($markdown);
     }
 
     public static function page_type_lang_callback($str)
@@ -250,8 +249,4 @@ class TwoFactor extends CMSModule
         
         return hash('sha256', $hash_data);
     }
-
-
-
-
 }

@@ -1,0 +1,6 @@
+.git
+.gitignore
+.distignore
+.kiro
+composer.lock
+vendor

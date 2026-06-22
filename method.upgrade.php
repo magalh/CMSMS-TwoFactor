@@ -47,8 +47,8 @@ if( version_compare($oldver, '2.1.0') < 0 ) {
     // Remove legacy twofactor.php file if it exists
     $config = cms_config::get_instance();
     $dest = cms_join_path(CMS_ROOT_PATH, $config['admin_dir'], 'twofactor.php');
-    if (file_exists($dest)) {
-        @unlink($dest);
+    if (is_file($dest)) {
+        unlink($dest);
     }
 }
 
