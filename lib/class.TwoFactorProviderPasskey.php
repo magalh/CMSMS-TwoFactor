@@ -33,10 +33,10 @@ class TwoFactorProviderPasskey extends TwoFactorProvider
 
     public function authentication_page($user)
     {
-        // The actual UI is handled by verify_passkey.tpl + webauthn.js
-        // This is a fallback for the provider interface
-        echo '<p class="pagetext">Use your passkey to verify your identity.</p>';
-        echo '<input type="hidden" name="webauthn_response" id="webauthn_response" value="" />';
+        $mod = \cms_utils::get_module('TwoFactor');
+        $smarty = \cmsms()->GetSmarty();
+        $tpl = $smarty->CreateTemplate($mod->GetTemplateResource('verify_passkey_field.tpl'), null, null, $smarty);
+        $tpl->display();
     }
 
     public function validate_authentication($user_id, $params = [])
