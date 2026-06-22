@@ -31,47 +31,26 @@ if (isset($params['subaction'])) {
     }
 }
 
-// Determine which login flow we're in
-error_log('TwoFactor: Checking login flow...');
-error_log('TwoFactor: hasNewLoginFlow() = ' . (TwoFactor::hasNewLoginFlow() ? 'true' : 'false'));
-error_log('TwoFactor: cms_pending_auth_userid = ' . (isset($_SESSION['cms_pending_auth_userid']) ? $_SESSION['cms_pending_auth_userid'] : 'not set'));
-error_log('TwoFactor: twofactor_user_id = ' . (isset($_SESSION['twofactor_user_id']) ? $_SESSION['twofactor_user_id'] : 'not set'));
-$new_flow = TwoFactor::hasNewLoginFlow() && isset($_SESSION['cms_pending_auth_userid']);
-
-if ($new_flow) {
-    error_log('TwoFactor: Using NEW flow');
-    // Clear old flow session variable if it exists
-    unset($_SESSION['twofactor_user_id']);
-    session_write_close();
-    session_start();
-    // New core: pending auth timeout check (5 minutes)
-    $pending_time = $_SESSION['cms_pending_auth_time'] ?? null;
-    if (!$pending_time || $pending_time < (time() - 300)) {
-        error_log('TwoFactor: Pending auth timeout');
-        unset($_SESSION['cms_pending_auth_userid'], $_SESSION['cms_pending_effective_userid'], $_SESSION['cms_pending_auth_time']);
-        redirect($config['admin_url'] . '/login.php');
-        exit;
-    }
-    $uid = (int) $_SESSION['cms_pending_auth_userid'];
-    error_log('TwoFactor: New flow UID = ' . $uid);
-} elseif (isset($_SESSION['twofactor_user_id'])) {
-    error_log('TwoFactor: Using OLD flow');
-    // Old core
-    $uid = $_SESSION['twofactor_user_id'];
-    error_log('TwoFactor: Old flow UID = ' . $uid);
-} else {
-    error_log('TwoFactor: No valid flow detected, redirecting to login');
+// Verify pending authentication session
+if (!isset($_SESSION['cms_pending_auth_userid'])) {
     redirect($config['admin_url'] . '/login.php');
     exit;
 }
 
-// Load effective user for new core
+// Pending auth timeout check (5 minutes)
+$pending_time = $_SESSION['cms_pending_auth_time'] ?? null;
+if (!$pending_time || $pending_time < (time() - 300)) {
+    unset($_SESSION['cms_pending_auth_userid'], $_SESSION['cms_pending_effective_userid'], $_SESSION['cms_pending_auth_time']);
+    redirect($config['admin_url'] . '/login.php');
+    exit;
+}
+
+$uid = (int) $_SESSION['cms_pending_auth_userid'];
+
+// Load effective user for finalization
 $effective_user = null;
-if ($new_flow && !empty($_SESSION['cms_pending_effective_userid'])) {
-    error_log('TwoFactor: Loading effective user for new flow, ID = ' . $_SESSION['cms_pending_effective_userid']);
+if (!empty($_SESSION['cms_pending_effective_userid'])) {
     $effective_user = UserOperations::get_instance()->LoadUserByID((int)$_SESSION['cms_pending_effective_userid']);
-} else {
-    error_log('TwoFactor: No effective user for new flow');
 }
 
 // Check if device is trusted
@@ -81,15 +60,8 @@ if (TwoFactor::IsProActive() && class_exists('TwoFactorTrustedDevice') && TwoFac
         $login_ops = CMSMS\LoginOperations::get_instance();
         $rememberme = $_SESSION['twofactor_rememberme'] ?? 0;
 
-        if ($new_flow) {
-            $key = $login_ops->finalize_authentication($user, $effective_user);
-            unset($_SESSION['cms_pending_auth_userid'], $_SESSION['cms_pending_effective_userid'], $_SESSION['cms_pending_auth_time']);
-            error_log('TwoFactor: finalize_authentication for trusted device returned key: ' . ($key ? 'yes' : 'no'));
-        } else {
-            $key = $login_ops->save_authentication($user);
-            unset($_SESSION['twofactor_user_id']);
-            error_log('TwoFactor: save_authentication for trusted device returned key: ' . ($key ? 'yes' : 'no'));
-        }
+        $key = $login_ops->finalize_authentication($user, $effective_user);
+        unset($_SESSION['cms_pending_auth_userid'], $_SESSION['cms_pending_effective_userid'], $_SESSION['cms_pending_auth_time']);
         
         if ($rememberme) {
             setcookie(CMS_USER_KEY, $key, time() + 2592000);
@@ -102,13 +74,10 @@ if (TwoFactor::IsProActive() && class_exists('TwoFactorTrustedDevice') && TwoFac
         redirect($config['admin_url'] . '/index.php');
         exit;
     }
-} else {
-    error_log('TwoFactor: Device not trusted or trusted devices not enabled');
 }
 
 // Handle provider switch
 if (isset($params['provider'])) {
-    error_log('TwoFactor: Provider switch requested: ' . $params['provider']);
     if ($params['provider'] !== '') {
         // Normalize provider name (fix old singular form and aliases)
         $provider_name = $params['provider'];
@@ -163,11 +132,7 @@ if (isset($_SESSION['twofactor_override_provider'])) {
 }
 
 if (!$provider) {
-    if ($new_flow) {
-        unset($_SESSION['cms_pending_auth_userid'], $_SESSION['cms_pending_effective_userid'], $_SESSION['cms_pending_auth_time']);
-    } else {
-        unset($_SESSION['twofactor_user_id']);
-    }
+    unset($_SESSION['cms_pending_auth_userid'], $_SESSION['cms_pending_effective_userid'], $_SESSION['cms_pending_auth_time']);
     redirect($config['admin_url'] . '/login.php');
     exit;
 }
@@ -198,11 +163,8 @@ if (TwoFactor::IsProActive()) {
 }
 
 if (isset($params['submit']) && $locked_seconds === false) {
-    error_log('TwoFactor: Form submitted');
-    
     // Validate CSRF token
     if (!\xt_utils::valid_form_csrf()) {
-        error_log('TwoFactor: CSRF validation failed');
         $error = 'Invalid form submission';
     }
         
@@ -210,7 +172,6 @@ if (isset($params['submit']) && $locked_seconds === false) {
         $result = $provider->validate_authentication($uid, $params);
     
 if ($result) {
-    error_log('TwoFactor: Verification successful for UID ' . $uid);
     // Reset failed attempts on success
     if (TwoFactor::IsProActive()) {
         TwoFactorRateLimiter::reset_attempts($uid, $ip_address);
@@ -222,26 +183,12 @@ if ($result) {
     }
     
     $user = UserOperations::get_instance()->LoadUserByID($uid);
-    error_log('TwoFactor: User loaded: ' . ($user ? $user->username : 'FAILED'));
     if ($user) {
-        error_log('TwoFactor: About to finalize authentication, new_flow = ' . ($new_flow ? 'true' : 'false'));
         $login_ops = CMSMS\LoginOperations::get_instance();
         $rememberme = $_SESSION['twofactor_rememberme'] ?? 0;
 
-        if ($new_flow) {
-            error_log('TwoFactor: Calling finalize_authentication');
-            $key = $login_ops->finalize_authentication($user, $effective_user);
-            error_log('TwoFactor: finalize_authentication returned key: ' . ($key ? 'yes' : 'no'));
-            unset($_SESSION['cms_pending_auth_userid'], $_SESSION['cms_pending_effective_userid'], $_SESSION['cms_pending_auth_time'], $_SESSION['twofactor_user_id']);
-            session_write_close();
-            error_log('TwoFactor: Session closed after finalize_authentication');
-        } else {
-            error_log('TwoFactor: Calling save_authentication');
-            $key = $login_ops->save_authentication($user);
-            error_log('TwoFactor: save_authentication returned key: ' . ($key ? 'yes' : 'no'));
-            session_regenerate_id(true);
-            unset($_SESSION['twofactor_user_id']);
-        }
+        $key = $login_ops->finalize_authentication($user, $effective_user);
+        unset($_SESSION['cms_pending_auth_userid'], $_SESSION['cms_pending_effective_userid'], $_SESSION['cms_pending_auth_time']);
         
         if ($rememberme) {
             setcookie(CMS_USER_KEY, $key, time() + 2592000);
@@ -254,11 +201,7 @@ if ($result) {
         unset($_SESSION['twofactor_error']);
         unset($_SESSION['twofactor_webauthn_challenge']);
         
-        error_log('TwoFactor: User ' . $user->username . ' authenticated successfully with provider ' . get_class($provider));
         audit($uid, 'Admin Username: ' . $user->username, 'Logged In (2FA)');
-        
-        error_log('TwoFactor: About to redirect to admin index');
-        error_log('TwoFactor: Session vars before redirect - cms_pending_auth_userid: ' . (isset($_SESSION['cms_pending_auth_userid']) ? $_SESSION['cms_pending_auth_userid'] : 'not set') . ', twofactor_user_id: ' . (isset($_SESSION['twofactor_user_id']) ? $_SESSION['twofactor_user_id'] : 'not set'));
         
         // Clear any output buffers
         while (ob_get_level()) {
@@ -266,14 +209,10 @@ if ($result) {
         }
         
         $redirect_url = $config['admin_url'] . '/index.php';
-        error_log('TwoFactor: Sending redirect to ' . $redirect_url);
         header('Location: ' . $redirect_url);
         exit;
-    } else {
-        error_log('TwoFactor: Failed to load user');
     }
 } else {
-    error_log('TwoFactor: Verification failed for UID ' . $uid);
     $error = $this->Lang('invalid_code');
     if (TwoFactor::IsProActive()) {
         TwoFactorRateLimiter::record_failed_attempt($uid, $ip_address);
