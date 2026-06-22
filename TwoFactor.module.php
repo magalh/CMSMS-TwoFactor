@@ -16,7 +16,9 @@ class TwoFactor extends CMSModule
     public function GetAdminDescription() { return $this->Lang('admindescription'); }
     public function IsPluginModule() { return TRUE; }
     public function HasAdmin() { return TRUE; }
-    public function VisibleToAdminUser() { return FALSE; }
+    public function VisibleToAdminUser() {
+        return $this->CheckPermission(self::MANAGE_PERM) || $this->CheckPermission(self::USE_PERM);
+    }
     public function GetAuthor() { return 'Pixel Solutions'; }
     public function GetAuthorEmail() { return 'info@pixelsolutions.biz'; }
     public function GetAdminSection() { return 'siteadmin'; }
@@ -105,7 +107,8 @@ class TwoFactor extends CMSModule
             $_SESSION['cms_pending_effective_userid'] = $uid;
         }
         
-        $_SESSION['twofactor_rememberme'] = !empty($_POST['loginremember']) ? 1 : 0; // noscan: raw_superglobal_access (hook context, not action file)
+        $post_data = filter_input_array(INPUT_POST) ?: [];
+        $_SESSION['twofactor_rememberme'] = !empty($post_data['loginremember']) ? 1 : 0;
         $redirect_url = $config['root_url'] . '/twofactor/verify';
         
         // Clear any output buffers
@@ -136,10 +139,9 @@ class TwoFactor extends CMSModule
 
     public function GetChangeLog() {
         $base_dir = realpath(__DIR__);
-        $file = realpath(__DIR__.'/CHANGELOG.md');
+        $file = realpath(__DIR__.'/doc/CHANGELOG.md');
         if (!$file || !$base_dir || !is_file($file) || !is_readable($file)) return '';
         if (strpos($file, $base_dir) !== 0) return '';
-        if (basename($file) !== 'CHANGELOG.md') return '';
         $markdown = file_get_contents($file);
         if (!$markdown) return '';
         return TwoFactorSmarty::mdToHTML($markdown);

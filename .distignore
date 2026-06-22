@@ -4,3 +4,6 @@
 .kiro
 composer.lock
 vendor
+assets/banner.jpg
+assets/icon.png
+assets/thumbnail.jpg

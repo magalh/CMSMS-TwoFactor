@@ -6,6 +6,7 @@ $this->SetCurrentTab('smssettings');
 if (!$this->CheckPermission(TwoFactor::MANAGE_SMS_PERM)) return;
 
 if (isset($params['submit_credits'])) {
+    if (!\xt_utils::valid_form_csrf()) { $this->SetError($this->Lang('error_invalid_csrf')); $this->RedirectToAdminTab(); return; }
     $product_key = trim($params['product_key']);
     
     if (empty($product_key)) {
@@ -36,6 +37,7 @@ if (isset($params['submit_credits'])) {
 }
 
 if (isset($params['remove_credits'])) {
+    if (!\xt_utils::valid_form_csrf()) { $this->SetError($this->Lang('error_invalid_csrf')); $this->RedirectToAdminTab(); return; }
     $this->SetPreference('twofactor_sms_product_key', '');
     $this->SetPreference('twofactor_smscredit_enabled', '0');
     $twilio_configured = $this->GetPreference('twofactor_twilio_enabled', false);
@@ -49,6 +51,7 @@ if (isset($params['remove_credits'])) {
 }
 
 if (isset($params['remove_twilio'])) {
+    if (!\xt_utils::valid_form_csrf()) { $this->SetError($this->Lang('error_invalid_csrf')); $this->RedirectToAdminTab(); return; }
     $this->SetPreference('twofactor_twilio_api_key', '');
     $this->SetPreference('twofactor_twilio_api_secret', '');
     $this->SetPreference('twofactor_twilio_service_sid', '');
@@ -64,6 +67,7 @@ if (isset($params['remove_twilio'])) {
 }
 
 if (isset($params['submit_twilio'])) {
+    if (!\xt_utils::valid_form_csrf()) { $this->SetError($this->Lang('error_invalid_csrf')); $this->RedirectToAdminTab(); return; }
     $api_key = trim($params['api_key']);
     $api_secret = trim($params['api_secret']);
     $service_sid = trim($params['service_sid']);

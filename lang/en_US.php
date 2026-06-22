@@ -327,3 +327,4 @@ $lang['register_key'] = 'Register Key';
 $lang['passkey_type_desc'] = 'Touch ID, Windows Hello, Face ID';
 $lang['security_key_type_desc'] = 'YubiKey, Titan Key, USB/NFC';
 $lang['tab_security_keys'] = 'Security Keys';$lang['preferences_cleared'] = 'All preferences cleared';
+$lang['error_invalid_csrf'] = 'Invalid form submission';

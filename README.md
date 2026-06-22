@@ -1,97 +1,44 @@
-=== Two Factor ===
-Contributors: Pixel Solutions
-Tags: security, two-factor, authentication, 2fa, login
-Requires at least: 2.2.1
-Tested up to: 2.2.22
-Stable tag: 3.0.0
-Requires PHP: 7.4
-License: MIT
+# TwoFactor
 
-Secure your CMS Made Simple login with two-factor authentication (2FA).
+Two-factor authentication module for CMS Made Simple. Adds 2FA to the admin login flow with multiple provider support.
 
-== Description ==
+## Providers
 
-TwoFactor adds two-factor authentication to your CMS Made Simple admin login. Supports multiple authentication methods including TOTP (authenticator apps), Passkeys (WebAuthn/FIDO2), Email, SMS, and Backup Codes.
+- **TOTP** (Authenticator App) - Google Authenticator, Authy, 1Password, etc.
+- **Email** - One-time codes sent via email
+- **SMS** - One-time codes sent via SMS (requires Twilio or Managed Credits)
+- **Passkey** - WebAuthn/FIDO2 biometric and device authentication
+- **Backup Codes** - One-time recovery codes
 
-**Multiple Authentication Methods**
+## Requirements
 
-- TOTP (Time-based One-Time Password) — Google Authenticator, Authy, Microsoft Authenticator, etc.
-- Passkey / WebAuthn — Windows Hello, Touch ID, Face ID, Android biometrics
-- Email Verification — Receive codes via email
-- SMS Verification — Receive codes via SMS (Twilio or Managed SMS Credits)
-- Backup Codes — One-time emergency access codes
+- CMS Made Simple 2.2.23+
+- PHP 7.4+
+- CMSMSExt module >= 1.5.2
+- HTTPS (required for Passkey/WebAuthn support)
 
-**Passkey Support (WebAuthn / FIDO2)**
+## Third-Party Services
 
-- Built-in WebAuthn server — no external dependencies
-- One passkey per user (free tier)
-- Auto-detects authenticator type via AAGUID
-- Works with Touch ID, Windows Hello, Face ID, and device PIN
+This module connects to external services for specific features. No data is sent unless the feature is explicitly configured and enabled by the site administrator.
 
-**Flexible Configuration**
+### Pixel Solutions License API
 
-- Users can enable/disable methods individually
-- Choose primary authentication method
-- Multiple methods can be enabled as fallback options
-- "Use a different method" links on all verification pages
+- **Purpose:** Validates SMS credit license keys and checks remaining credits.
+- **Data sent:** License key, site domain.
+- **When:** Only when SMS Credits feature is enabled and configured.
+- **Endpoint:** `https://api.pixelsolutions.biz`
+- **Terms of Service:** https://pixelsolutions.biz/terms
+- **Privacy Policy:** https://pixelsolutions.biz/privacy
 
-**SMS Options**
+### Twilio Verify API
 
-Option 1: Managed SMS Credits — Purchase SMS credits from Pixel Solutions. Simple setup, no API configuration needed.
+- **Purpose:** Sends SMS verification codes to users during 2FA setup and login.
+- **Data sent:** User phone number, verification code request.
+- **When:** Only when Twilio SMS provider is enabled and configured with API credentials.
+- **Endpoint:** `https://verify.twilio.com`
+- **Terms of Service:** https://www.twilio.com/legal/tos
+- **Privacy Policy:** https://www.twilio.com/legal/privacy
 
-Option 2: Your Own Twilio Account — Use your existing Twilio account with full control over SMS delivery.
+## License
 
-**Upgrade to Pro**
-
-Unlock enterprise-grade security features with [TwoFactor Pro](https://pixelsolutions.biz/plugins/twofactor/):
-
-- Unlimited Passkeys — Register multiple passkeys per user
-- Physical Security Keys — YubiKey, Titan Key, USB/NFC as a standalone login method
-- Security Key as Primary Method — Separate from Passkey, selectable as primary 2FA
-- AAGUID Detection — Auto-identifies authenticator make/model
-- Enforce 2FA — Require all admin users to enable 2FA
-- Rate Limiting — Protect against brute-force attacks
-- Trusted Devices — Remember devices for 30 days
-- User Management — Admin dashboard to manage all users
-- Security Alerts — Email notifications for suspicious activity
-- IP Blacklisting — Block malicious IP addresses
-- Email Templates — Customize security notification emails
-
-== Installation ==
-
-1. Upload the TwoFactor module files to modules/TwoFactor/
-2. Install the module from Extensions > Modules
-3. Grant users the "Use TwoFactor" permission
-4. Users can enable 2FA from My Preferences > TwoFactor
-
-== Screenshots ==
-
-1. User preferences — enable and configure authentication methods
-2. Admin settings — configure SMS credits and Twilio API
-
-== Changelog ==
-
-= 3.0.0 =
-- Added Passkey / WebAuthn (FIDO2) support as a new authentication method
-- Built self-contained WebAuthn server library (no external dependencies)
-- Platform authenticator support (Touch ID, Windows Hello, Face ID)
-- Single passkey registration per user in free tier
-- AJAX-based registration ceremony with real-time status feedback
-- Pro integration: authentication checks both base and Pro multi-key credentials
-
-= 2.1.0 =
-- Migrated verification flow to module action
-- Added language string support for all verification templates
-- Enhanced rate limiting with automatic cleanup
-- Improved countdown timer with language-based messages
-
-= 2.0.0 =
-- Split module into TwoFactor (Free) and TwoFactorPro (Premium)
-- Added Managed SMS Credits system
-- Added SMS verification logs with pagination
-- Added event system for Pro integration
-
-= 1.0.0 =
-- Initial stable release
-- TOTP, Email, SMS, and Backup Codes support
-- Login interception via Core::LoginPost event
+See doc/LICENSE for full license information.
