@@ -40,7 +40,7 @@ if (isset($params['clear_all_prefs'])) {
             $mod_pro->RemovePreference($pref);
         }
     }
-    $this->SetMessage('All preferences cleared');
+    $this->SetMessage($this->Lang('preferences_cleared'));
     $this->RedirectToAdminTab('debug');
     return;
 }

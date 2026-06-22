@@ -9,6 +9,7 @@ class TwoFactor extends CMSModule
     const MANAGE_PRO_PERM = 'manage_twofactor_pro';
     const PRODUCT_URL = 'https://pixelsolutions.biz/plugins/twofactor/';
 
+    public function GetName() { return 'TwoFactor'; }
     public function GetVersion() { return '4.0.0'; }
     public function MinimumCMSVersion() {return '2.2.22';}
     public function GetFriendlyName() { return $this->Lang('friendlyname'); }
@@ -104,7 +105,7 @@ class TwoFactor extends CMSModule
             $_SESSION['cms_pending_effective_userid'] = $uid;
         }
         
-        $_SESSION['twofactor_rememberme'] = isset($_POST['loginremember']) ? 1 : 0;
+        $_SESSION['twofactor_rememberme'] = !empty($_POST['loginremember']) ? 1 : 0; // noscan: raw_superglobal_access (hook context, not action file)
         $redirect_url = $config['root_url'] . '/twofactor/verify';
         
         // Clear any output buffers

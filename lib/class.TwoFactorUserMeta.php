@@ -14,11 +14,11 @@ class TwoFactorUserMeta
         
         if ($single) {
             $value = $db->GetOne($sql, [$user_id, $key]);
-            return $value ? unserialize($value) : null;
+            return $value ? unserialize($value, ['allowed_classes' => false]) : null;
         }
         
         $rows = $db->GetCol($sql, [$user_id, $key]);
-        return array_map('unserialize', $rows);
+        return array_map(function($v) { return unserialize($v, ['allowed_classes' => false]); }, $rows);
     }
 
     public static function update($user_id, $key, $value)

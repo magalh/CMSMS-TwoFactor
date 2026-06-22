@@ -236,4 +236,3 @@ $lang['totp_verification_title'] = 'Authentification à deux facteurs';
 $lang['verification_code_label'] = 'Code de vérification';
 $lang['sms_verification_title'] = 'Vérification par SMS';
 $lang['sms_verification_sent'] = 'Un code de vérification a été envoyé sur votre téléphone.';
-?>

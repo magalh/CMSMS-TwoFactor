@@ -236,4 +236,3 @@ $lang['totp_verification_title'] = 'אימות דו-גורמי';
 $lang['verification_code_label'] = 'קוד אימות';
 $lang['sms_verification_title'] = 'אימות SMS';
 $lang['sms_verification_sent'] = 'קוד אימות נשלח לטלפון שלך.';
-?>

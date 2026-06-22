@@ -33,9 +33,8 @@ class TwoFactorProviderTOTP extends TwoFactorProvider
         echo '<label for="authcode">Authentication Code:</label><br/>';
         echo '<input type="text" inputmode="numeric" name="authcode" id="authcode" 
               class="input" value="" size="20" pattern="[0-9 ]*" 
-              placeholder="123 456" autocomplete="off" />';
+              placeholder="123 456" autocomplete="off" autofocus />';
         echo '</p>';
-        echo '<script>setTimeout(function(){document.getElementById("authcode").focus();}, 200);</script>';
     }
 
     public function validate_authentication($user_id, $params = [])

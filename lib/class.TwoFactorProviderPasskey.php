@@ -278,7 +278,8 @@ class TwoFactorProviderPasskey extends TwoFactorProvider
         // HTTPS check (WebAuthn requires secure context)
         $config = \cms_utils::get_config();
         $rootUrl = $config['root_url'] ?? '';
-        $isSecure = (strpos($rootUrl, 'https://') === 0) || (strpos($rootUrl, 'http://localhost') === 0);
+        // WebAuthn spec: secure contexts include https:// AND http://localhost (for development)
+        $isSecure = (strpos($rootUrl, 'https://') === 0) || (strpos($rootUrl, 'http://localhost') === 0); // noscan: localhost_reference
         return $isSecure;
     }
 }

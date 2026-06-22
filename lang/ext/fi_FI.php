@@ -236,4 +236,3 @@ $lang['totp_verification_title'] = 'Kaksivaiheinen todennus';
 $lang['verification_code_label'] = 'Vahvistuskoodi';
 $lang['sms_verification_title'] = 'SMS-vahvistus';
 $lang['sms_verification_sent'] = 'Puhelimeesi on lähetetty vahvistuskoodi.';
-?>
