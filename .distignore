@@ -5,6 +5,7 @@
 .amazonq
 .vscode
 composer.lock
+composer.json
 releases
 build
 tmp_*
