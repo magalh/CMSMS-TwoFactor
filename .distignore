@@ -2,8 +2,13 @@
 .gitignore
 .distignore
 .kiro
+.amazonq
+.vscode
 composer.lock
 vendor
+releases
+build
+tmp_*
 assets/banner.jpg
 assets/icon.png
 assets/thumbnail.jpg

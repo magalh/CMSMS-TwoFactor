@@ -4,6 +4,9 @@ if (!defined('CMS_VERSION')) exit;
 
 $mod_tf = cms_utils::get_module('TwoFactor');
 $mod_pro = cms_utils::get_module('TwoFactorPro');
+// TwoFactorPro is an optional premium add-on, never a hard dependency.
+$is_pro_installed = is_object($mod_pro);
+$is_pro_active = $is_pro_installed && (bool)$mod_pro->GetPreference('twofactorpro_enabled', 0);
 
 if (isset($params['clear_all_prefs'])) {
     $basic_prefs = [

@@ -184,7 +184,9 @@ class TwoFactor extends CMSModule
                 return str_replace('&amp;', '&', $url);
             }
         } catch (\Throwable $e) {
-            // fall through to explicit builder
+            // create_url() can throw if the route isn't resolvable yet; log and
+            // fall through to the explicit builder below.
+            error_log('TwoFactor: GetVerifyUrl create_url() failed, using fallback: ' . $e->getMessage());
         }
 
         return $this->buildVerifyUrlFallback($subaction, $extra);
