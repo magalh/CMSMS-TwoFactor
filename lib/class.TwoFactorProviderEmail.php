@@ -59,7 +59,13 @@ class TwoFactorProviderEmail extends TwoFactorProvider
         $mailer->IsHTML(true);
         $mailer->SetBody($body);
         
-        return $mailer->Send();
+        try {
+            $sent = $mailer->Send();
+        } catch (\Throwable $e) {
+            error_log('TwoFactorProviderEmail: mail send failed: ' . $e->getMessage());
+            return false;
+        }
+        return (bool) $sent;
     }
 
     public function validate_authentication($user_id, $params = [])
