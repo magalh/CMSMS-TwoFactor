@@ -105,6 +105,7 @@ $lang['enter_code_from_app'] = 'Enter the 6-digit code from your authenticator a
 $lang['authentication_code'] = 'Authentication Code';
 $lang['invalid_code'] = 'Invalid code. Please try again.';
 $lang['code_resent'] = 'A new verification code has been sent.';
+$lang['code_send_failed'] = 'We could not send your verification code right now. Please try another method or contact your administrator.';
 $lang['verify'] = 'Verify';
 
 $lang['provider_email'] = 'Email Verification';
@@ -253,6 +254,7 @@ $lang['account_locked_minutes'] = 'Too many failed attempts. Please try again in
 $lang['resend_verification_code'] = 'Resend verification code';
 $lang['use_backup_code'] = 'Use a backup code';
 $lang['use_other_method'] = 'Use a different method';
+$lang['back_to_primary'] = 'Back to your primary method';
 $lang['totp_verification_title'] = 'Two-Factor Authentication';
 $lang['verification_code_label'] = 'Verification Code';
 $lang['sms_verification_title'] = 'SMS Verification';

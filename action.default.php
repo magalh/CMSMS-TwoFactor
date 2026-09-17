@@ -102,7 +102,8 @@ if (isset($params['provider'])) {
     }
     unset($_SESSION['twofactor_email_sent']);
     unset($_SESSION['twofactor_sms_sent']);
-    $url = $config['root_url'] . '/twofactor/verify?_=' . time();
+    $url = $this->GetVerifyUrl('', ['_' => time()]);
+    session_write_close();
     redirect($url);
     exit;
 }
@@ -113,7 +114,8 @@ if (isset($params['resend'])) {
     unset($_SESSION['twofactor_email_sent']);
     unset($_SESSION['twofactor_sms_sent']);
     $_SESSION['twofactor_message'] = $this->Lang('code_resent');
-    $url = $config['root_url'] . '/twofactor/verify?_=' . time();
+    $url = $this->GetVerifyUrl('', ['_' => time()]);
+    session_write_close();
     redirect($url);
     exit;
 }
@@ -236,15 +238,21 @@ if (strpos($provider_class, 'TOTP') !== false) {
     $template = 'verify_email.tpl';
     // Send email code if not already sent
     if (!isset($_SESSION['twofactor_email_sent'])) {
-        $provider->generate_and_send_code($uid);
-        $_SESSION['twofactor_email_sent'] = true;
+        if ($provider->generate_and_send_code($uid)) {
+            $_SESSION['twofactor_email_sent'] = true;
+        } else {
+            $error = $this->Lang('code_send_failed');
+        }
     }
 } elseif (strpos($provider_class, 'SMS') !== false) {
     $template = 'verify_sms.tpl';
     // Send SMS code if not already sent
     if (!isset($_SESSION['twofactor_sms_sent'])) {
-        $provider->generate_and_send_code($uid);
-        $_SESSION['twofactor_sms_sent'] = true;
+        if ($provider->generate_and_send_code($uid)) {
+            $_SESSION['twofactor_sms_sent'] = true;
+        } else {
+            $error = $this->Lang('code_send_failed');
+        }
     }
 } elseif (strpos($provider_class, 'Passkey') !== false) {
     $template = 'verify_passkey.tpl';
@@ -298,10 +306,22 @@ foreach ($available as $key => $p) {
         $alt_methods[] = [
             'slug'  => $slug_map[$key],
             'label' => $this->Lang($label_map[$key]),
+            'url'   => $this->GetVerifyUrl($slug_map[$key], ['_' => time()]),
         ];
     }
 }
 $tpl->assign('alt_methods', $alt_methods);
+
+// Pre-built, url_rewriting-aware navigation URLs for the verify templates.
+// (Templates must not hardcode /twofactor/verify paths, which only resolve
+// when mod_rewrite pretty URLs are enabled.)
+$tpl->assign('resend_url',  $this->GetVerifyUrl('resend', ['_' => time()]));
+$tpl->assign('backup_url',  $this->GetVerifyUrl('backup-codes', ['_' => time()]));
+$tpl->assign('primary_url', $this->GetVerifyUrl('primary', ['_' => time()]));
+// Explicit frontend POST target for the verify form. {form_start} guesses the
+// admin dispatcher (moduleinterface.php) in this login context, which breaks
+// when pretty URLs are off, so we post to the resolved frontend verify URL.
+$tpl->assign('form_action', $this->GetVerifyUrl());
 
 $handlers = ob_list_handlers();
 for ($cnt = 0; $cnt < sizeof($handlers); $cnt++) { ob_end_clean(); }

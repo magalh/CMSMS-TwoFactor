@@ -1,0 +1,84 @@
+/* TwoFactor verification page: alternative methods block.
+   Self-contained styles so the presentation is consistent regardless of the
+   admin login theme. Scoped under .tfa-alt to avoid clashing with theme CSS. */
+
+.tfa-alt {
+	margin-top: 18px;
+	padding-top: 14px;
+	border-top: 1px solid rgba(0, 0, 0, .12);
+	text-align: left;
+}
+
+.tfa-alt__label {
+	display: block;
+	font-size: 12px;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+	color: #888;
+	margin-bottom: 8px;
+	text-align: center;
+}
+
+.tfa-alt__list {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.tfa-method {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 9px 12px;
+	border: 1px solid rgba(0, 0, 0, .12);
+	border-radius: 6px;
+	background: #fff;
+	color: #333;
+	text-decoration: none;
+	font-size: 14px;
+	line-height: 1.2;
+	transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+}
+
+.tfa-method:hover,
+.tfa-method:focus {
+	border-color: #4a90e2;
+	background: #f5f9ff;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+	color: #1b1b1b;
+}
+
+.tfa-method__icon {
+	flex: 0 0 auto;
+	width: 20px;
+	height: 20px;
+	color: #4a90e2;
+}
+
+.tfa-method__icon svg {
+	width: 20px;
+	height: 20px;
+	display: block;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.8;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.tfa-method__label {
+	flex: 1 1 auto;
+}
+
+.tfa-method__chevron {
+	flex: 0 0 auto;
+	color: #bbb;
+}
+
+.tfa-method--backup {
+	border-style: dashed;
+}
+
+.tfa-method--backup .tfa-method__icon {
+	color: #e0912f;
+}

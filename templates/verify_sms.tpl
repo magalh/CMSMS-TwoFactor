@@ -8,6 +8,7 @@
 		<meta name="viewport" content="initial-scale=1.0 maximum-scale=1.0 user-scalable=no" />
 		<link rel="shortcut icon" href="{$config.admin_url}/themes/OneEleven/images/favicon/cmsms-favicon.ico"/>
 		<link rel="stylesheet" href="{$config.admin_url}/loginstyle.php" />
+		<link rel="stylesheet" href="{$mod_url}/assets/twofactor_verify.css" />
 		{cms_jquery}
 	</head>
 	<body id="login">
@@ -21,7 +22,7 @@
 						<h1>{$mod->Lang('sms_verification_title')}</h1>
 					</header>
 					<p>{$mod->Lang('sms_verification_sent')}</p>
-					{form_start action='twofactor' module='TwoFactor'}
+					{form_start action='default' module='TwoFactor' url=$form_action}
 						{xt_form_csrf}
 						<fieldset>
 							<label for="authcode">{$mod->Lang('verification_code_label')}</label>
@@ -67,22 +68,10 @@
 					{/if}
 					{if !isset($locked_seconds) || $locked_seconds === false}
 						<p class="forgotpw">
-							<a href="{root_url}/twofactor/verify/resend&_={$smarty.now}">{$mod->Lang('resend_verification_code')}</a> &nbsp;
+							<a href="{$resend_url}">{$mod->Lang('resend_verification_code')}</a> &nbsp;
 						</p>
 					{/if}
-					{if !empty($alt_methods)}
-						<p class="forgotpw">
-							{$mod->Lang('use_other_method')}:
-							{foreach $alt_methods as $alt}
-								<a href="{root_url}/twofactor/verify/{$alt.slug}&_={$smarty.now}">{$alt.label}</a>{if !$alt@last} | {/if}
-							{/foreach}
-						</p>
-					{/if}
-					{if $has_backup_codes && !$using_backup && (!isset($locked_seconds) || $locked_seconds === false)}
-						<p class="forgotpw">
-							<a href="{root_url}/twofactor/verify/backup-codes&_={$smarty.now}">{$mod->Lang('use_backup_code')}</a> &nbsp;
-						</p>
-					{/if}
+					{include file=$mod->GetTemplateResource('verify_alt_methods.tpl')}
 				</div>
 				<footer>
 					<small class="copyright">Copyright &copy; <a rel="external" href="http://www.cmsmadesimple.org">CMS Made Simple&trade;</a></small>
