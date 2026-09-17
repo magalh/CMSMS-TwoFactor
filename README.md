@@ -13,7 +13,7 @@ Two-factor authentication module for CMS Made Simple. Adds 2FA to the admin logi
 ## Requirements
 
 - CMS Made Simple 2.2.23+
-- PHP 7.4+
+- PHP 8.1+
 - CMSMSExt module >= 1.5.2
 - HTTPS (required for Passkey/WebAuthn support)
 

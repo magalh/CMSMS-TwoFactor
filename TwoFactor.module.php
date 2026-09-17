@@ -11,7 +11,7 @@ class TwoFactor extends CMSModule
 
     public function GetName() { return 'TwoFactor'; }
     public function GetVersion() { return '4.0.0'; }
-    public function MinimumCMSVersion() {return '2.2.22';}
+    public function MinimumCMSVersion() {return '2.2.23';}
     public function GetFriendlyName() { return $this->Lang('friendlyname'); }
     public function GetAdminDescription() { return $this->Lang('admindescription'); }
     public function IsPluginModule() { return TRUE; }
@@ -59,8 +59,38 @@ class TwoFactor extends CMSModule
 
     public function InitializeFrontend()
     { 
+        $this->SetParameterType('subaction', CLEAN_STRING);
+        $this->SetParameterType('_', CLEAN_INT);
         $this->RegisterRoute('/[Tt]wofactor\/verify$/', ['action' => 'default']);
         $this->RegisterRoute('/[Tt]wofactor\/verify\/(?P<subaction>.*)$/', ['action' => 'default']);
+    }
+
+    /**
+     * Generate the pretty URL path for the verification route.
+     *
+     * Called automatically by CMSMS whenever create_url() / {cms_action_url}
+     * builds a URL for this module's "default" action on a frontend request.
+     * Returning a path here makes the core emit the SEF form
+     * (twofactor/verify[/<subaction>]) when url_rewriting is enabled, and the
+     * standard mact URL when it is not. CMSMS handles the mod_rewrite vs
+     * internal vs none difference for us.
+     *
+     * @param string $id       The module action id (e.g. cntnt01).
+     * @param string $action   The action name.
+     * @param string $returnid The page id the action renders on.
+     * @param array  $params   Action parameters.
+     * @param bool   $inline   Whether the action is rendered inline.
+     * @return string|null The pretty path, or null to use the default URL.
+     */
+    public function get_pretty_url($id, $action, $returnid = '', $params = [], $inline = false)
+    {
+        if ($action !== 'default') return null;
+
+        $url = 'twofactor/verify';
+        if (!empty($params['subaction'])) {
+            $url .= '/' . trim((string) $params['subaction'], '/');
+        }
+        return $url;
     }
 
     public function InitializeAdmin()
@@ -109,7 +139,7 @@ class TwoFactor extends CMSModule
         
         $post_data = filter_input_array(INPUT_POST) ?: [];
         $_SESSION['twofactor_rememberme'] = !empty($post_data['loginremember']) ? 1 : 0;
-        $redirect_url = $config['root_url'] . '/twofactor/verify';
+        $redirect_url = $this->GetVerifyUrl();
         
         // Clear any output buffers
         while (ob_get_level()) {
@@ -119,6 +149,82 @@ class TwoFactor extends CMSModule
         session_write_close();
         header('Location: ' . $redirect_url, true, 302);
         exit;
+    }
+
+    /**
+     * Build the absolute URL to the 2FA verification page.
+     *
+     * Prefers the native CMSMS create_url() (which calls get_pretty_url()
+     * above and therefore honours the site's url_rewriting mode: SEF path,
+     * index.php/... , or a mact query URL). Falls back to an explicit builder
+     * for the admin login-hook context, where a frontend URL cannot be
+     * generated reliably.
+     *
+     * @param string $subaction Optional route sub-action (e.g. 'resend',
+     *                          'backup-codes', 'primary', or a method slug).
+     * @param array  $extra     Extra query parameters to append (e.g. cache-buster).
+     * @return string
+     */
+    public function GetVerifyUrl($subaction = '', array $extra = [])
+    {
+        $subaction = trim((string) $subaction, '/');
+        $params = $extra;
+        if ($subaction !== '') $params['subaction'] = $subaction;
+
+        // Native path: create_url() -> get_pretty_url(), honouring url_rewriting.
+        // Guard in try/catch because create_url() relies on frontend request
+        // context that is not present during the admin login hook.
+        try {
+            $url = $this->create_url('cntnt01', 'default', '', $params);
+            if (is_string($url) && $url !== ''
+                && strpos($url, 'moduleinterface.php') === false
+                && strpos($url, '/admin/') === false) {
+                // Frontend URL only. create_url() escapes '&' as '&amp;' for
+                // HTML output; undo it for a raw Location header / redirect.
+                return str_replace('&amp;', '&', $url);
+            }
+        } catch (\Throwable $e) {
+            // fall through to explicit builder
+        }
+
+        return $this->buildVerifyUrlFallback($subaction, $extra);
+    }
+
+    /**
+     * Explicit url_rewriting-aware builder used when create_url() is not
+     * available (admin login hook). Mirrors what get_pretty_url()/create_url()
+     * would produce.
+     */
+    private function buildVerifyUrlFallback($subaction, array $extra)
+    {
+        $config = cms_utils::get_config();
+        $root = defined('CMS_ROOT_URL') ? CMS_ROOT_URL : '';
+        if ($root === '' && !empty($config['root_url'])) {
+            $root = $config['root_url'];
+        }
+        $root = rtrim((string) $root, '/');
+        $mode = isset($config['url_rewriting']) ? $config['url_rewriting'] : 'none';
+        $subaction = trim((string) $subaction, '/');
+
+        if ($mode === 'mod_rewrite' || $mode === 'internal') {
+            $prefix = ($mode === 'internal') ? '/index.php' : '';
+            $url = $root . $prefix . '/twofactor/verify';
+            if ($subaction !== '') $url .= '/' . rawurlencode($subaction);
+            if ($extra) $url .= '?' . http_build_query($extra);
+            return $url;
+        }
+
+        // No pretty URLs: canonical frontend module action. Commas in the mact
+        // value must NOT be url-encoded or CMSMS will fail to parse it.
+        // Frontend action params must be prefixed with the module action id
+        // (cntnt01) so CMSMS extracts them into $params; a bare "subaction"
+        // is ignored.
+        $qs = [];
+        if ($subaction !== '') $qs['cntnt01subaction'] = $subaction;
+        $qs = array_merge($qs, $extra);
+        $url = $root . '/index.php?mact=TwoFactor,cntnt01,default,0';
+        if ($qs) $url .= '&' . http_build_query($qs);
+        return $url;
     }
 
     public function GetHelp() {

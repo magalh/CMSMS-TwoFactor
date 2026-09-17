@@ -18,6 +18,10 @@ $this->RemoveEventHandler('TwoFactor', 'BeforeVerification');
 $this->RemoveEventHandler('TwoFactor', 'AfterVerificationSuccess');
 $this->RemoveEventHandler('TwoFactor', 'AfterVerificationFail');
 
+// Remove the legacy pre-4.0.0 login interceptor handler if a site was
+// upgraded from an old version that hooked Core::LoginPost.
+$this->RemoveEventHandler('Core', 'LoginPost');
+
 $db = $this->GetDb();
 $dict = NewDataDictionary($db);
 
