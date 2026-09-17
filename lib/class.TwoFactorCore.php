@@ -5,6 +5,29 @@ class TwoFactorCore
 {
     private static $providers = [];
 
+    /**
+     * Resolve the site's base URL robustly. CMS_ROOT_URL is always populated
+     * in a web request; $config['root_url'] can be empty when the site relies
+     * on auto-detection, which previously produced a blank domain/rpId.
+     */
+    public static function site_url()
+    {
+        if (defined('CMS_ROOT_URL') && CMS_ROOT_URL) {
+            return CMS_ROOT_URL;
+        }
+        $config = \cms_utils::get_config();
+        return $config['root_url'] ?? '';
+    }
+
+    /**
+     * The site's host/domain (e.g. "example.com"), resolved robustly.
+     */
+    public static function site_domain()
+    {
+        $host = parse_url(self::site_url(), PHP_URL_HOST);
+        return $host ?: '';
+    }
+
     public static function register_providers()
     {
         self::$providers = [

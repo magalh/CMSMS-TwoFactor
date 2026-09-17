@@ -42,8 +42,7 @@ class TwoFactorProviderSMS extends TwoFactorProvider
         // Prioritize SMS credits if enabled
         if ($smscredit_enabled) {
             $license_key = $mod->GetPreference('twofactor_sms_product_key', '');
-            $config = cms_utils::get_config();
-            $domain = parse_url($config['root_url'], PHP_URL_HOST);
+            $domain = TwoFactorCore::site_domain();
             
             if ($license_key) {
                 $result = TwoFactorAPI::send_verification($license_key, $domain, $phone);
@@ -88,8 +87,7 @@ class TwoFactorProviderSMS extends TwoFactorProvider
         // Prioritize SMS credits if enabled
         if ($smscredit_enabled) {
             $license_key = $mod->GetPreference('twofactor_sms_product_key', '');
-            $config = cms_utils::get_config();
-            $domain = parse_url($config['root_url'], PHP_URL_HOST);
+            $domain = TwoFactorCore::site_domain();
             
             if ($license_key) {
                 $result = TwoFactorAPI::verify_code($license_key, $domain, $phone, $submitted_code);

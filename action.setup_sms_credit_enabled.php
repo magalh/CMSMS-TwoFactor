@@ -15,8 +15,7 @@ if (isset($params['resend_code'])) {
     $pending = TwoFactorUserMeta::get($uid, 'sms_phone_pending');
     if ($pending) {
         $license_key = $this->GetPreference('twofactor_sms_product_key', '');
-        $config = cms_utils::get_config();
-        $domain = parse_url($config['root_url'], PHP_URL_HOST);
+        $domain = TwoFactorCore::site_domain();
         
         if ($license_key) {
             $result = TwoFactorAPI::send_verification($license_key, $domain, $pending);
@@ -44,8 +43,7 @@ if (isset($params['verify_code'])) {
     
     if ($code && $pending) {
         $license_key = $this->GetPreference('twofactor_sms_product_key', '');
-        $config = cms_utils::get_config();
-        $domain = parse_url($config['root_url'], PHP_URL_HOST);
+        $domain = TwoFactorCore::site_domain();
         
         $result = TwoFactorAPI::verify_code($license_key, $domain, $pending, $code);
         
@@ -69,8 +67,7 @@ if (isset($params['send_verification'])) {
     $phone = trim($params['phone'] ?? '');
     if ($phone) {
         $license_key = $this->GetPreference('twofactor_sms_product_key', '');
-        $config = cms_utils::get_config();
-        $domain = parse_url($config['root_url'], PHP_URL_HOST);
+        $domain = TwoFactorCore::site_domain();
         
         if ($license_key) {
             $normalized_phone = TwoFactorAPI::normalize_phone($phone);

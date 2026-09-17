@@ -260,10 +260,24 @@ class TwoFactorProviderPasskey extends TwoFactorProvider
         return self::$AAGUID_MAP[$aaguid] ?? null;
     }
 
+    /**
+     * Resolve the site's base URL robustly. CMS_ROOT_URL is always populated
+     * in a web request; $config['root_url'] can be empty when the site relies
+     * on auto-detection. An empty value here previously caused the WebAuthn
+     * rpId to fall back to 'localhost', breaking passkeys on real domains.
+     */
+    private static function get_site_url()
+    {
+        if (defined('CMS_ROOT_URL') && CMS_ROOT_URL) {
+            return CMS_ROOT_URL;
+        }
+        $config = \cms_utils::get_config();
+        return $config['root_url'] ?? '';
+    }
+
     public static function get_webauthn_instance()
     {
-        $config = \cms_utils::get_config();
-        $rootUrl = $config['root_url'] ?? '';
+        $rootUrl = self::get_site_url();
         $parsed = parse_url($rootUrl);
         $rpId = $parsed['host'] ?? 'localhost';
         $sitename = get_site_preference('sitename', 'CMS Made Simple');
@@ -276,8 +290,7 @@ class TwoFactorProviderPasskey extends TwoFactorProvider
         // Server-side: need OpenSSL
         if (!function_exists('openssl_verify')) return false;
         // HTTPS check (WebAuthn requires secure context)
-        $config = \cms_utils::get_config();
-        $rootUrl = $config['root_url'] ?? '';
+        $rootUrl = self::get_site_url();
         // WebAuthn spec requires secure context (HTTPS or loopback for development)
         $isSecure = (strpos($rootUrl, 'https://') === 0);
         if (!$isSecure) {
