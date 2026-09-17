@@ -103,6 +103,7 @@ $lang['cancel'] = 'Cancel';
 $lang['two_factor_required'] = 'Two-Factor Authentication Required';
 $lang['enter_code_from_app'] = 'Enter the 6-digit code from your authenticator app';
 $lang['authentication_code'] = 'Authentication Code';
+$lang['enter_authenticator_code'] = 'Enter the code from your authenticator app:';
 $lang['invalid_code'] = 'Invalid code. Please try again.';
 $lang['code_resent'] = 'A new verification code has been sent.';
 $lang['code_send_failed'] = 'We could not send your verification code right now. Please try another method or contact your administrator.';

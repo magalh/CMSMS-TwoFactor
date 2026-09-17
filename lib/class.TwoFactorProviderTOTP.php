@@ -28,13 +28,11 @@ class TwoFactorProviderTOTP extends TwoFactorProvider
 
     public function authentication_page($user)
     {
-        echo '<p class="pagetext">Enter the code from your authenticator app:</p>';
-        echo '<p class="pageinput">';
-        echo '<label for="authcode">Authentication Code:</label><br/>';
-        echo '<input type="text" inputmode="numeric" name="authcode" id="authcode" 
-              class="input" value="" size="20" pattern="[0-9 ]*" 
-              placeholder="123 456" autocomplete="off" autofocus />';
-        echo '</p>';
+        $mod = \cms_utils::get_module('TwoFactor');
+        $smarty = \cmsms()->GetSmarty();
+        $tpl = $smarty->CreateTemplate($mod->GetTemplateResource('verify_totp_field.tpl'), null, null, $smarty);
+        $tpl->assign('mod', $mod);
+        $tpl->display();
     }
 
     public function validate_authentication($user_id, $params = [])
