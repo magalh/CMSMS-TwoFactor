@@ -26,11 +26,10 @@ class TwoFactor extends CMSModule
 
     public function __construct()
     {
-        $autoload_file = cms_join_path($this->GetModulePath(), 'vendor', 'autoload.php');
-        if (file_exists($autoload_file)) {
-            require_once $autoload_file;
-        }
-        
+        // Self-contained PSR-4 autoloading for the bundled robthree/twofactorauth
+        // library and this module's own lib/ classes. We intentionally do NOT
+        // require Composer's generated vendor/autoload.php so the distributed
+        // package doesn't need to ship Composer's ClassLoader machinery.
         spl_autoload_register([$this, '_autoloader']);
         parent::__construct();
         $smarty = cmsms()->GetSmarty();
@@ -43,15 +42,31 @@ class TwoFactor extends CMSModule
 
     private function _autoloader($classname)
     {
+        // PSR-4: RobThree\Auth\* maps to vendor/robthree/twofactorauth/lib/*
+        if (strpos($classname, 'RobThree\\Auth\\') === 0) {
+            $relative = substr($classname, strlen('RobThree\\Auth\\'));
+            $relative = str_replace('\\', DIRECTORY_SEPARATOR, $relative);
+            $fn = cms_join_path(
+                $this->GetModulePath(),
+                'vendor', 'robthree', 'twofactorauth', 'lib',
+                $relative . '.php'
+            );
+            if (file_exists($fn)) {
+                require_once($fn);
+            }
+            return;
+        }
+
+        // This module's own classes: lib/class.<ClassName>.php
         $parts = explode('\\', $classname);
         $classname = end($parts);
-        
+
         $fn = cms_join_path(
             $this->GetModulePath(),
             'lib',
             'class.' . $classname . '.php'
         );
-        
+
         if (file_exists($fn)) {
             require_once($fn);
         }

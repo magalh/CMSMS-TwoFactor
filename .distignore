@@ -5,10 +5,30 @@
 .amazonq
 .vscode
 composer.lock
-vendor
 releases
 build
 tmp_*
 assets/banner.jpg
 assets/icon.png
 assets/thumbnail.jpg
+# The module autoloads the bundled robthree/twofactorauth library via its own
+# PSR-4 resolver (see TwoFactor.module.php::_autoloader), so Composer's
+# generated autoloader machinery is not shipped. Only the library's lib/
+# sources are required at runtime.
+vendor/autoload.php
+vendor/composer
+vendor/robthree/twofactorauth/tests
+vendor/robthree/twofactorauth/testsDependency
+vendor/robthree/twofactorauth/docs
+vendor/robthree/twofactorauth/demo
+vendor/robthree/twofactorauth/.github
+vendor/robthree/twofactorauth/.gitignore
+vendor/robthree/twofactorauth/.php-cs-fixer.dist.php
+vendor/robthree/twofactorauth/phpunit.xml
+vendor/robthree/twofactorauth/phpstan.neon
+vendor/robthree/twofactorauth/TwoFactorAuth.phpproj
+vendor/robthree/twofactorauth/TwoFactorAuth.sln
+vendor/robthree/twofactorauth/logo.png
+vendor/robthree/twofactorauth/multifactorauthforeveryone.png
+vendor/robthree/twofactorauth/CHANGELOG.md
+vendor/robthree/twofactorauth/README.md
