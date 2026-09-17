@@ -73,5 +73,11 @@
     <p style="text-align: center; margin-top: 30px;">
         <a href="{$product_url}" target="_blank" class="cta" data-icon="my-icon-star" style="margin-left: 10px;">Get TwoFactor Pro</a>
     </p>
+
+    <p style="text-align: center; margin-top: 30px;">
+        <a href="https://pixelsolutions.biz" target="_blank" rel="noopener noreferrer">
+            <img src="https://pixelsolution.s3.eu-south-1.amazonaws.com/logos/LOGO_3_COLOR_300.png" alt="Pixel Solutions" style="height:40px;" />
+        </a>
+    </p>
 </div>
 </section>
