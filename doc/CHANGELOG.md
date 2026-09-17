@@ -1,5 +1,16 @@
 # Changelog
 
+## Version 4.0.0
+- Improved: two-factor login now works smoothly with the modern CMS Made Simple login process (2.2.23 and newer), with no more forced logout-and-back-in behind the scenes
+- Improved: the verification page and its links now work correctly whether or not your site uses pretty URLs
+- Improved: choosing a different verification method is now clearer. Alternatives are shown as a tidy list of buttons with an icon for each method, instead of a cramped line of text links
+- Fixed: entering your code could fail with a "Not Found" error on sites without pretty URLs. Verification now submits reliably in all setups
+- Fixed: the "resend code", "use another method", "use a backup code", and "back to primary method" links now always work
+- Fixed: choosing email or SMS verification no longer shows an error page when the message cannot be sent. You now get a clear message and can switch to another method
+- Fixed: the backup codes verification screen could fail to load; it now displays correctly
+- Changed: now requires CMS Made Simple 2.2.23 or newer, and PHP 8.1 or newer
+- Housekeeping: upgrading from an older version and uninstalling now clean up leftover login settings automatically
+
 ## Version 3.0.0
 - Added Passkey / WebAuthn (FIDO2) support as a new authentication method
 - Built self-contained WebAuthn server library (no external dependencies)
